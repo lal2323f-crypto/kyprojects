@@ -3,166 +3,207 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>英語1学期 文法テスト</title>
+<title>英語1学期 復習テスト</title>
 <style>
 :root {
-  --bg: #F2EFE8;
+  --bg: #F4F4F6;
   --card: #FFFFFF;
-  --ink: #1C1C1C;
+  --ink: #1A1A1A;
+  --ink2: #444;
   --faint: #9A9690;
   --red: #C0392B;
   --red-bg: #FDECEA;
   --red-border: #E8A09A;
   --blue: #2C4A7C;
-  --green: #27724A;
+  --blue-light: #EEF2FA;
+  --green: #1E7A4A;
   --green-bg: #E8F5ED;
   --green-border: #7DC49A;
-  --border: #D8D2C8;
-  --line: #EDE8E0;
-  --gold: #F4C842;
-  --teal: #2E86AB;
+  --border: #E0DCd8;
+  --line: #EDEDED;
+  --gold: #C8900A;
+  --gold-bg: #FEF3D0;
+  --gold-border: #F0CC70;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   background: var(--bg);
-  background-image: linear-gradient(var(--line) 1px, transparent 1px);
-  background-size: 100% 28px;
   font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Yu Gothic','Meiryo',sans-serif;
   color: var(--ink);
   min-height: 100vh;
-  padding-bottom: 80px;
+  padding-bottom: 60px;
 }
 
-/* ── SELECT SCREEN ── */
+/* ══════════════════════════
+   SELECT SCREEN
+══════════════════════════ */
 #select-screen { display: block; }
-.sel-header {
-  background: var(--blue); color: #fff;
-  padding: 18px 20px 16px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
-.sel-eyebrow { font-size: 10px; opacity: 0.6; letter-spacing: 0.1em; margin-bottom: 4px; }
-.sel-title { font-size: 20px; font-weight: 800; letter-spacing: 0.02em; }
-.sel-subtitle { font-size: 12px; opacity: 0.55; margin-top: 4px; }
-.sel-body { padding: 20px 14px; display: flex; flex-direction: column; gap: 14px; }
 
+.sel-header {
+  background: var(--card);
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sel-eyebrow {
+  font-size: 10px; color: var(--faint);
+  letter-spacing: 0.1em; margin-bottom: 6px;
+}
+.sel-title {
+  font-size: 22px; font-weight: 800;
+  color: var(--ink); letter-spacing: -0.01em;
+  line-height: 1.2; margin-bottom: 8px;
+}
+.sel-desc {
+  font-size: 12.5px; color: var(--ink2);
+  line-height: 1.65;
+}
+
+/* 目次 label */
+.index-label {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 18px 10px;
+}
+.index-tag {
+  background: var(--blue); color: #fff;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+  padding: 4px 16px 4px 12px;
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 0 100%);
+  white-space: nowrap; flex-shrink: 0;
+}
+.index-line { flex: 1; height: 1px; background: var(--border); }
+
+/* Period card */
 .period-card {
   background: var(--card);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin: 0 14px 12px;
   overflow: hidden;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-.period-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); border-color: #b8b0a4; }
 
-.pc-head {
+/* clickable main area */
+.pc-main {
   display: flex; align-items: center; gap: 14px;
-  padding: 16px 18px 12px;
-  border-bottom: 1px solid var(--line);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
 }
-.pc-num {
-  width: 44px; height: 44px; border-radius: 10px;
+.pc-main:hover { background: #FAFAFA; }
+.pc-main:active { background: #F2F2F2; }
+
+.pc-badge {
+  width: 46px; height: 46px; border-radius: 10px;
   background: var(--blue); color: #fff;
   display: flex; align-items: center; justify-content: center;
-  font-family: Georgia, serif; font-size: 22px; font-weight: 700;
+  font-family: Georgia, serif; font-size: 24px; font-weight: 700;
   flex-shrink: 0;
 }
-.pc-info { flex: 1; }
-.pc-label { font-size: 17px; font-weight: 800; }
-.pc-meta { font-size: 12px; color: var(--faint); margin-top: 2px; }
-.pc-qcount {
-  font-family: Georgia, serif; font-size: 22px; font-weight: 700;
-  color: var(--blue); text-align: right; flex-shrink: 0;
-}
-.pc-qcount span { font-size: 11px; color: var(--faint); font-family: inherit; font-weight: 400; }
 
-/* stats section inside card */
-.pc-stats { padding: 12px 18px; }
-.pc-no-record {
-  font-size: 12px; color: var(--faint);
-  text-align: center; padding: 6px 0;
-  border: 1.5px dashed var(--border);
-  border-radius: 8px;
+.pc-body { flex: 1; min-width: 0; }
+.pc-title { font-size: 15px; font-weight: 800; line-height: 1.3; margin-bottom: 3px; }
+.pc-topics { font-size: 11.5px; color: var(--faint); line-height: 1.5; }
+.pc-count {
+  display: inline-block; margin-top: 5px;
+  font-size: 11px; font-weight: 700; color: var(--blue);
+  background: var(--blue-light); padding: 2px 8px; border-radius: 10px;
 }
 
-/* growth timeline in card */
-.growth-chain {
-  display: flex; align-items: center;
-  gap: 0; margin-bottom: 10px;
-  overflow-x: auto; padding-bottom: 2px;
+.pc-chevron {
+  font-size: 20px; color: #C0BAB4; flex-shrink: 0;
+  padding-left: 4px;
 }
-.gc-node { text-align: center; flex-shrink: 0; min-width: 52px; }
-.gc-dot {
-  width: 36px; height: 36px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
+
+/* stats strip */
+.pc-stats-strip {
+  border-top: 1px solid var(--line);
+  padding: 10px 14px 11px;
+  background: #FAFAFA;
+}
+
+.pcs-empty {
+  display: flex; align-items: flex-start; gap: 7px;
+  font-size: 12px; color: var(--faint); line-height: 1.5;
+}
+.pcs-empty-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+.pcs-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; flex-wrap: wrap;
+}
+.pcs-icon { font-size: 15px; flex-shrink: 0; }
+.pcs-label { font-size: 12px; font-weight: 700; color: var(--ink2); }
+
+.pcs-best-badge {
+  background: var(--gold-bg); color: var(--gold);
+  border: 1px solid var(--gold-border);
   font-size: 11px; font-weight: 800;
-  margin: 0 auto 3px;
-  border: 2px solid transparent;
+  padding: 2px 9px; border-radius: 20px;
 }
-.gc-dot.dot-first  { background: #EEF2FA; color: var(--blue); border-color: #C5D0E8; }
-.gc-dot.dot-mid    { background: #FEF3E2; color: #E07B1A; border-color: #F4C084; }
-.gc-dot.dot-latest { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
-.gc-dot.dot-only   { background: #EEF2FA; color: var(--blue); border-color: #C5D0E8; }
-.gc-label { font-size: 9px; color: var(--faint); }
-.gc-connector {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; gap: 2px; min-width: 28px;
-  padding-bottom: 14px;
+.pcs-reset-btn {
+  margin-left: auto; flex-shrink: 0;
+  background: none; border: none;
+  font-family: inherit; font-size: 11px;
+  color: var(--faint); cursor: pointer;
+  padding: 2px 0; text-decoration: underline;
 }
-.gc-line { width: 100%; height: 2px; background: var(--border); border-radius: 1px; }
-.gc-delta { font-size: 9px; font-weight: 700; }
-.gc-delta.pos { color: var(--green); }
-.gc-delta.neg { color: var(--red); }
-.gc-delta.neu { color: var(--faint); }
+.pcs-reset-btn:hover { color: var(--red); }
 
-.pc-summary {
-  display: flex; gap: 6px; flex-wrap: wrap;
+.pcs-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pcs-chip {
+  font-size: 12px; font-weight: 700;
+  padding: 3px 11px; border-radius: 20px;
+  border: 1.5px solid var(--green-border);
+  color: var(--green); background: var(--green-bg);
+  white-space: nowrap;
 }
-.pc-stat-chip {
-  background: #F6F3EE; border-radius: 20px;
-  padding: 3px 10px; font-size: 11px; font-weight: 600;
-  color: var(--ink);
+.pcs-chip.chip-current {
+  border-color: var(--blue); color: var(--blue);
+  background: var(--blue-light);
 }
-.pc-stat-chip b { color: var(--blue); }
 
-.pc-footer { padding: 0 18px 16px; }
-.start-btn {
-  width: 100%; padding: 14px;
-  background: var(--blue); color: #fff;
-  border: none; border-radius: 10px;
-  font-family: inherit; font-size: 15px; font-weight: 700;
-  letter-spacing: 0.03em; cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
+/* footer info */
+.sel-footer {
+  margin: 10px 14px 0;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
 }
-.start-btn:hover { opacity: 0.88; }
-.start-btn:active { transform: scale(0.98); }
+.sel-footer p {
+  font-size: 12px; color: var(--faint); line-height: 1.7;
+}
+.sel-footer p + p { margin-top: 6px; }
 
-/* ── QUIZ WRAPPER ── */
+/* ══════════════════════════
+   QUIZ WRAPPER
+══════════════════════════ */
 #quiz-wrapper { display: none; }
 
-/* ── QUIZ HEADER ── */
 .q-header {
   background: var(--blue); color: #fff;
-  padding: 14px 20px; position: sticky; top: 0; z-index: 100;
+  padding: 13px 18px; position: sticky; top: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 .qh-left { display: flex; align-items: center; gap: 10px; }
 .back-btn {
   background: rgba(255,255,255,0.15); border: none; color: #fff;
   border-radius: 6px; padding: 5px 10px;
   font-family: inherit; font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: background 0.1s;
+  cursor: pointer; transition: background 0.1s; white-space: nowrap;
 }
 .back-btn:hover { background: rgba(255,255,255,0.25); }
 .qh-title-wrap { display: flex; flex-direction: column; gap: 1px; }
 .qh-eyebrow { font-size: 9px; opacity: 0.55; letter-spacing: 0.1em; }
-.qh-title { font-size: 15px; font-weight: 700; }
-.prog-wrap { text-align: right; }
+.qh-title { font-size: 14px; font-weight: 700; }
+.prog-wrap { text-align: right; flex-shrink: 0; }
 .prog-text { font-size: 11px; opacity: 0.65; margin-bottom: 5px; }
-.prog-outer { width: 90px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
+.prog-outer { width: 80px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
 .prog-inner { height: 100%; background: #F4C842; border-radius: 3px; transition: width 0.35s ease; width: 0%; }
 
-/* ── SECTION TAB ── */
+/* section tab */
 .sec-tab { display: flex; align-items: center; gap: 10px; margin: 26px 14px 8px; }
 .sec-tag {
   background: var(--blue); color: #fff;
@@ -171,27 +212,28 @@ body {
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
   white-space: nowrap;
 }
-.sec-line { flex: 1; height: 1px; background: var(--blue); opacity: 0.25; }
+.sec-line { flex: 1; height: 1px; background: var(--blue); opacity: 0.2; }
 .sec-sub { font-size: 11px; color: var(--faint); white-space: nowrap; }
 .instr {
   margin: 4px 14px 10px; font-size: 13px; font-weight: 600; color: var(--ink);
-  background: #EEF2FA; border-left: 3px solid var(--blue);
+  background: var(--blue-light); border-left: 3px solid var(--blue);
   padding: 7px 10px; border-radius: 0 3px 3px 0; line-height: 1.6;
 }
 
-/* ── QUESTION CARD ── */
+/* question card */
 .q-card {
   background: var(--card); margin: 0 14px 10px;
-  border-radius: 4px; border: 1.5px solid var(--border);
+  border-radius: 8px; border: 1px solid var(--border);
   overflow: hidden; transition: border-color 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .q-card.is-correct { border-color: var(--green-border); }
 .q-card.is-wrong   { border-color: var(--red-border); }
 .q-head { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px 10px; border-bottom: 1px solid var(--line); }
 .q-badge { font-family: Georgia, serif; font-style: italic; font-size: 12px; color: var(--faint); min-width: 26px; padding-top: 2px; user-select: none; }
-.q-text { font-size: 14px; line-height: 1.7; flex: 1; word-break: break-word; white-space: pre-wrap; }
+.q-text { font-size: 14px; line-height: 1.75; flex: 1; word-break: break-word; white-space: pre-wrap; }
 .q-text em { font-style: normal; text-decoration: underline; text-decoration-color: var(--red); text-underline-offset: 3px; }
-.q-opts { padding: 5px 0; }
+.q-opts { padding: 4px 0; }
 .opt {
   display: flex; align-items: flex-start; gap: 10px;
   width: 100%; border: none; background: none;
@@ -200,7 +242,7 @@ body {
   line-height: 1.5; transition: background 0.1s; position: relative;
 }
 .opt:not(:last-child) { border-bottom: 1px solid var(--line); }
-.opt:hover:not(:disabled) { background: #F6F3EE; }
+.opt:hover:not(:disabled) { background: #F7F5F2; }
 .opt:disabled { cursor: default; }
 .opt-n { font-family: 'Courier New', monospace; font-size: 12px; font-weight: 700; color: var(--faint); min-width: 18px; padding-top: 2px; user-select: none; flex-shrink: 0; }
 .opt-t { flex: 1; }
@@ -219,13 +261,15 @@ body {
 .opt.chosen-correct::after { content: '✓'; color: var(--green); }
 .opt.reveal::after          { content: '✓'; color: var(--green); }
 .opt.chosen-wrong::after    { content: '✗'; color: var(--red); }
-.q-result-tag { display: none; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; padding: 5px 14px; line-height: 1.6; }
+.q-result-tag { display: none; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; padding: 6px 14px; line-height: 1.65; }
 .q-result-tag.show { display: block; }
 .q-result-tag.ok { background: var(--green-bg); color: var(--green); border-top: 1px solid var(--green-border); }
 .q-result-tag.ng { background: var(--red-bg); color: var(--red); border-top: 1px solid var(--red-border); }
 .tag-completed { display: block; margin-top: 3px; font-size: 11px; opacity: 0.85; }
 
-/* ── RESULTS SCREEN ── */
+/* ══════════════════════════
+   RESULTS SCREEN
+══════════════════════════ */
 #results-screen { display: none; padding: 0 0 80px; }
 #results-screen.show { display: block; }
 .res-hero {
@@ -233,7 +277,7 @@ body {
   padding: 32px 20px 28px; color: #fff; position: relative; overflow: hidden;
 }
 .res-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 80% 20%,rgba(244,200,66,0.08) 0%,transparent 60%); pointer-events:none; }
-.res-hero-label { font-size:10px; letter-spacing:0.2em; opacity:0.5; text-transform:uppercase; text-align:center; margin-bottom:20px; }
+.res-hero-label { font-size:10px; letter-spacing:0.2em; opacity:0.5; text-transform:uppercase; text-align:center; margin-bottom:18px; }
 .res-hero-body { display:flex; align-items:center; justify-content:center; gap:24px; }
 .res-donut-wrap { position:relative; flex-shrink:0; }
 .res-donut-wrap svg { display:block; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
@@ -242,82 +286,71 @@ body {
 .res-donut-unit { font-size:11px; opacity:0.55; margin-top:1px; }
 .res-detail { display:flex; flex-direction:column; gap:6px; }
 .res-frac { font-family:Georgia,serif; line-height:1; }
-.res-frac-num { font-size:56px; font-weight:700; letter-spacing:-2px; }
+.res-frac-num { font-size:54px; font-weight:700; letter-spacing:-2px; }
 .res-frac-denom { font-size:18px; opacity:0.45; }
 .res-frac-unit { font-size:12px; opacity:0.55; display:block; margin-top:2px; }
-.res-miss { display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.1); border-radius:20px; padding:4px 10px; font-size:12px; font-weight:600; margin-top:4px; width:fit-content; }
-.res-grade { margin:18px 20px 0; border-radius:10px; padding:12px 16px; font-size:15px; font-weight:700; text-align:center; letter-spacing:0.03em; display:flex; align-items:center; justify-content:center; gap:8px; }
+.res-miss { display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.12); border-radius:20px; padding:4px 10px; font-size:12px; font-weight:600; margin-top:4px; width:fit-content; }
+.res-grade { margin:16px 20px 0; border-radius:10px; padding:12px 16px; font-size:15px; font-weight:700; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px; }
 
-/* ── GROWTH VISUALIZATION (results) ── */
+/* growth section */
 .res-section-wrap { padding: 0 14px; }
-.res-section-head { display:flex; align-items:center; gap:8px; margin:22px 0 12px; }
+.res-section-head { display:flex; align-items:center; gap:8px; margin:20px 0 10px; }
 .res-section-head-line { flex:1; height:1px; background:var(--border); }
 .res-section-head-text { font-size:11px; font-weight:700; letter-spacing:0.1em; color:var(--faint); text-transform:uppercase; white-space:nowrap; }
 
-/* Session growth box */
-.growth-box {
-  background: var(--card); border: 1.5px solid var(--border);
-  border-radius: 12px; padding: 16px; margin-bottom: 14px;
+/* growth card */
+.growth-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+  margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-.growth-box-title {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
-  color: var(--blue); text-transform: uppercase; margin-bottom: 14px;
-  display: flex; align-items: center; gap: 6px;
+.growth-card-head {
+  padding: 11px 14px 10px;
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; gap: 7px;
+  background: #FAFAFA;
 }
-.growth-box-title::before { content:''; display:block; width:3px; height:14px; background:var(--blue); border-radius:2px; }
+.growth-card-head-icon { font-size: 14px; }
+.growth-card-head-title { font-size: 12px; font-weight: 700; color: var(--ink2); }
+.growth-card-body { padding: 12px 14px 14px; }
 
-/* horizontal step chain */
-.step-chain { display: flex; align-items: center; overflow-x: auto; padding-bottom: 4px; }
+/* step chain (within-session) */
+.step-chain { display: flex; align-items: center; overflow-x: auto; padding-bottom: 2px; gap: 0; }
 .step-node { text-align: center; flex-shrink: 0; }
 .step-circle {
-  width: 52px; height: 52px; border-radius: 50%;
+  width: 54px; height: 54px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-family: Georgia, serif; font-size: 14px; font-weight: 800;
-  margin: 0 auto 4px;
-  border: 2px solid transparent;
+  font-family: Georgia, serif; font-size: 13px; font-weight: 800;
+  margin: 0 auto 5px; border: 2px solid transparent;
 }
-.step-circle.sc-main   { background: #EEF2FA; color: var(--blue); border-color: #C5D0E8; }
-.step-circle.sc-retry  { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
-.step-circle.sc-best   { background: #FFF8E1; color: #E07B1A; border-color: #F4C084; }
+.sc-main  { background: var(--blue-light); color: var(--blue); border-color: #B8C8E0; }
+.sc-retry { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
 .step-node-label { font-size: 10px; color: var(--faint); white-space: nowrap; }
-.step-node-sub { font-size: 9px; color: var(--faint); }
-
-.step-arrow {
-  flex: 1; min-width: 30px; display: flex; flex-direction: column;
-  align-items: center; gap: 2px; padding: 0 4px;
-  padding-bottom: 22px;
-}
-.step-arrow-line { width: 100%; height: 2px; background: var(--border); }
-.step-arrow-delta { font-size: 10px; font-weight: 700; }
+.step-node-sub { font-size: 9px; color: #BDB7B0; }
+.step-arrow { flex: 1; min-width: 28px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding-bottom: 24px; }
+.step-arrow-line { width: 100%; height: 1.5px; background: var(--border); }
+.step-arrow-delta { font-size: 10px; font-weight: 800; }
 .step-arrow-delta.up   { color: var(--green); }
 .step-arrow-delta.down { color: var(--red); }
 .step-arrow-delta.same { color: var(--faint); }
+.growth-summary-text { margin-top: 10px; font-size: 12.5px; font-weight: 700; text-align: center; padding: 8px; border-radius: 6px; }
 
-/* Cross-session history chart */
-.session-history { margin-top: 6px; }
-.sh-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 0;
-  border-bottom: 1px solid var(--line);
-}
+/* cross-session history */
+.sh-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--line); }
 .sh-row:last-child { border-bottom: none; }
-.sh-num {
-  font-size: 10px; font-weight: 700; color: var(--faint);
-  min-width: 36px; flex-shrink: 0;
-}
+.sh-label { font-size: 11px; font-weight: 700; color: var(--faint); min-width: 38px; flex-shrink: 0; }
 .sh-bar-wrap { flex: 1; }
 .sh-bar-bg { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
-.sh-bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
-.sh-pct { font-size: 11px; font-weight: 700; min-width: 34px; text-align: right; flex-shrink: 0; }
-.sh-date { font-size: 9px; color: var(--faint); min-width: 38px; text-align: right; flex-shrink: 0; }
-.sh-now-badge {
-  font-size: 9px; font-weight: 700; background: var(--blue); color: #fff;
-  padding: 1px 5px; border-radius: 3px; flex-shrink: 0;
-}
+.sh-bar-fill { height: 100%; border-radius: 4px; transition: width 0.9s cubic-bezier(.4,0,.2,1); width: 0%; }
+.sh-sub { font-size: 9px; color: #C0BAB4; margin-top: 2px; }
+.sh-pct { font-size: 12px; font-weight: 800; min-width: 36px; text-align: right; flex-shrink: 0; }
+.sh-date { font-size: 9px; color: var(--faint); min-width: 34px; text-align: right; flex-shrink: 0; }
+.sh-now { font-size: 9px; font-weight: 700; background: var(--blue); color: #fff; padding: 1px 6px; border-radius: 3px; flex-shrink: 0; }
+.sh-overall { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; font-weight: 800; text-align: center; }
 
 /* section-level results */
-.sec-card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 14px 10px; margin-bottom:0; position:relative; overflow:hidden; }
-.sec-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:8px 0 0 8px; }
+.sec-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 14px 10px; margin-bottom:0; position:relative; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+.sec-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:10px 0 0 10px; }
 .sec-card.grade-perfect::before { background:#27724A; }
 .sec-card.grade-good::before    { background:#2E86AB; }
 .sec-card.grade-ok::before      { background:#F4A442; }
@@ -332,7 +365,7 @@ body {
 .sec-card-label { font-size:13px; font-weight:700; color:var(--ink); }
 .sec-card-right { display:flex; align-items:baseline; gap:2px; }
 .sec-card-score-big { font-family:Georgia,serif; font-size:20px; font-weight:700; }
-.sec-card-score-total { font-size:12px; opacity:0.45; }
+.sec-card-score-total { font-size:12px; opacity:0.4; }
 .grade-perfect .sec-card-score-big { color:#27724A; }
 .grade-good    .sec-card-score-big { color:#2E86AB; }
 .grade-ok      .sec-card-score-big { color:#E07B1A; }
@@ -344,81 +377,83 @@ body {
 .grade-ok      .sec-bar-fill { background:#F4A442; }
 .grade-ng      .sec-bar-fill { background:#C0392B; }
 .sec-bar-row { display:flex; align-items:center; gap:8px; }
-.sec-bar-pct { font-size:10px; font-weight:700; opacity:0.45; white-space:nowrap; min-width:30px; text-align:right; }
+.sec-bar-pct { font-size:10px; font-weight:700; opacity:0.4; white-space:nowrap; min-width:30px; text-align:right; }
 .wrong-item { background:var(--card); border:1px solid var(--red-border); border-radius:8px; margin-bottom:6px; overflow:hidden; }
 .wrong-item-head { background:var(--red-bg); padding:10px 14px; font-size:13px; line-height:1.6; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
 .wrong-item-ans { padding:8px 14px; font-size:13px; font-weight:700; color:var(--green); display:flex; align-items:center; gap:8px; border-top:1px solid var(--green-border); background:var(--green-bg); }
 .wrong-item-ans::before { content:'正解'; font-size:10px; font-weight:700; background:var(--green); color:#fff; padding:2px 7px; border-radius:3px; letter-spacing:0.05em; white-space:nowrap; }
-.wrong-item-completed { padding:6px 14px 8px; font-size:12px; font-weight:600; color:var(--blue); background:#EEF2FA; border-top:1px solid #C5D0E8; }
+.wrong-item-completed { padding:6px 14px 8px; font-size:12px; font-weight:600; color:var(--blue); background:var(--blue-light); border-top:1px solid #C5D0E8; }
 .sec-wrong-wrap { margin:8px 0 4px; padding-left:8px; border-left:2px solid var(--red-border); }
 .sec-wrong-wrap .wrong-item:last-child { margin-bottom: 0; }
-.sec-card-group { margin-bottom:20px; border-bottom:2px solid var(--line); padding-bottom:20px; }
+.sec-card-group { margin-bottom:16px; border-bottom:1px solid var(--line); padding-bottom:16px; }
 .sec-card-group:last-child { border-bottom:none; padding-bottom:0; }
 
 /* action buttons */
-.action-btns { display:flex; flex-direction:column; gap:10px; margin-top:24px; padding:0 14px; }
-.act-btn { border:none; border-radius:10px; font-family:inherit; font-size:15px; font-weight:700; letter-spacing:0.03em; padding:16px 20px; cursor:pointer; transition:opacity 0.15s,transform 0.1s; }
+.action-btns { display:flex; flex-direction:column; gap:10px; margin-top:22px; padding:0 14px; }
+.act-btn { border:none; border-radius:12px; font-family:inherit; font-size:15px; font-weight:700; padding:16px 20px; cursor:pointer; transition:opacity 0.15s,transform 0.1s; letter-spacing:0.02em; }
 .act-btn:hover { opacity:0.88; }
 .act-btn:active { transform:scale(0.98); }
 .act-btn.primary   { background:var(--red); color:#fff; }
 .act-btn.secondary { background:#EEF2FA; color:var(--blue); border:1.5px solid #C5D0E8; }
 .act-btn.home      { background:var(--blue); color:#fff; }
 
-/* ── RETRY SCREEN ── */
+/* retry screen */
 #retry-screen { display:none; padding-bottom:60px; }
 #retry-screen.show { display:block; }
-.retry-header { background:var(--red); color:#fff; padding:12px 20px; font-size:13px; font-weight:700; letter-spacing:0.06em; display:flex; align-items:center; justify-content:space-between; }
+.retry-header { background:var(--red); color:#fff; padding:12px 18px; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:space-between; }
 .retry-round { font-size:11px; opacity:0.75; font-weight:400; }
 
 /* ── RESPONSIVE ── */
-@media (min-width: 600px) {
-  .sel-body { flex-direction: row; }
-  .period-card { flex: 1; }
-}
 @media (min-width: 768px) {
-  body { background-size: 100% 32px; }
-  .sel-header { padding: 22px 32px 18px; }
-  .sel-title { font-size: 24px; }
-  .sel-body { padding: 24px; gap: 16px; max-width: 900px; margin: 0 auto; }
-  .q-header { padding: 16px 32px; }
-  .qh-title { font-size: 18px; }
-  .prog-outer { width: 140px; }
-  .sec-tab { margin: 32px 24px 10px; }
-  .instr { margin: 6px 24px 12px; font-size: 14px; }
-  .q-card { margin: 0 24px 12px; border-radius: 6px; }
+  body { max-width: 680px; margin: 0 auto; }
+  .sel-header { padding: 24px 24px 20px; }
+  .sel-title { font-size: 26px; }
+  .index-label { padding: 24px 24px 12px; }
+  .period-card { margin: 0 24px 14px; border-radius: 16px; }
+  .sel-footer { margin: 12px 24px 0; }
+  .q-header { padding: 15px 24px; }
+  .sec-tab { margin: 28px 20px 8px; }
+  .instr { margin: 4px 20px 10px; }
+  .q-card { margin: 0 20px 10px; }
   .q-text { font-size: 15px; }
-  .opt { font-size: 14px; padding: 11px 20px; }
-  .res-section-wrap { padding: 0 24px; }
-  .action-btns { padding: 0 24px; }
+  .opt { font-size: 14px; padding: 10px 18px; }
+  .res-section-wrap { padding: 0 20px; }
+  .action-btns { padding: 0 20px; }
 }
 @media (min-width: 1024px) {
-  body { max-width: 860px; margin: 0 auto; box-shadow: 0 0 40px rgba(0,0,0,0.08); }
-  .sel-header { border-radius: 0; }
-  .q-card { margin: 0 28px 14px; border-radius: 8px; }
-  .q-text { font-size: 16px; line-height: 1.8; }
-  .opt { font-size: 15px; padding: 13px 24px; }
-  .res-section-wrap { padding: 0 28px; }
-  .action-btns { padding: 0 28px; }
+  body { max-width: 760px; box-shadow: 0 0 40px rgba(0,0,0,0.07); }
+  .q-text { font-size: 15.5px; line-height: 1.8; }
 }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════
+<!-- ═════════════════════════════════════
      SELECT SCREEN
-═══════════════════════════════════ -->
+═════════════════════════════════════ -->
 <div id="select-screen">
   <div class="sel-header">
     <div class="sel-eyebrow">高３ スタンダードレベル英語 ～文法編～</div>
-    <div class="sel-title">英語1学期 文法テスト</div>
-    <div class="sel-subtitle">テストを選んで始めましょう</div>
+    <h1 class="sel-title">英語1学期 復習テスト</h1>
+    <p class="sel-desc">受けたいテストを選んでください。テストを受けるたびに正答率が記録され、成長が確認できます。</p>
   </div>
-  <div class="sel-body" id="select-cards"></div>
+
+  <div class="index-label">
+    <div class="index-tag">目次</div>
+    <div class="index-line"></div>
+  </div>
+
+  <div id="select-cards"></div>
+
+  <div class="sel-footer">
+    <p>各テストは選択式で、解答するとその場で正誤判定されます。</p>
+    <p>最後に得点と間違えた問題が表示され、間違えた問題だけを解き直すこともできます。</p>
+  </div>
 </div>
 
-<!-- ═══════════════════════════════════
+<!-- ═════════════════════════════════════
      QUIZ WRAPPER
-═══════════════════════════════════ -->
+═════════════════════════════════════ -->
 <div id="quiz-wrapper">
   <div class="q-header">
     <div class="qh-left">
@@ -758,46 +793,26 @@ const P4_SECTIONS = [
 ];
 
 // ═══════════════════════════════════════
-// NORMALIZE DATA TO FLAT ARRAY
+// NORMALIZE
 // ═══════════════════════════════════════
 function normalizeP3(sections) {
   const all = [];
-  sections.forEach(sec => {
-    sec.qs.forEach((q, qi) => {
-      all.push({ ...q, _label: sec.label, _sub: sec.sub, _instr: sec.instr });
-    });
-  });
+  sections.forEach(sec => sec.qs.forEach(q => all.push({ ...q, _label: sec.label, _sub: sec.sub, _instr: sec.instr })));
   return all;
 }
 function normalizeP4(sections) {
   const all = [];
-  sections.forEach(sec => {
-    sec.blocks.forEach(block => {
-      block.qs.forEach(q => {
-        all.push({ ...q, _label: sec.label, _sub: sec.sub, _instr: block.instr });
-      });
-    });
-  });
+  sections.forEach(sec => sec.blocks.forEach(b => b.qs.forEach(q => all.push({ ...q, _label: sec.label, _sub: sec.sub, _instr: b.instr }))));
   return all;
 }
 
 const PERIODS = {
-  p3: {
-    id: 'p3',
-    title: '英語1学期-3 復習テスト',
-    shortTitle: '1学期-3',
-    sections: P3_SECTIONS,
-    allQs: normalizeP3(P3_SECTIONS),
-    lectures: '第1・2・7〜9・12〜14講',
-  },
-  p4: {
-    id: 'p4',
-    title: '英語1学期-4 復習テスト',
-    shortTitle: '1学期-4',
-    sections: P4_SECTIONS,
-    allQs: normalizeP4(P4_SECTIONS),
-    lectures: '第2・3・5〜6・9〜11・13・18〜21・23講',
-  }
+  p3: { id:'p3', title:'英語1学期-3 復習テスト', shortTitle:'英語1学期-3 復習テスト',
+        topics:'時制・不定詞・動名詞・受動態・関係詞ほか',
+        sections: P3_SECTIONS, allQs: normalizeP3(P3_SECTIONS) },
+  p4: { id:'p4', title:'英語1学期-4 復習テスト', shortTitle:'英語1学期-4 復習テスト',
+        topics:'接続詞・代名詞・受動態・前置詞・関係代名詞ほか',
+        sections: P4_SECTIONS, allQs: normalizeP4(P4_SECTIONS) }
 };
 PERIODS.p3.total = PERIODS.p3.allQs.length;
 PERIODS.p4.total = PERIODS.p4.allQs.length;
@@ -806,44 +821,34 @@ PERIODS.p4.total = PERIODS.p4.allQs.length;
 // STORAGE
 // ═══════════════════════════════════════
 const STORE_KEY = 'eigo_quiz_v1';
-
 function loadRecords() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)) || { p3:{sessions:[]}, p4:{sessions:[]} }; }
   catch(e) { return { p3:{sessions:[]}, p4:{sessions:[]} }; }
 }
-function saveRecords(data) {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch(e) {}
-}
-function addSessionRound(periodId, sessionId, roundNum, correct, total, pct) {
+function saveRecords(d) { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch(e) {} }
+function addSessionRound(pid, sessionId, roundNum, correct, total, pct) {
   const data = loadRecords();
-  if (!data[periodId]) data[periodId] = { sessions: [] };
-  const sessions = data[periodId].sessions;
-  let session = sessions.find(s => s.id === sessionId);
-  if (!session) {
-    const d = new Date();
-    session = {
-      id: sessionId,
-      date: `${d.getMonth()+1}/${d.getDate()}`,
-      rounds: []
-    };
-    sessions.push(session);
+  if (!data[pid]) data[pid] = { sessions: [] };
+  let s = data[pid].sessions.find(x => x.id === sessionId);
+  if (!s) {
+    const now = new Date();
+    s = { id: sessionId, date:`${now.getMonth()+1}/${now.getDate()}`, rounds: [] };
+    data[pid].sessions.push(s);
   }
-  const existing = session.rounds.find(r => r.round === roundNum);
-  if (!existing) {
-    session.rounds.push({ round: roundNum, correct, total, pct });
-  }
+  if (!s.rounds.find(r => r.round === roundNum))
+    s.rounds.push({ round: roundNum, correct, total, pct });
+  saveRecords(data);
+}
+function resetPeriodRecords(pid) {
+  const data = loadRecords();
+  data[pid] = { sessions: [] };
   saveRecords(data);
 }
 
 // ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
-let currentPeriod = null;
-let currentSections = null;
-let currentAllQs = null;
-let currentTotal = 0;
-let currentSessionId = null;
-
+let currentPeriod = null, currentSections = null, currentAllQs = null, currentTotal = 0, currentSessionId = null;
 let answered = 0, correctCount = 0, wrongIdxs = [];
 let retrySet = [], retryAnswered = 0, retryCorrect = 0, retryWrong = [], retryRound = 0;
 
@@ -858,9 +863,7 @@ const retryScreen   = document.getElementById('retry-screen');
 const progText      = document.getElementById('prog-text');
 const progBar       = document.getElementById('prog-bar');
 const qhTitle       = document.getElementById('qh-title');
-const backBtn       = document.getElementById('back-btn');
-
-backBtn.addEventListener('click', () => showSelectScreen());
+document.getElementById('back-btn').addEventListener('click', showSelectScreen);
 
 // ═══════════════════════════════════════
 // SELECT SCREEN
@@ -879,155 +882,142 @@ function buildSelectCards() {
     const p = PERIODS[pid];
     const records = loadRecords();
     const sessions = (records[pid] && records[pid].sessions) || [];
-    container.appendChild(makePerionCard(p, sessions));
+    container.appendChild(makePeriodCard(p, sessions));
   });
 }
 
-function makePerionCard(p, sessions) {
+function makePeriodCard(p, sessions) {
+  const num = p.id === 'p3' ? '3' : '4';
   const card = document.createElement('div');
   card.className = 'period-card';
 
-  // head
-  const num = p.id === 'p3' ? '3' : '4';
-  card.innerHTML = `
-    <div class="pc-head">
-      <div class="pc-num">${num}</div>
-      <div class="pc-info">
-        <div class="pc-label">${p.shortTitle}</div>
-        <div class="pc-meta">${p.lectures}</div>
-      </div>
-      <div class="pc-qcount">${p.total}<br><span>問</span></div>
+  // Main clickable area
+  const main = document.createElement('div');
+  main.className = 'pc-main';
+  main.setAttribute('role', 'button');
+  main.setAttribute('tabindex', '0');
+  main.innerHTML = `
+    <div class="pc-badge">${num}</div>
+    <div class="pc-body">
+      <div class="pc-title">${p.shortTitle}</div>
+      <div class="pc-topics">${p.topics}</div>
+      <span class="pc-count">全${p.total}問</span>
     </div>
-    <div class="pc-stats" id="stats-${p.id}"></div>
-    <div class="pc-footer">
-      <button class="start-btn" data-pid="${p.id}">テストを始める →</button>
-    </div>`;
+    <div class="pc-chevron">›</div>`;
+  main.addEventListener('click', () => startPeriod(p.id));
+  main.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') startPeriod(p.id); });
+  card.appendChild(main);
 
-  // stats section
-  const statsEl = card.querySelector(`#stats-${p.id}`);
-  if (sessions.length === 0) {
-    statsEl.innerHTML = '<div class="pc-no-record">まだプレイ記録がありません</div>';
-  } else {
-    // Build growth chain from main-round pcts across sessions
-    const mainPcts = sessions.map(s => {
-      const main = s.rounds.find(r => r.round === 0);
-      return { pct: main ? main.pct : null, date: s.date };
-    }).filter(x => x.pct !== null);
+  // Stats strip
+  const strip = document.createElement('div');
+  strip.className = 'pc-stats-strip';
+  strip.id = `strip-${p.id}`;
+  renderStatsStrip(strip, p.id, sessions);
+  card.appendChild(strip);
 
-    let chainHTML = '';
-    if (mainPcts.length === 1) {
-      chainHTML = `<div class="gc-node"><div class="gc-dot dot-only">${mainPcts[0].pct}%</div><div class="gc-label">1回目</div></div>`;
-    } else {
-      mainPcts.forEach((item, i) => {
-        const isFirst  = i === 0;
-        const isLatest = i === mainPcts.length - 1;
-        const cls = isLatest ? 'dot-latest' : isFirst ? 'dot-first' : 'dot-mid';
-        const lbl = isLatest ? `${i+1}回目\n(最新)` : `${i+1}回目`;
-        chainHTML += `<div class="gc-node"><div class="gc-dot ${cls}">${item.pct}%</div><div class="gc-label">${i+1}回目</div></div>`;
-        if (i < mainPcts.length - 1) {
-          const delta = mainPcts[i+1].pct - item.pct;
-          const dCls = delta > 0 ? 'pos' : delta < 0 ? 'neg' : 'neu';
-          const dTxt = delta > 0 ? `▲+${delta}%` : delta < 0 ? `▼${delta}%` : '±0%';
-          chainHTML += `<div class="gc-connector"><div class="gc-line"></div><div class="gc-delta ${dCls}">${dTxt}</div></div>`;
-        }
-      });
-    }
+  return card;
+}
 
-    const firstPct = mainPcts[0].pct;
-    const lastPct  = mainPcts[mainPcts.length-1].pct;
-    const bestPct  = Math.max(...mainPcts.map(x => x.pct));
-    const totalDelta = lastPct - firstPct;
-    const totalCls = totalDelta > 0 ? 'pos' : totalDelta < 0 ? 'neg' : 'neu';
-    const totalTxt = totalDelta > 0 ? `+${totalDelta}%` : `${totalDelta}%`;
+function renderStatsStrip(strip, pid, sessions) {
+  strip.innerHTML = '';
+  const mainSessions = sessions.filter(s => s.rounds.some(r => r.round === 0));
 
-    statsEl.innerHTML = `
-      <div style="margin-bottom:8px;">
-        <div class="growth-chain">${chainHTML}</div>
-      </div>
-      <div class="pc-summary">
-        <div class="pc-stat-chip">📊 <b>${sessions.length}</b>回プレイ</div>
-        <div class="pc-stat-chip">🏆 最高 <b>${bestPct}%</b></div>
-        ${sessions.length > 1 ? `<div class="pc-stat-chip">成長 <b class="${totalDelta>=0?'':'neg'}" style="color:${totalDelta>=0?'var(--green)':'var(--red)'};">${totalTxt}</b></div>` : ''}
+  if (mainSessions.length === 0) {
+    strip.innerHTML = `
+      <div class="pcs-empty">
+        <span class="pcs-empty-icon">📊</span>
+        <span>まだ記録がありません。テストを最後まで解くと正答率が記録されます。</span>
       </div>`;
+    return;
   }
 
-  card.querySelector('.start-btn').addEventListener('click', () => startPeriod(p.id));
-  return card;
+  const allMainPcts = mainSessions.map(s => s.rounds.find(r=>r.round===0).pct);
+  const bestPct = Math.max(...allMainPcts);
+
+  // header row
+  const hdr = document.createElement('div');
+  hdr.className = 'pcs-header';
+  hdr.innerHTML = `
+    <span class="pcs-icon">📊</span>
+    <span class="pcs-label">学習記録（${mainSessions.length}回）</span>
+    <span class="pcs-best-badge">最高 ${bestPct}%</span>
+    <button class="pcs-reset-btn" data-pid="${pid}">記録をリセット</button>`;
+  hdr.querySelector('.pcs-reset-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    if (confirm('この学期の学習記録をリセットしますか？')) {
+      resetPeriodRecords(pid);
+      buildSelectCards();
+    }
+  });
+  strip.appendChild(hdr);
+
+  // chips: one per session showing main-round pct
+  const chips = document.createElement('div');
+  chips.className = 'pcs-chips';
+  mainSessions.forEach((s, i) => {
+    const main = s.rounds.find(r => r.round === 0);
+    const chip = document.createElement('span');
+    chip.className = 'pcs-chip';
+    chip.textContent = `${i+1}回目 ${main.pct}%`;
+    chips.appendChild(chip);
+  });
+  strip.appendChild(chips);
 }
 
 // ═══════════════════════════════════════
 // START QUIZ
 // ═══════════════════════════════════════
 function startPeriod(pid) {
-  currentPeriod  = pid;
-  currentSections = PERIODS[pid].sections;
-  currentAllQs   = PERIODS[pid].allQs;
-  currentTotal   = PERIODS[pid].total;
-  qhTitle.textContent = PERIODS[pid].title;
-
+  currentPeriod    = pid;
+  currentSections  = PERIODS[pid].sections;
+  currentAllQs     = PERIODS[pid].allQs;
+  currentTotal     = PERIODS[pid].total;
+  qhTitle.textContent = PERIODS[pid].shortTitle;
   selectScreen.style.display = 'none';
   quizWrapper.style.display  = 'block';
   resultsScreen.classList.remove('show');
   resultsScreen.innerHTML = '';
   retryScreen.classList.remove('show');
-  retryScreen.innerHTML = '';
   retryScreen.style.display = 'none';
   quizScreen.style.display  = 'block';
-
   currentSessionId = null;
   retryRound = 0;
   buildMain();
 }
 
 // ═══════════════════════════════════════
-// BUILD MAIN QUIZ
+// BUILD MAIN
 // ═══════════════════════════════════════
 function buildMain() {
   quizScreen.innerHTML = '';
   answered = 0; correctCount = 0; wrongIdxs = [];
-
-  const isP4 = currentPeriod === 'p4';
-  let globalIdx = 0;
-
-  if (isP4) {
+  let gIdx = 0;
+  if (currentPeriod === 'p4') {
     let lastLabel = '';
     currentSections.forEach(sec => {
       sec.blocks.forEach(block => {
-        if (sec.label !== lastLabel) {
-          quizScreen.appendChild(makeSecTab(sec.label, sec.sub));
-          lastLabel = sec.label;
-        }
-        const instr = makeInstr(block.instr);
-        quizScreen.appendChild(instr);
-        block.qs.forEach((q, qi) => {
-          quizScreen.appendChild(makeCard(q, qi, globalIdx++, false));
-        });
+        if (sec.label !== lastLabel) { quizScreen.appendChild(makeSecTab(sec.label, sec.sub)); lastLabel = sec.label; }
+        quizScreen.appendChild(makeInstr(block.instr));
+        block.qs.forEach((q, qi) => quizScreen.appendChild(makeCard(q, qi, gIdx++, false)));
       });
     });
   } else {
     currentSections.forEach(sec => {
       quizScreen.appendChild(makeSecTab(sec.label, sec.sub));
       quizScreen.appendChild(makeInstr(sec.instr));
-      sec.qs.forEach((q, qi) => {
-        quizScreen.appendChild(makeCard(q, qi, globalIdx++, false));
-      });
+      sec.qs.forEach((q, qi) => quizScreen.appendChild(makeCard(q, qi, gIdx++, false)));
     });
   }
-
   updateProg(0, currentTotal);
 }
 
 function makeSecTab(label, sub) {
-  const d = document.createElement('div');
-  d.className = 'sec-tab';
+  const d = document.createElement('div'); d.className = 'sec-tab';
   d.innerHTML = `<div class="sec-tag">${label}</div><div class="sec-line"></div><div class="sec-sub">${sub}</div>`;
   return d;
 }
 function makeInstr(text) {
-  const p = document.createElement('p');
-  p.className = 'instr';
-  p.textContent = text;
-  return p;
+  const p = document.createElement('p'); p.className = 'instr'; p.textContent = text; return p;
 }
 
 // ═══════════════════════════════════════
@@ -1036,15 +1026,10 @@ function makeInstr(text) {
 function buildRetry(questions, round) {
   retryScreen.innerHTML = '';
   retryAnswered = 0; retryCorrect = 0; retryWrong = [];
-
-  const hdr = document.createElement('div');
-  hdr.className = 'retry-header';
+  const hdr = document.createElement('div'); hdr.className = 'retry-header';
   hdr.innerHTML = `<span>🔄 間違えた問題のみ解き直す</span><span class="retry-round">解き直し第${round}回目</span>`;
   retryScreen.appendChild(hdr);
-
-  questions.forEach((q, i) => {
-    retryScreen.appendChild(makeCard(q, i, i, true));
-  });
+  questions.forEach((q, i) => retryScreen.appendChild(makeCard(q, i, i, true)));
   updateProg(0, questions.length);
 }
 
@@ -1052,59 +1037,41 @@ function buildRetry(questions, round) {
 // MAKE CARD
 // ═══════════════════════════════════════
 function makeCard(q, displayNum, trackIdx, isRetry) {
-  const card = document.createElement('div');
-  card.className = 'q-card';
-
-  const head = document.createElement('div');
-  head.className = 'q-head';
-  const badge = document.createElement('div');
-  badge.className = 'q-badge';
-  badge.textContent = `(${displayNum + 1})`;
-  const text = document.createElement('div');
-  text.className = 'q-text';
+  const card = document.createElement('div'); card.className = 'q-card';
+  const head = document.createElement('div'); head.className = 'q-head';
+  const badge = document.createElement('div'); badge.className = 'q-badge'; badge.textContent = `(${displayNum+1})`;
+  const text = document.createElement('div'); text.className = 'q-text';
   q.text.split('\n').forEach((line, li) => {
     if (li > 0) text.appendChild(document.createElement('br'));
     const sp = document.createElement('span');
     sp.innerHTML = line.replace(/<em>(.*?)<\/em>/g, '<em>$1</em>');
     text.appendChild(sp);
   });
-  head.appendChild(badge);
-  head.appendChild(text);
-  card.appendChild(head);
-
-  const optsWrap = document.createElement('div');
-  optsWrap.className = 'q-opts';
+  head.appendChild(badge); head.appendChild(text); card.appendChild(head);
+  const optsWrap = document.createElement('div'); optsWrap.className = 'q-opts';
   q.opts.forEach((opt, oi) => {
-    const btn = document.createElement('button');
-    btn.className = 'opt';
+    const btn = document.createElement('button'); btn.className = 'opt';
     btn.innerHTML = `<span class="opt-n">${oi+1}.</span><span class="opt-t">${opt}</span>`;
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', () => {
       if (card.dataset.done === '1') return;
       card.dataset.done = '1';
       const allBtns = optsWrap.querySelectorAll('.opt');
       allBtns.forEach(b => b.disabled = true);
       const tag = card.querySelector('.q-result-tag');
-
       if (oi === q.ans) {
-        btn.classList.add('chosen-correct');
-        card.classList.add('is-correct');
-        tag.className = 'q-result-tag show ok';
-        tag.textContent = '⭕  正解！';
+        btn.classList.add('chosen-correct'); card.classList.add('is-correct');
+        tag.className = 'q-result-tag show ok'; tag.textContent = '⭕  正解！';
         if (isRetry) retryCorrect++; else correctCount++;
       } else {
-        btn.classList.add('chosen-wrong');
-        allBtns[q.ans].classList.add('reveal');
-        card.classList.add('is-wrong');
+        btn.classList.add('chosen-wrong'); allBtns[q.ans].classList.add('reveal'); card.classList.add('is-wrong');
         tag.className = 'q-result-tag show ng';
         const isReorder = q.text.includes('番目') || q.text.includes('ならべかえ');
-        if (isReorder && q.completed) {
+        if (isReorder && q.completed)
           tag.innerHTML = `✕  不正解  ―  正解：${q.ans+1}. ${q.opts[q.ans]}<span class="tag-completed">完成文：${q.completed}</span>`;
-        } else {
+        else
           tag.textContent = `✕  不正解  ―  正解：${q.ans+1}. ${q.opts[q.ans]}`;
-        }
         if (isRetry) retryWrong.push(trackIdx); else wrongIdxs.push(trackIdx);
       }
-
       if (isRetry) {
         retryAnswered++;
         updateProg(retryAnswered, retrySet.length);
@@ -1118,32 +1085,23 @@ function makeCard(q, displayNum, trackIdx, isRetry) {
     optsWrap.appendChild(btn);
   });
   card.appendChild(optsWrap);
-
-  const tag = document.createElement('div');
-  tag.className = 'q-result-tag';
-  card.appendChild(tag);
+  const tag = document.createElement('div'); tag.className = 'q-result-tag'; card.appendChild(tag);
   return card;
 }
 
 // ═══════════════════════════════════════
-// FINISH MAIN
+// FINISH
 // ═══════════════════════════════════════
 function finishMain() {
   const pct = Math.round((correctCount / currentTotal) * 100);
-  // Save session
   currentSessionId = Date.now();
   addSessionRound(currentPeriod, currentSessionId, 0, correctCount, currentTotal, pct);
   showResults(correctCount, currentTotal, pct, wrongIdxs, currentAllQs, false);
 }
-
-// ═══════════════════════════════════════
-// FINISH RETRY
-// ═══════════════════════════════════════
 function finishRetry() {
   const pct = Math.round((retryCorrect / retrySet.length) * 100);
   addSessionRound(currentPeriod, currentSessionId, retryRound, retryCorrect, retrySet.length, pct);
-  const badList = retryWrong.length === 0 ? [] : retryWrong;
-  showResults(retryCorrect, retrySet.length, pct, badList, retrySet, true);
+  showResults(retryCorrect, retrySet.length, pct, retryWrong.length ? retryWrong : [], retrySet, true);
 }
 
 // ═══════════════════════════════════════
@@ -1151,26 +1109,20 @@ function finishRetry() {
 // ═══════════════════════════════════════
 function showResults(corr, tot, pct, badIdxs, qSource, isAfterRetry) {
   quizScreen.style.display = 'none';
-  retryScreen.style.display = 'none';
-  retryScreen.classList.remove('show');
-  resultsScreen.innerHTML = '';
-  resultsScreen.classList.add('show');
+  retryScreen.style.display = 'none'; retryScreen.classList.remove('show');
+  resultsScreen.innerHTML = ''; resultsScreen.classList.add('show');
 
   let gradeText, gradeColor, gradeIcon;
-  if (pct===100)    { gradeText='満点！完璧です！';        gradeColor='#F4C842'; gradeIcon='🏆'; }
-  else if(pct>=90)  { gradeText='優秀！もう少しで満点！';  gradeColor='#F4C842'; gradeIcon='⭐'; }
-  else if(pct>=70)  { gradeText='合格圏！あと一息！';      gradeColor='#2E86AB'; gradeIcon='👍'; }
-  else if(pct>=50)  { gradeText='もう少し！復習あるのみ！'; gradeColor='#F4A442'; gradeIcon='📖'; }
-  else              { gradeText='基礎から見直そう！';      gradeColor='#E8A09A'; gradeIcon='💪'; }
+  if(pct===100)    {gradeText='満点！完璧です！';        gradeColor='#E8A800';gradeIcon='🏆';}
+  else if(pct>=90) {gradeText='優秀！もう少しで満点！';  gradeColor='#E8A800';gradeIcon='⭐';}
+  else if(pct>=70) {gradeText='合格圏！あと一息！';      gradeColor='#2E86AB';gradeIcon='👍';}
+  else if(pct>=50) {gradeText='もう少し！復習あるのみ！';gradeColor='#F4A442';gradeIcon='📖';}
+  else             {gradeText='基礎から見直そう！';      gradeColor='#E8A09A';gradeIcon='💪';}
 
-  const R=52, CX=64, CY=64, SW=10;
-  const circ = 2*Math.PI*R;
-  const offset = circ*(1-pct/100);
-
-  const hero = document.createElement('div');
-  hero.className = 'res-hero';
+  const R=52,CX=64,CY=64,SW=10,circ=2*Math.PI*R,offset=circ*(1-pct/100);
+  const hero = document.createElement('div'); hero.className = 'res-hero';
   hero.innerHTML = `
-    <div class="res-hero-label">${isAfterRetry ? `解き直し第${retryRound}回目結果` : '最終スコア'}</div>
+    <div class="res-hero-label">${isAfterRetry?`解き直し第${retryRound}回目`:'最終スコア'}</div>
     <div class="res-hero-body">
       <div class="res-donut-wrap">
         <svg width="128" height="128" viewBox="0 0 128 128">
@@ -1179,181 +1131,146 @@ function showResults(corr, tot, pct, badIdxs, qSource, isAfterRetry) {
             stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"
             stroke-linecap="round" transform="rotate(-90 ${CX} ${CY})"/>
         </svg>
-        <div class="res-donut-center">
-          <span class="res-donut-pct">${pct}</span>
-          <span class="res-donut-unit">%</span>
-        </div>
+        <div class="res-donut-center"><span class="res-donut-pct">${pct}</span><span class="res-donut-unit">%</span></div>
       </div>
       <div class="res-detail">
-        <div class="res-frac">
-          <span class="res-frac-num">${corr}</span><span class="res-frac-denom"> / ${tot}</span>
-          <span class="res-frac-unit">問正解</span>
-        </div>
-        <div class="res-miss">${badIdxs.length>0 ? `✕ ${badIdxs.length}問ミス` : '✓ 全問正解'}</div>
+        <div class="res-frac"><span class="res-frac-num">${corr}</span><span class="res-frac-denom"> / ${tot}</span><span class="res-frac-unit">問正解</span></div>
+        <div class="res-miss">${badIdxs.length?`✕ ${badIdxs.length}問ミス`:'✓ 全問正解'}</div>
       </div>
     </div>
-    <div class="res-grade" style="background:${gradeColor}18;border:1.5px solid ${gradeColor}50;color:${gradeColor}">
+    <div class="res-grade" style="background:${gradeColor}22;border:1.5px solid ${gradeColor}55;color:${gradeColor}">
       <span>${gradeIcon}</span><span>${gradeText}</span>
     </div>`;
   resultsScreen.appendChild(hero);
 
-  // ── GROWTH VISUALIZATION ──
+  // ── GROWTH SECTION ──
   const records = loadRecords();
   const sessions = (records[currentPeriod] && records[currentPeriod].sessions) || [];
-  const currentSession = sessions.find(s => s.id === currentSessionId);
+  const curSession = sessions.find(s => s.id === currentSessionId);
+  const growWrap = document.createElement('div'); growWrap.className = 'res-section-wrap';
 
-  const growWrap = document.createElement('div');
-  growWrap.className = 'res-section-wrap';
+  // Within-session growth
+  if (curSession && curSession.rounds.length >= 1) {
+    const h = document.createElement('div'); h.className = 'res-section-head';
+    h.innerHTML = `<div class="res-section-head-line"></div><div class="res-section-head-text">今回の成長</div><div class="res-section-head-line"></div>`;
+    growWrap.appendChild(h);
 
-  // 1) Current session rounds (within-session growth)
-  if (currentSession && currentSession.rounds.length >= 1) {
-    const growHead = document.createElement('div');
-    growHead.className = 'res-section-head';
-    growHead.innerHTML = `<div class="res-section-head-line"></div><div class="res-section-head-text">今回の成長</div><div class="res-section-head-line"></div>`;
-    growWrap.appendChild(growHead);
+    const gc = document.createElement('div'); gc.className = 'growth-card';
+    const gcHead = document.createElement('div'); gcHead.className = 'growth-card-head';
+    gcHead.innerHTML = `<span class="growth-card-head-icon">📈</span><span class="growth-card-head-title">セッション内の正答率推移</span>`;
+    gc.appendChild(gcHead);
 
-    const box = document.createElement('div');
-    box.className = 'growth-box';
-
-    const boxTitle = document.createElement('div');
-    boxTitle.className = 'growth-box-title';
-    boxTitle.textContent = 'セッション内の成長記録';
-    box.appendChild(boxTitle);
-
-    const chain = document.createElement('div');
-    chain.className = 'step-chain';
-
-    const rounds = [...currentSession.rounds].sort((a,b) => a.round - b.round);
+    const gcBody = document.createElement('div'); gcBody.className = 'growth-card-body';
+    const chain = document.createElement('div'); chain.className = 'step-chain';
+    const rounds = [...curSession.rounds].sort((a,b)=>a.round-b.round);
     rounds.forEach((r, i) => {
-      const node = document.createElement('div');
-      node.className = 'step-node';
+      const node = document.createElement('div'); node.className = 'step-node';
       const cls = r.round === 0 ? 'sc-main' : 'sc-retry';
-      const lbl = r.round === 0 ? '1回目テスト' : `解き直し${r.round}回目`;
-      const sub = r.round === 0 ? `${r.correct}/${r.total}問` : `${r.correct}/${r.total}問正解`;
+      const lbl = r.round === 0 ? '1回目テスト' : `解き直し${r.round}`;
+      const sub = r.round === 0 ? `${r.correct}/${r.total}問` : `${r.correct}/${r.total}問`;
       node.innerHTML = `<div class="step-circle ${cls}">${r.pct}%</div><div class="step-node-label">${lbl}</div><div class="step-node-sub">${sub}</div>`;
       chain.appendChild(node);
-
-      if (i < rounds.length - 1) {
+      if (i < rounds.length-1) {
         const next = rounds[i+1];
-        const delta = next.pct - r.pct;
-        const dCls = delta > 0 ? 'up' : delta < 0 ? 'down' : 'same';
-        const dTxt = delta > 0 ? `▲ +${delta}%` : delta < 0 ? `▼ ${delta}%` : '±0%';
-        const arrow = document.createElement('div');
-        arrow.className = 'step-arrow';
-        arrow.innerHTML = `<div class="step-arrow-line"></div><div class="step-arrow-delta ${dCls}">${dTxt}</div>`;
-        chain.appendChild(arrow);
+        const d = next.pct - r.pct;
+        const cls2 = d>0?'up':d<0?'down':'same';
+        const txt = d>0?`▲+${d}%`:d<0?`▼${d}%`:'±0%';
+        const arr = document.createElement('div'); arr.className = 'step-arrow';
+        arr.innerHTML = `<div class="step-arrow-line"></div><div class="step-arrow-delta ${cls2}">${txt}</div>`;
+        chain.appendChild(arr);
       }
     });
-    box.appendChild(chain);
-
-    // Summary sentence
+    gcBody.appendChild(chain);
     if (rounds.length > 1) {
-      const first = rounds[0].pct;
-      const last  = rounds[rounds.length-1].pct;
-      const total = last - first;
-      const color = total > 0 ? 'var(--green)' : total < 0 ? 'var(--red)' : 'var(--faint)';
-      const txt   = total > 0 ? `+${total}%アップ！` : total < 0 ? `${total}%` : '変化なし';
+      const first = rounds[0].pct, last = rounds[rounds.length-1].pct, d = last - first;
+      const color = d>0?'var(--green)':d<0?'var(--red)':'var(--faint)';
+      const bg    = d>0?'var(--green-bg)':d<0?'var(--red-bg)':'#F6F3EE';
+      const txt   = d>0?`+${d}%アップ！`:d<0?`${d}%`:'変化なし';
       const sum = document.createElement('div');
-      sum.style.cssText = `margin-top:12px;font-size:12px;font-weight:700;color:${color};text-align:center;`;
+      sum.className = 'growth-summary-text';
+      sum.style.cssText = `color:${color};background:${bg};`;
       sum.textContent = `このセッションの成長: ${txt}`;
-      box.appendChild(sum);
+      gcBody.appendChild(sum);
     }
-
-    growWrap.appendChild(box);
+    gc.appendChild(gcBody);
+    growWrap.appendChild(gc);
   }
 
-  // 2) Cross-session history (if 2+ sessions)
-  const mainSessions = sessions.filter(s => s.rounds.some(r => r.round === 0));
+  // Cross-session history
+  const mainSessions = sessions.filter(s => s.rounds.some(r=>r.round===0));
   if (mainSessions.length >= 1) {
-    const histHead = document.createElement('div');
-    histHead.className = 'res-section-head';
-    histHead.innerHTML = `<div class="res-section-head-line"></div><div class="res-section-head-text">プレイ履歴・成長記録</div><div class="res-section-head-line"></div>`;
-    growWrap.appendChild(histHead);
+    const h2 = document.createElement('div'); h2.className = 'res-section-head';
+    h2.innerHTML = `<div class="res-section-head-line"></div><div class="res-section-head-text">プレイ履歴</div><div class="res-section-head-line"></div>`;
+    growWrap.appendChild(h2);
 
-    const box2 = document.createElement('div');
-    box2.className = 'growth-box';
+    const gc2 = document.createElement('div'); gc2.className = 'growth-card';
+    const gc2Head = document.createElement('div'); gc2Head.className = 'growth-card-head';
+    gc2Head.innerHTML = `<span class="growth-card-head-icon">📊</span><span class="growth-card-head-title">全${mainSessions.length}回のプレイ記録</span>`;
+    gc2.appendChild(gc2Head);
 
-    const box2Title = document.createElement('div');
-    box2Title.className = 'growth-box-title';
-    box2Title.textContent = `全${mainSessions.length}回のプレイ履歴`;
-    box2.appendChild(box2Title);
-
-    const maxPct = Math.max(...mainSessions.map(s => {
-      const m = s.rounds.find(r=>r.round===0); return m ? m.pct : 0;
-    }));
+    const gc2Body = document.createElement('div'); gc2Body.className = 'growth-card-body';
+    const maxP = Math.max(...mainSessions.map(s=>s.rounds.find(r=>r.round===0).pct));
 
     mainSessions.forEach((s, i) => {
-      const main = s.rounds.find(r => r.round === 0);
-      if (!main) return;
-      const bestRetry = s.rounds.filter(r=>r.round>0).reduce((best,r) => r.pct > best ? r.pct : best, main.pct);
+      const main = s.rounds.find(r=>r.round===0);
+      const bestR = s.rounds.filter(r=>r.round>0).reduce((b,r)=>r.pct>b?r.pct:b, main.pct);
       const isNow = s.id === currentSessionId;
-      const barColor = isNow ? 'var(--blue)' : main.pct === maxPct ? 'var(--green)' : '#B8C8E0';
+      const barColor = isNow ? 'var(--blue)' : main.pct === maxP ? 'var(--green)' : '#A8C0D8';
 
-      const row = document.createElement('div');
-      row.className = 'sh-row';
+      const row = document.createElement('div'); row.className = 'sh-row';
       row.innerHTML = `
-        <div class="sh-num">${i+1}回目</div>
+        <div class="sh-label">${i+1}回目</div>
         <div class="sh-bar-wrap">
-          <div class="sh-bar-bg">
-            <div class="sh-bar-fill" style="width:0%;background:${barColor}" data-pct="${main.pct}"></div>
-          </div>
-          ${s.rounds.length > 1 ? `<div style="font-size:9px;color:var(--faint);margin-top:2px;">解き直し最高: ${bestRetry}%</div>` : ''}
+          <div class="sh-bar-bg"><div class="sh-bar-fill" style="background:${barColor}" data-pct="${main.pct}"></div></div>
+          ${s.rounds.length>1?`<div class="sh-sub">解き直し最高 ${bestR}%</div>`:''}
         </div>
         <div class="sh-pct" style="color:${barColor}">${main.pct}%</div>
         <div class="sh-date">${s.date}</div>
-        ${isNow ? '<div class="sh-now-badge">今回</div>' : ''}`;
-      box2.appendChild(row);
+        ${isNow?'<div class="sh-now">今回</div>':''}`;
+      gc2Body.appendChild(row);
     });
 
-    // Overall growth summary
     if (mainSessions.length >= 2) {
-      const firstPct = mainSessions[0].rounds.find(r=>r.round===0).pct;
-      const latestPct = mainSessions[mainSessions.length-1].rounds.find(r=>r.round===0).pct;
-      const diff = latestPct - firstPct;
-      const color = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'var(--faint)';
-      const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
-      const sum2 = document.createElement('div');
-      sum2.style.cssText = `margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;font-weight:700;text-align:center;color:${color};`;
-      sum2.innerHTML = `初回 ${firstPct}% ${arrow} 最新 ${latestPct}% &nbsp;（通算成長: ${diff>0?'+':''}${diff}%）`;
-      box2.appendChild(sum2);
+      const fp = mainSessions[0].rounds.find(r=>r.round===0).pct;
+      const lp = mainSessions[mainSessions.length-1].rounds.find(r=>r.round===0).pct;
+      const d2 = lp - fp;
+      const color2 = d2>0?'var(--green)':d2<0?'var(--red)':'var(--faint)';
+      const arr2 = d2>0?'↑':d2<0?'↓':'→';
+      const overall = document.createElement('div'); overall.className = 'sh-overall';
+      overall.style.color = color2;
+      overall.innerHTML = `初回 ${fp}% ${arr2} 最新 ${lp}% &nbsp;（通算成長: ${d2>0?'+':''}${d2}%）`;
+      gc2Body.appendChild(overall);
     }
 
-    growWrap.appendChild(box2);
+    gc2.appendChild(gc2Body);
+    growWrap.appendChild(gc2);
   }
 
   resultsScreen.appendChild(growWrap);
 
   // ── 講義別成績 ──
   {
-    const wrap = document.createElement('div');
-    wrap.className = 'res-section-wrap';
-    const secHead = document.createElement('div');
-    secHead.className = 'res-section-head';
-    secHead.innerHTML = `<div class="res-section-head-line"></div><div class="res-section-head-text">講義別の成績</div><div class="res-section-head-line"></div>`;
-    wrap.appendChild(secHead);
+    const wrap = document.createElement('div'); wrap.className = 'res-section-wrap';
+    const sh = document.createElement('div'); sh.className = 'res-section-head';
+    sh.innerHTML = `<div class="res-section-head-line"></div><div class="res-section-head-text">講義別の成績</div><div class="res-section-head-line"></div>`;
+    wrap.appendChild(sh);
 
-    const labelsInSource = [...new Set(qSource.map(q => q._label))];
-    const srcSections = currentPeriod === 'p4' ? P4_SECTIONS : P3_SECTIONS;
-    const orderedSections = srcSections.filter(s => labelsInSource.includes(s.label));
+    const labelsInSource = [...new Set(qSource.map(q=>q._label))];
+    const srcSections = currentPeriod==='p4' ? P4_SECTIONS : P3_SECTIONS;
+    srcSections.filter(s=>labelsInSource.includes(s.label)).forEach(sec => {
+      const secAllQs = qSource.filter(q=>q._label===sec.label);
+      const secTotal = isAfterRetry ? secAllQs.length : currentAllQs.filter(q=>q._label===sec.label).length;
+      const secBad = badIdxs.filter(idx=>qSource[idx]&&qSource[idx]._label===sec.label);
+      const secCorr = secTotal - secBad.length;
+      const secPct = Math.round((secCorr/secTotal)*100);
+      let cls,icon;
+      if(secPct===100){cls='grade-perfect';icon='✓';}
+      else if(secPct>=70){cls='grade-good';icon='△';}
+      else if(secPct>=50){cls='grade-ok';icon='!';}
+      else{cls='grade-ng';icon='✕';}
 
-    orderedSections.forEach(sec => {
-      const secAllQs = qSource.filter(q => q._label === sec.label);
-      const secTotal = isAfterRetry ? secAllQs.length : currentAllQs.filter(q => q._label === sec.label).length;
-      const secBadIdxs = badIdxs.filter(idx => qSource[idx] && qSource[idx]._label === sec.label);
-      const secCorr = secTotal - secBadIdxs.length;
-      const secPct = Math.round((secCorr / secTotal) * 100);
-
-      let cls, icon;
-      if(secPct===100)    {cls='grade-perfect';icon='✓';}
-      else if(secPct>=70) {cls='grade-good';   icon='△';}
-      else if(secPct>=50) {cls='grade-ok';     icon='!';}
-      else                 {cls='grade-ng';     icon='✕';}
-
-      const group = document.createElement('div');
-      group.className = 'sec-card-group';
-
-      const cell = document.createElement('div');
-      cell.className = `sec-card ${cls}`;
+      const group = document.createElement('div'); group.className = 'sec-card-group';
+      const cell = document.createElement('div'); cell.className = `sec-card ${cls}`;
       cell.innerHTML = `
         <div class="sec-card-top">
           <div class="sec-card-left"><div class="sec-card-icon">${icon}</div><div class="sec-card-label">${sec.label}</div></div>
@@ -1364,93 +1281,65 @@ function showResults(corr, tot, pct, badIdxs, qSource, isAfterRetry) {
           <span class="sec-bar-pct">${secPct}%</span>
         </div>`;
       group.appendChild(cell);
-
-      if (secBadIdxs.length > 0) {
-        const wrongWrap = document.createElement('div');
-        wrongWrap.className = 'sec-wrong-wrap';
-        secBadIdxs.forEach(idx => {
+      if (secBad.length > 0) {
+        const ww = document.createElement('div'); ww.className = 'sec-wrong-wrap';
+        secBad.forEach(idx => {
           const q = qSource[idx];
-          const item = document.createElement('div');
-          item.className = 'wrong-item';
-          const plainText = q.text.replace(/<em>(.*?)<\/em>/g, '$1');
-          const isReorder = q.text.includes('番目') || q.text.includes('ならべかえ');
-          const completedLine = (isReorder && q.completed) ? `<div class="wrong-item-completed">完成文：${q.completed}</div>` : '';
-          item.innerHTML = `<div class="wrong-item-head">${plainText}</div><div class="wrong-item-ans">${q.opts[q.ans]}</div>${completedLine}`;
-          wrongWrap.appendChild(item);
+          const item = document.createElement('div'); item.className = 'wrong-item';
+          const pt = q.text.replace(/<em>(.*?)<\/em>/g,'$1');
+          const isR = q.text.includes('番目')||q.text.includes('ならべかえ');
+          item.innerHTML = `<div class="wrong-item-head">${pt}</div><div class="wrong-item-ans">${q.opts[q.ans]}</div>${isR&&q.completed?`<div class="wrong-item-completed">完成文：${q.completed}</div>`:''}`;
+          ww.appendChild(item);
         });
-        group.appendChild(wrongWrap);
+        group.appendChild(ww);
       }
       wrap.appendChild(group);
     });
     resultsScreen.appendChild(wrap);
   }
 
-  // ── Action buttons ──
-  const btns = document.createElement('div');
-  btns.className = 'action-btns';
-
+  // ── Buttons ──
+  const btns = document.createElement('div'); btns.className = 'action-btns';
   if (badIdxs.length > 0) {
-    const retryBtn = document.createElement('button');
-    retryBtn.className = 'act-btn primary';
-    retryBtn.textContent = `✕ 間違えた問題のみ解き直す（${badIdxs.length}問）`;
-    retryBtn.addEventListener('click', () => {
+    const rb = document.createElement('button'); rb.className = 'act-btn primary';
+    rb.textContent = `✕ 間違えた問題のみ解き直す（${badIdxs.length}問）`;
+    rb.addEventListener('click', () => {
       retryRound++;
       retrySet = badIdxs.map(i => qSource[i]);
-      resultsScreen.classList.remove('show');
-      resultsScreen.innerHTML = '';
-      retryScreen.style.display = 'block';
-      retryScreen.classList.add('show');
+      resultsScreen.classList.remove('show'); resultsScreen.innerHTML = '';
+      retryScreen.style.display = 'block'; retryScreen.classList.add('show');
       buildRetry(retrySet, retryRound);
-      window.scrollTo({ top:0, behavior:'smooth' });
+      window.scrollTo({top:0,behavior:'smooth'});
     });
-    btns.appendChild(retryBtn);
+    btns.appendChild(rb);
   }
-
-  const allBtn = document.createElement('button');
-  allBtn.className = 'act-btn secondary';
-  allBtn.textContent = '↩ 全ての問題を解き直す';
-  allBtn.addEventListener('click', () => {
-    retryRound = 0;
-    currentSessionId = null;
-    resultsScreen.classList.remove('show');
-    resultsScreen.innerHTML = '';
-    retryScreen.style.display = 'none';
-    quizScreen.style.display = 'block';
-    buildMain();
-    window.scrollTo({ top:0, behavior:'smooth' });
+  const ab = document.createElement('button'); ab.className = 'act-btn secondary';
+  ab.textContent = '↩ 全ての問題を解き直す';
+  ab.addEventListener('click', () => {
+    retryRound = 0; currentSessionId = null;
+    resultsScreen.classList.remove('show'); resultsScreen.innerHTML = '';
+    retryScreen.style.display = 'none'; quizScreen.style.display = 'block';
+    buildMain(); window.scrollTo({top:0,behavior:'smooth'});
   });
-  btns.appendChild(allBtn);
-
-  const homeBtn = document.createElement('button');
-  homeBtn.className = 'act-btn home';
-  homeBtn.textContent = '🏠 テスト選択に戻る';
-  homeBtn.addEventListener('click', () => showSelectScreen());
-  btns.appendChild(homeBtn);
-
+  btns.appendChild(ab);
+  const hb = document.createElement('button'); hb.className = 'act-btn home';
+  hb.textContent = '🏠 テスト選択に戻る';
+  hb.addEventListener('click', showSelectScreen);
+  btns.appendChild(hb);
   resultsScreen.appendChild(btns);
-  window.scrollTo({ top:0, behavior:'smooth' });
+  window.scrollTo({top:0,behavior:'smooth'});
 
-  // Animate bars after render
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      resultsScreen.querySelectorAll('.sh-bar-fill[data-pct]').forEach(el => {
-        el.style.width = el.dataset.pct + '%';
-      });
-    });
-  });
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    resultsScreen.querySelectorAll('.sh-bar-fill[data-pct]').forEach(el => { el.style.width = el.dataset.pct + '%'; });
+  }));
 }
 
-// ═══════════════════════════════════════
-// PROGRESS
-// ═══════════════════════════════════════
 function updateProg(done, total) {
   progText.textContent = `${done} / ${total}`;
-  progBar.style.width = `${total > 0 ? (done/total)*100 : 0}%`;
+  progBar.style.width = `${total>0?(done/total)*100:0}%`;
 }
 
-// ═══════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════
 showSelectScreen();
 </script>
 </body>
