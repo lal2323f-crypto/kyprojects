@@ -485,6 +485,78 @@
     font-size:0.74rem;
     margin-top:2.4rem;
   }
+
+  /* ---------- growth history ---------- */
+  #history-wrap{
+    margin-top:2rem;
+    padding-top:1.4rem;
+    border-top:1px dashed var(--grid);
+    text-align:center;
+  }
+  #history-wrap h2{
+    font-family:'Klee One', cursive;
+    font-weight:600;
+    font-size:1.05rem;
+    margin:0 0 0.9rem;
+    color:var(--ink);
+  }
+  .history-table-wrap{
+    overflow-x:auto;
+    max-width:600px;
+    margin:0 auto;
+  }
+  #history-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.86rem;
+    text-align:center;
+  }
+  #history-table th{
+    font-weight:700;
+    color:var(--pencil);
+    border-bottom:1.5px solid var(--ink);
+    padding:0.3rem 0.6rem;
+    white-space:nowrap;
+  }
+  #history-table td{
+    padding:0.38rem 0.6rem;
+    border-bottom:1px dashed var(--grid);
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  #history-table tr:last-child td{border-bottom:none;}
+  .hist-up{color:var(--ballpoint);font-weight:700;}
+  .hist-down{color:var(--red);}
+  .hist-bar{
+    display:inline-block;
+    width:60px; height:6px;
+    background:var(--grid);
+    border-radius:3px;
+    vertical-align:middle;
+    margin-right:4px;
+  }
+  .hist-bar-fill{
+    height:6px;
+    background:var(--ballpoint);
+    border-radius:3px;
+    transition:width .5s ease;
+  }
+  .hist-pct{font-size:0.8rem;}
+  #clear-history-btn{
+    display:inline-block;
+    margin:0.9rem auto 0;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:0.76rem;
+    color:var(--pencil);
+    background:transparent;
+    border:1px solid var(--grid);
+    border-radius:2px;
+    padding:0.28rem 0.8rem;
+    cursor:pointer;
+    letter-spacing:0.02em;
+  }
+  #clear-history-btn:hover{color:var(--red);border-color:var(--red);}
+  #clear-history-btn:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
 </style>
 </head>
 <body>
@@ -534,6 +606,25 @@
         </div>
       </div>
     </div>
+
+    <section id="history-wrap" style="display:none;" aria-label="成長記録">
+      <h2>成長記録</h2>
+      <div class="history-table-wrap">
+        <table id="history-table">
+          <thead>
+            <tr>
+              <th>回</th>
+              <th>日付</th>
+              <th>正解数</th>
+              <th>正答率</th>
+              <th>前回比</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </div>
+      <button id="clear-history-btn">記録をリセット</button>
+    </section>
 
     <footer class="note">「動詞テスト.pdf」の出題内容をもとに作成。選択肢の並びと出題順は毎回ランダムです。</footer>
   </div>
@@ -875,6 +966,85 @@
     } else {
       retryWrongBtn.style.display = "none";
     }
+
+    saveAttempt(correctCount, TOTAL, wrongAnswers);
+  }
+
+  // ---- localStorage history ----
+  var STORAGE_KEY = "doushi_quiz_history";
+
+  function getHistory(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch(e){ return []; }
+  }
+
+  function saveAttempt(score, total, wrongs){
+    var history = getHistory();
+    history.push({
+      d: new Date().toISOString(),
+      s: score,
+      t: total,
+      w: wrongs.map(function(p){ return p[0]; })
+    });
+    if(history.length > 30) history = history.slice(-30);
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch(e){}
+    renderHistory();
+  }
+
+  function renderHistory(){
+    var history = getHistory();
+    var wrap = document.getElementById("history-wrap");
+    var tbody = document.getElementById("history-tbody");
+    if(!history.length){ wrap.style.display = "none"; return; }
+    wrap.style.display = "block";
+    tbody.innerHTML = "";
+    history.forEach(function(entry, i){
+      var pct = Math.round((entry.s / entry.t) * 100);
+      var prevPct = i > 0 ? Math.round((history[i-1].s / history[i-1].t) * 100) : null;
+      var diff = prevPct !== null ? pct - prevPct : null;
+      var date = new Date(entry.d);
+      var dateStr = (date.getMonth()+1) + "/" + date.getDate();
+      var diffStr = diff === null ? "—" :
+        diff > 0 ? "↑+" + diff + "%" : diff < 0 ? "↓" + diff + "%" : "→±0%";
+      var diffCls = diff === null ? "" : diff > 0 ? "hist-up" : diff < 0 ? "hist-down" : "";
+
+      var tr = document.createElement("tr");
+
+      var td1 = document.createElement("td");
+      td1.textContent = (i+1) + "回目";
+
+      var td2 = document.createElement("td");
+      td2.textContent = dateStr;
+
+      var td3 = document.createElement("td");
+      td3.textContent = entry.s + "/" + entry.t;
+
+      var td4 = document.createElement("td");
+      var bar = document.createElement("div");
+      bar.className = "hist-bar";
+      var fill = document.createElement("div");
+      fill.className = "hist-bar-fill";
+      fill.style.width = pct + "%";
+      bar.appendChild(fill);
+      var pctLabel = document.createElement("span");
+      pctLabel.className = "hist-pct";
+      pctLabel.textContent = pct + "%";
+      td4.appendChild(bar);
+      td4.appendChild(pctLabel);
+
+      var td5 = document.createElement("td");
+      td5.textContent = diffStr;
+      td5.className = diffCls;
+
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      tr.appendChild(td3);
+      tr.appendChild(td4);
+      tr.appendChild(td5);
+      tbody.appendChild(tr);
+    });
   }
 
   document.getElementById("retry-btn").addEventListener("click", function(){
@@ -889,6 +1059,14 @@
     window.scrollTo({top:0, behavior:"smooth"});
   });
 
+  document.getElementById("clear-history-btn").addEventListener("click", function(){
+    if(confirm("成長記録をすべて削除しますか？")){
+      try{ localStorage.removeItem(STORAGE_KEY); } catch(e){}
+      renderHistory();
+    }
+  });
+
+  renderHistory();
   buildQuiz(VOCAB);
 })();
 </script>
