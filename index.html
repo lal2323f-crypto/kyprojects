@@ -369,7 +369,16 @@ function fb(text,msg){var ta=document.createElement('textarea');ta.value=text;ta
 function b64enc(str){return btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
 function b64dec(str){str=str.replace(/-/g,'+').replace(/_/g,'/');while(str.length%4)str+='=';return decodeURIComponent(escape(atob(str)));}
 
-async function saveQuiz(code,data){try{var d=Object.assign({},data,{ts:Date.now()});localStorage.setItem('quiz:'+code,JSON.stringify(d));return true;}catch(e){console.warn('storage unavailable',e);return false;}}
+var FIREBASE_URL='https://quiz-as-20efb-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+async function saveQuiz(code,data){
+  var d=Object.assign({},data,{ts:Date.now()});
+  try{localStorage.setItem('quiz:'+code,JSON.stringify(d));}catch(e){}
+  try{
+    await fetch(FIREBASE_URL+'/quizzes/'+code+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
+  }catch(e){console.warn('Firebase save failed',e);}
+  return true;
+}
 function listQuizzes(){var items=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('quiz:')=== 0){var code=k.slice(5);try{var d=JSON.parse(localStorage.getItem(k));if(d&&d.t&&d.v)items.push({code:code,title:d.t,count:d.v.length,ts:d.ts||0});}catch(e){}}}}catch(e){}items.sort(function(a,b){return b.ts-a.ts;});return items;}
 function deleteQuiz(code){try{localStorage.removeItem('quiz:'+code);}catch(e){}}
 function renderManageScreen(){
@@ -426,7 +435,11 @@ async function loadQuiz(code){
       if(data&&data.v&&data.v.length)return data;
     }
   }catch(e){}
-  try{var r=localStorage.getItem('quiz:'+code);if(r)return JSON.parse(r);}catch(e){console.warn('storage load failed',e);}
+  try{var r=localStorage.getItem('quiz:'+code);if(r)return JSON.parse(r);}catch(e){}
+  try{
+    var resp=await fetch(FIREBASE_URL+'/quizzes/'+code+'.json');
+    if(resp.ok){var fd=await resp.json();if(fd&&fd.v&&fd.v.length)return fd;}
+  }catch(e){console.warn('Firebase load failed',e);}
   return null;
 }
 
