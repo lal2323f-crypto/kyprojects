@@ -156,13 +156,26 @@ legend{display:block;width:100%;padding:0;margin:0;}
 #vrbtn:hover{background:var(--bp);}
 #vrwbtn{color:var(--ink);background:transparent;border:1.5px solid var(--red);}
 #vrwbtn:hover{background:var(--red-tint);}
+#screen-manage{background:var(--bg);padding:0 0 4rem;}
+.manage-empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:.9rem;}
+.qlist{display:flex;flex-direction:column;gap:.65rem;}
+.qitem{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem;display:flex;align-items:center;gap:.85rem;flex-wrap:wrap;}
+.qitem-code{font-family:'Kaisei Decol',serif;font-size:1.3rem;font-weight:700;color:var(--blue);letter-spacing:.18em;flex:0 0 auto;min-width:5rem;}
+.qitem-info{flex:1;min-width:0;}
+.qitem-title{font-family:'Klee One',cursive;font-weight:600;font-size:.97rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.qitem-meta{color:var(--muted);font-size:.75rem;margin-top:.18rem;}
+.qitem-actions{display:flex;gap:.4rem;flex-wrap:wrap;flex:0 0 auto;}
+.qitem-actions .btn{font-size:.78rem;padding:.36rem .7rem;}
+.btn-red{background:transparent;border:1.5px solid var(--red);color:var(--red);}
+.btn-red:hover{background:var(--red-tint);}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;}}
 @media(prefers-color-scheme:dark){
 :root{--paper:#211F19;--grid:#34322A;--ink:#EFEDE4;--pencil:#A8A498;--bp:#9DB6E8;--red:#E8736A;--red-deep:#FF8C82;--red-tint:rgba(232,115,106,.16);}
 #screen-home{background:linear-gradient(135deg,#1a1914 0%,#25241e 100%);}
 .home-card,.success-card{background:#2a2921;border:1px solid #3a3830;}
-#screen-creator,#screen-viewer{background:#15140F;}
+#screen-creator,#screen-manage,#screen-viewer{background:#15140F;}
 .step{background:#2a2921;border-color:#3a3830;}
+.qitem{background:#2a2921;border-color:#3a3830;}
 input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
 .creator-header,#vprogress-strip{background:rgba(33,31,25,.95);}
 #vsheet{background:var(--paper);box-shadow:0 1px 0 rgba(0,0,0,.3),0 18px 40px -22px rgba(0,0,0,.6);}
@@ -188,6 +201,23 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
       <button class="btn btn-green" id="go-by-code" style="flex:0 0 auto;">始める →</button>
     </div>
     <div class="err-inline" id="home-err"></div>
+    <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:.9rem;">
+      <button class="btn-ghost" id="go-manage" style="width:100%;text-align:center;color:var(--muted);font-size:.8rem;">📋 作成済みクイズを管理する</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-manage" class="screen">
+  <div class="creator-header">
+    <button class="btn-ghost" id="manage-back">← ホーム</button>
+    <h1>作成済みクイズ一覧</h1>
+  </div>
+  <div class="container">
+    <div class="manage-empty" id="manage-empty" style="display:none;">
+      <p style="font-size:2rem;margin-bottom:.5rem;">📭</p>
+      <p>このブラウザで作成されたクイズはありません。</p>
+    </div>
+    <div class="qlist" id="qlist"></div>
   </div>
 </div>
 
@@ -265,6 +295,7 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
       <button class="btn btn-green" id="try-quiz-btn">▶ 自分でクイズを解いてみる</button>
       <button class="btn btn-outline" id="copy-code-btn">コード「<span id="code-copy-inline">----</span>」をコピー</button>
       <button class="btn-ghost" id="make-another-btn">← 別のクイズを作る</button>
+      <button class="btn-ghost" id="go-manage-from-success" style="color:var(--muted);">作成済みクイズ一覧を見る</button>
     </div>
   </div>
 </div>
@@ -319,7 +350,54 @@ function fb(text,msg){var ta=document.createElement('textarea');ta.value=text;ta
 function b64enc(str){return btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
 function b64dec(str){str=str.replace(/-/g,'+').replace(/_/g,'/');while(str.length%4)str+='=';return decodeURIComponent(escape(atob(str)));}
 
-async function saveQuiz(code,data){try{localStorage.setItem('quiz:'+code,JSON.stringify(data));return true;}catch(e){console.warn('storage unavailable',e);return false;}}
+async function saveQuiz(code,data){try{var d=Object.assign({},data,{ts:Date.now()});localStorage.setItem('quiz:'+code,JSON.stringify(d));return true;}catch(e){console.warn('storage unavailable',e);return false;}}
+function listQuizzes(){var items=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('quiz:')=== 0){var code=k.slice(5);try{var d=JSON.parse(localStorage.getItem(k));if(d&&d.t&&d.v)items.push({code:code,title:d.t,count:d.v.length,ts:d.ts||0});}catch(e){}}}}catch(e){}items.sort(function(a,b){return b.ts-a.ts;});return items;}
+function deleteQuiz(code){try{localStorage.removeItem('quiz:'+code);}catch(e){}}
+function renderManageScreen(){
+  var items=listQuizzes();
+  var empty=document.getElementById('manage-empty');
+  var list=document.getElementById('qlist');
+  list.innerHTML='';
+  if(!items.length){empty.style.display='block';return;}
+  empty.style.display='none';
+  items.forEach(function(item){
+    var div=document.createElement('div');div.className='qitem';
+    var dateStr='';
+    if(item.ts){var d=new Date(item.ts);dateStr=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+ d.getDate();}
+    div.innerHTML='<div class="qitem-code">'+item.code+'</div>'
+      +'<div class="qitem-info"><div class="qitem-title">'+escHtml(item.title)+'</div>'
+      +'<div class="qitem-meta">'+item.count+'問'+(dateStr?' · 作成日: '+dateStr:'')+'</div></div>'
+      +'<div class="qitem-actions">'
+      +'<button class="btn btn-outline qopen-btn" data-code="'+item.code+'">▶ 解く</button>'
+      +'<button class="btn btn-outline qcopy-btn" data-code="'+item.code+'">URLをコピー</button>'
+      +'<button class="btn btn-red qdel-btn" data-code="'+item.code+'">削除</button>'
+      +'</div>';
+    list.appendChild(div);
+  });
+  list.querySelectorAll('.qopen-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var code=this.dataset.code;
+      try{var d=JSON.parse(localStorage.getItem('quiz:'+code));if(d&&d.v)launchViewer(d.t,d.v,code);}catch(e){}
+    });
+  });
+  list.querySelectorAll('.qcopy-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var code=this.dataset.code;
+      try{
+        var d=JSON.parse(localStorage.getItem('quiz:'+code));
+        if(d&&d.v){var encoded=b64enc(JSON.stringify({t:d.t,v:d.v}));var url=window.location.origin+window.location.pathname+'#'+code+'-'+encoded;copyText(url,'URLをコピーしました！');}
+      }catch(e){}
+    });
+  });
+  list.querySelectorAll('.qdel-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var code=this.dataset.code;
+      if(!confirm('コード「'+code+'」のクイズを削除しますか？\nこのブラウザから削除されます。URLを持っている人は引き続き解けます。'))return;
+      deleteQuiz(code);toast('削除しました','#A8281D');renderManageScreen();
+    });
+  });
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 async function loadQuiz(code){
   try{
     var h=window.location.hash;
@@ -336,6 +414,9 @@ async function loadQuiz(code){
 function getHashCode(){try{var h=window.location.hash;if(h&&h.length>1){var m=h.match(/^#([A-Z0-9]{4})(-[A-Za-z0-9_-]+)?$/i);if(m)return m[1].toUpperCase();}}catch(e){}return null;}
 
 document.getElementById('go-creator').addEventListener('click',function(){showScreen('screen-creator');});
+document.getElementById('go-manage').addEventListener('click',function(){renderManageScreen();showScreen('screen-manage');});
+document.getElementById('manage-back').addEventListener('click',function(){showScreen('screen-home');});
+document.getElementById('go-manage-from-success').addEventListener('click',function(){renderManageScreen();showScreen('screen-manage');});
 document.getElementById('creator-back').addEventListener('click',function(){showScreen('screen-home');});
 document.getElementById('make-another-btn').addEventListener('click',function(){showScreen('screen-creator');});
 document.getElementById('viewer-back-btn').addEventListener('click',function(){try{history.replaceState(null,'',window.location.pathname);}catch(e){}showScreen('screen-home');});
