@@ -14,8 +14,8 @@ html,body{margin:0;padding:0;overflow-x:hidden;}
 body{font-family:'Zen Kaku Gothic New',sans-serif;color:var(--ink);background:var(--bg);}
 .screen{display:none;min-height:100vh;}
 .screen.active{display:block;}
-#screen-home{display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#E8E4D8 0%,#F4F3EF 100%);}
-#screen-home.active{display:flex;}
+#screen-home,#screen-password{display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#E8E4D8 0%,#F4F3EF 100%);}
+#screen-home.active,#screen-password.active{display:flex;}
 #screen-success{display:none;align-items:center;justify-content:center;background:var(--bg);padding:1rem 0;}
 #screen-success.active{display:flex;}
 .home-card,.success-card{background:var(--surface);border-radius:12px;box-shadow:0 4px 32px rgba(0,0,0,.10);padding:2.4rem 2rem;max-width:420px;width:100%;margin:1rem;text-align:center;}
@@ -178,7 +178,7 @@ legend{display:block;width:100%;padding:0;margin:0;}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;}}
 @media(prefers-color-scheme:dark){
 :root{--paper:#211F19;--grid:#34322A;--ink:#EFEDE4;--pencil:#A8A498;--bp:#9DB6E8;--red:#E8736A;--red-deep:#FF8C82;--red-tint:rgba(232,115,106,.16);}
-#screen-home{background:linear-gradient(135deg,#1a1914 0%,#25241e 100%);}
+#screen-home,#screen-password{background:linear-gradient(135deg,#1a1914 0%,#25241e 100%);}
 .home-card,.success-card{background:#2a2921;border:1px solid #3a3830;}
 #screen-creator,#screen-manage,#screen-viewer{background:#15140F;}
 .step{background:#2a2921;border-color:#3a3830;}
@@ -199,18 +199,41 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
   <div class="home-card">
     <div class="home-logo">📝</div>
     <h1 class="home-title">単語クイズ</h1>
-    <p class="home-sub">クイズを作成するか、コードを入力して始めましょう</p>
+    <p class="home-sub">クイズ一覧から選んで始めましょう</p>
+    <button class="btn btn-green" id="go-public-list" style="width:100%;padding:.72rem;font-size:.98rem;">📋 作成クイズ一覧</button>
+    <div class="home-divider">先生用</div>
     <button class="btn btn-blue" id="go-creator">＋ クイズを作成する</button>
-    <div class="home-divider">または</div>
-    <div class="code-label-text">クイズコードを入力して始める</div>
-    <div class="code-row">
-      <input type="text" id="code-input" maxlength="4" placeholder="XXXX" autocomplete="off" spellcheck="false">
-      <button class="btn btn-green" id="go-by-code" style="flex:0 0 auto;">始める →</button>
+    <div style="margin-top:.55rem;">
+      <button class="btn-ghost" id="go-manage" style="width:100%;text-align:center;color:var(--muted);font-size:.8rem;">⚙️ 作成済みクイズを管理する</button>
     </div>
-    <div class="err-inline" id="home-err"></div>
-    <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:.9rem;">
-      <button class="btn-ghost" id="go-manage" style="width:100%;text-align:center;color:var(--muted);font-size:.8rem;">📋 作成済みクイズを管理する</button>
+  </div>
+</div>
+
+<div id="screen-password" class="screen">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#E8E4D8 0%,#F4F3EF 100%);">
+    <div class="home-card" style="text-align:center;">
+      <div style="font-size:2rem;margin-bottom:.5rem;">🔐</div>
+      <h2 style="font-family:'Klee One',cursive;font-size:1.15rem;margin:0 0 1.2rem;color:var(--ink);">パスワードを入力してください</h2>
+      <input type="password" id="pw-input" placeholder="パスワード" style="text-align:center;letter-spacing:.2em;margin-bottom:.65rem;">
+      <button class="btn btn-blue" id="pw-submit">確認</button>
+      <div class="err-inline" id="pw-err" style="text-align:center;min-height:1.4em;"></div>
+      <button class="btn-ghost" id="pw-cancel" style="margin-top:.4rem;width:100%;text-align:center;">← キャンセル</button>
     </div>
+  </div>
+</div>
+
+<div id="screen-public-list" class="screen">
+  <div class="creator-header">
+    <button class="btn-ghost" id="public-list-back">← ホーム</button>
+    <h1>作成クイズ一覧</h1>
+  </div>
+  <div class="container">
+    <div class="manage-empty" id="public-list-empty" style="display:none;">
+      <p style="font-size:2rem;margin-bottom:.5rem;">📭</p>
+      <p>クイズがまだ作成されていません。</p>
+    </div>
+    <div id="public-list-loading" style="text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.9rem;">読み込み中...</div>
+    <div class="qlist" id="public-qlist"></div>
   </div>
 </div>
 
@@ -445,10 +468,26 @@ async function loadQuiz(code){
 
 function getHashCode(){try{var h=window.location.hash;if(h&&h.length>1){var m=h.match(/^#([A-Z0-9]{4})(-[A-Za-z0-9_-]+)?$/i);if(m)return m[1].toUpperCase();}}catch(e){}return null;}
 
-document.getElementById('go-creator').addEventListener('click',function(){showScreen('screen-creator');});
-document.getElementById('go-manage').addEventListener('click',function(){renderManageScreen();showScreen('screen-manage');});
+var pwDest=null;
+function showPassword(dest){pwDest=dest;document.getElementById('pw-input').value='';document.getElementById('pw-err').textContent='';showScreen('screen-password');setTimeout(function(){document.getElementById('pw-input').focus();},150);}
+function checkPassword(){
+  var val=document.getElementById('pw-input').value;
+  if(val==='kyquiz'){
+    if(pwDest==='creator')showScreen('screen-creator');
+    else if(pwDest==='manage'){renderManageScreen();showScreen('screen-manage');}
+  }else{
+    document.getElementById('pw-err').textContent='パスワードが違います';
+    setTimeout(function(){showScreen('screen-home');},1000);
+  }
+}
+document.getElementById('pw-submit').addEventListener('click',checkPassword);
+document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.key==='Enter')checkPassword();});
+document.getElementById('pw-cancel').addEventListener('click',function(){showScreen('screen-home');});
+
+document.getElementById('go-creator').addEventListener('click',function(){showPassword('creator');});
+document.getElementById('go-manage').addEventListener('click',function(){showPassword('manage');});
+document.getElementById('go-manage-from-success').addEventListener('click',function(){showPassword('manage');});
 document.getElementById('manage-back').addEventListener('click',function(){showScreen('screen-home');});
-document.getElementById('go-manage-from-success').addEventListener('click',function(){renderManageScreen();showScreen('screen-manage');});
 document.getElementById('creator-back').addEventListener('click',function(){showScreen('screen-home');});
 document.getElementById('make-another-btn').addEventListener('click',function(){showScreen('screen-creator');});
 document.getElementById('viewer-back-btn').addEventListener('click',function(){try{history.replaceState(null,'',window.location.pathname);}catch(e){}showScreen('screen-home');});
@@ -456,20 +495,35 @@ document.getElementById('try-quiz-btn').addEventListener('click',function(){if(c
 document.getElementById('copy-code-btn').addEventListener('click',function(){copyText(currentCode||'','コードをコピーしました！');});
 document.getElementById('copy-url-btn').addEventListener('click',function(){copyText(document.getElementById('url-display').value||window.location.href,'URLをコピーしました！');});
 
-document.getElementById('go-by-code').addEventListener('click',function(){startByCode();});
-document.getElementById('code-input').addEventListener('keydown',function(e){if(e.key==='Enter')startByCode();});
-document.getElementById('code-input').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');document.getElementById('home-err').textContent='';});
+document.getElementById('go-public-list').addEventListener('click',function(){renderPublicList();showScreen('screen-public-list');});
+document.getElementById('public-list-back').addEventListener('click',function(){showScreen('screen-home');});
 
-async function startByCode(){
-  var code=document.getElementById('code-input').value.trim().toUpperCase();
-  if(code.length!==4){document.getElementById('home-err').textContent='4文字のコードを入力してください';return;}
-  var errEl=document.getElementById('home-err');
-  errEl.textContent='読み込み中...';
-  var data=await loadQuiz(code);
-  if(!data||!data.v||!data.v.length){errEl.textContent='コード「'+code+'」はこの端末では見つかりませんでした。先生からQRコードまたはURLを受け取って開いてください。';return;}
-  errEl.textContent='';
-  document.getElementById('code-input').value='';
-  launchViewer(data.t,data.v,code);
+async function renderPublicList(){
+  var list=document.getElementById('public-qlist');
+  var empty=document.getElementById('public-list-empty');
+  var loading=document.getElementById('public-list-loading');
+  list.innerHTML='';empty.style.display='none';loading.style.display='block';
+  var items=[];
+  try{
+    var resp=await fetch(FIREBASE_URL+'/quizzes.json');
+    if(resp.ok){
+      var data=await resp.json();
+      if(data){items=Object.keys(data).map(function(code){return{code:code,title:data[code].t||'無題',count:(data[code].v||[]).length,ts:data[code].ts||0,v:data[code].v};}).sort(function(a,b){return b.ts-a.ts;});}
+    }
+  }catch(e){}
+  if(!items.length){
+    var local=listQuizzes();
+    items=local.map(function(item){try{var d=JSON.parse(localStorage.getItem('quiz:'+item.code));return{code:item.code,title:item.title,count:item.count,ts:item.ts,v:d?d.v:null};}catch(e){return null;}}).filter(Boolean);
+  }
+  loading.style.display='none';
+  if(!items.length){empty.style.display='block';return;}
+  items.forEach(function(item){
+    var div=document.createElement('div');div.className='qitem';div.style.cursor='pointer';
+    div.innerHTML='<div class="qitem-info" style="flex:1;"><div class="qitem-title">'+escHtml(item.title)+'</div><div class="qitem-meta">'+item.count+'問</div></div>'
+      +'<span style="color:var(--green);font-weight:700;font-size:.9rem;">▶ 解く</span>';
+    div.addEventListener('click',function(){if(item.v&&item.v.length)launchViewer(item.title,item.v,item.code);});
+    list.appendChild(div);
+  });
 }
 
 function parseCSV(text){text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');var rows=[];text.split('\n').forEach(function(line){if(!line.trim())return;var row=[],inQ=false,cell='';for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){if(inQ&&line[i+1]==='"'){cell+='"';i++;}else{inQ=!inQ;}}else if(ch===','&&!inQ){row.push(cell.trim());cell='';}else{cell+=ch;}}row.push(cell.trim());rows.push(row);});return rows;}
