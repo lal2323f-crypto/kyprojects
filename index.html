@@ -342,7 +342,14 @@ var currentQuizData=null,currentCode=null,parsedVocab=null,VallVocab=null,Vcl=nu
 var VLETTERS=['ア','イ','ウ','エ'];
 
 function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
-function genCode(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<4;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+function genCode(){
+  var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var used=new Set();
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('quiz:')===0)used.add(k.slice(5));}}catch(e){}
+  var s='',attempts=0;
+  do{s='';for(var j=0;j<4;j++)s+=c[Math.floor(Math.random()*c.length)];attempts++;}while(used.has(s)&&attempts<10000);
+  return s;
+}
 function toast(msg,col){var t=document.getElementById('toast');t.textContent=msg;t.style.background=col||'#1e7a47';t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
 function copyText(text,msg){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){toast(msg);}).catch(function(){fb(text,msg);});}else fb(text,msg);}
 function fb(text,msg){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:-999px;';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(msg);}catch(e){}document.body.removeChild(ta);}
