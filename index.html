@@ -306,29 +306,11 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
   <div class="success-card">
     <div class="success-top">
       <div class="success-icon">🎉</div>
-      <h2 class="success-title">クイズが作成されました！</h2>
-      <p class="success-sub">生徒にQRコードを見せて始めましょう</p>
-    </div>
-    <div class="qr-section">
-      <div class="qr-label"><strong>QRコードをスキャンして開始</strong>（別端末でも即アクセス）</div>
-      <div id="qrcode-wrap"><div id="qrcode"></div></div>
-      <p class="qr-hint">生徒はスキャンするだけ。コード入力不要です。</p>
-    </div>
-    <div class="code-block">
-      <div class="code-block-label">クイズコード（同じ端末のみ有効）</div>
-      <div class="code-block-value" id="code-display">----</div>
-    </div>
-    <div class="share-section">
-      <div class="share-label">URLを共有する（クイズデータ入り・別端末でも動作）</div>
-      <div class="share-url-row">
-        <input type="text" id="url-display" readonly placeholder="URLを生成中...">
-        <button class="btn btn-outline" id="copy-url-btn" style="flex:0 0 auto;white-space:nowrap;font-size:.8rem;">URLをコピー</button>
-      </div>
-      <p class="share-note" id="share-note">URLにクイズデータが含まれています。URLを開くだけでコード入力不要で解けます。コードのみ共有した場合は同じブラウザ内でのみ利用可能です。</p>
+      <h2 class="success-title" id="success-title-display"></h2>
+      <p class="success-sub">作成できました！</p>
     </div>
     <div class="success-actions">
       <button class="btn btn-green" id="try-quiz-btn">▶ 自分でクイズを解いてみる</button>
-      <button class="btn btn-outline" id="copy-code-btn">コード「<span id="code-copy-inline">----</span>」をコピー</button>
       <button class="btn-ghost" id="make-another-btn">← 別のクイズを作る</button>
       <button class="btn-ghost" id="go-manage-from-success" style="color:var(--muted);">作成済みクイズ一覧を見る</button>
     </div>
@@ -492,8 +474,6 @@ document.getElementById('creator-back').addEventListener('click',function(){show
 document.getElementById('make-another-btn').addEventListener('click',function(){showScreen('screen-creator');});
 document.getElementById('viewer-back-btn').addEventListener('click',function(){try{history.replaceState(null,'',window.location.pathname);}catch(e){}showScreen('screen-home');});
 document.getElementById('try-quiz-btn').addEventListener('click',function(){if(currentQuizData)launchViewer(currentQuizData.t,currentQuizData.v,currentCode);});
-document.getElementById('copy-code-btn').addEventListener('click',function(){copyText(currentCode||'','コードをコピーしました！');});
-document.getElementById('copy-url-btn').addEventListener('click',function(){copyText(document.getElementById('url-display').value||window.location.href,'URLをコピーしました！');});
 
 document.getElementById('go-public-list').addEventListener('click',function(){renderPublicList();showScreen('screen-public-list');});
 document.getElementById('public-list-back').addEventListener('click',function(){showScreen('screen-home');});
@@ -554,20 +534,7 @@ document.getElementById('generate-btn').addEventListener('click',async function(
   var data={t:title,v:parsedVocab};
   currentQuizData=data;currentCode=code;
   await saveQuiz(code,data);
-  document.getElementById('code-display').textContent=code;
-  document.getElementById('code-copy-inline').textContent=code;
-  var baseUrl='';
-  try{
-    var encoded=b64enc(JSON.stringify(data));
-    history.replaceState(null,'','#'+code+'-'+encoded);
-    baseUrl=window.location.href;
-  }catch(e){try{baseUrl=window.location.href;}catch(e2){}}
-  document.getElementById('url-display').value=baseUrl||'';
-  var qrWrap=document.getElementById('qrcode');
-  qrWrap.innerHTML='';
-  try{
-    new QRCode(qrWrap,{text:baseUrl||window.location.href,width:192,height:192,correctLevel:QRCode.CorrectLevel.M});
-  }catch(e){qrWrap.textContent='QRコードの生成に失敗しました。URLをコピーして共有してください。';}
+  document.getElementById('success-title-display').textContent=title;
   showScreen('screen-success');
 });
 
