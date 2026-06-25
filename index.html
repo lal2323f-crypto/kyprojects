@@ -389,7 +389,13 @@ async function saveQuiz(code,data){
   return{fbOk:fbOk,fbStatus:fbStatus};
 }
 function listQuizzes(){var items=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('quiz:')=== 0){var code=k.slice(5);try{var d=JSON.parse(localStorage.getItem(k));if(d&&d.t&&d.v)items.push({code:code,title:d.t,count:d.v.length,ts:d.ts||0});}catch(e){}}}}catch(e){}items.sort(function(a,b){return b.ts-a.ts;});return items;}
-function deleteQuiz(code){try{localStorage.removeItem('quiz:'+code);}catch(e){}}
+async function deleteQuiz(code){
+  try{localStorage.removeItem('quiz:'+code);}catch(e){}
+  try{
+    var r=await fetch(FIREBASE_URL+'/quizzes/'+code+'.json',{method:'DELETE'});
+    if(!r.ok)console.warn('Firebase delete error:',r.status);
+  }catch(e){console.warn('Firebase delete failed',e);}
+}
 function renderManageScreen(){
   var items=listQuizzes();
   var empty=document.getElementById('manage-empty');
@@ -427,10 +433,10 @@ function renderManageScreen(){
     });
   });
   list.querySelectorAll('.qdel-btn').forEach(function(btn){
-    btn.addEventListener('click',function(){
+    btn.addEventListener('click',async function(){
       var code=this.dataset.code;
-      if(!confirm('コード「'+code+'」のクイズを削除しますか？\nこのブラウザから削除されます。URLを持っている人は引き続き解けます。'))return;
-      deleteQuiz(code);toast('削除しました','#A8281D');renderManageScreen();
+      if(!confirm('コード「'+code+'」のクイズを削除しますか？'))return;
+      await deleteQuiz(code);toast('削除しました','#A8281D');renderManageScreen();
     });
   });
 }
