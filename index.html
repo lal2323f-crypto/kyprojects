@@ -244,9 +244,11 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
     <h1>作成済みクイズ一覧</h1>
   </div>
   <div class="container">
+    <div id="manage-loading" style="text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.9rem;">読み込み中...</div>
+    <div id="manage-fb-status" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:.75rem 1rem;margin-bottom:.75rem;font-size:.82rem;color:#856404;line-height:1.5;"></div>
     <div class="manage-empty" id="manage-empty" style="display:none;">
       <p style="font-size:2rem;margin-bottom:.5rem;">📭</p>
-      <p>このブラウザで作成されたクイズはありません。</p>
+      <p>クイズがまだ作成されていません。</p>
     </div>
     <div class="qlist" id="qlist"></div>
   </div>
@@ -396,48 +398,47 @@ async function deleteQuiz(code){
     if(!r.ok)console.warn('Firebase delete error:',r.status);
   }catch(e){console.warn('Firebase delete failed',e);}
 }
-function renderManageScreen(){
-  var items=listQuizzes();
+async function renderManageScreen(){
   var empty=document.getElementById('manage-empty');
   var list=document.getElementById('qlist');
-  list.innerHTML='';
+  var loading=document.getElementById('manage-loading');
+  var fbBanner=document.getElementById('manage-fb-status');
+  list.innerHTML='';empty.style.display='none';loading.style.display='block';fbBanner.style.display='none';
+  var items=[];
+  var fbOk=false;
+  try{
+    var resp=await fetch(FIREBASE_URL+'/quizzes.json');
+    fbOk=resp.ok;
+    if(resp.ok){
+      var data=await resp.json();
+      if(data){items=Object.keys(data).map(function(code){var q=data[code];return{code:code,title:q.t||'無題',count:(q.v||[]).length,ts:q.ts||0,v:q.v};}).sort(function(a,b){return b.ts-a.ts;});}
+    }
+  }catch(e){}
+  if(!fbOk){
+    fbBanner.style.display='block';
+    fbBanner.innerHTML='⚠ Firebaseに接続できません。このデバイスで作成したクイズのみ表示されます。';
+    var local=listQuizzes();
+    items=local.map(function(item){try{var d=JSON.parse(localStorage.getItem('quiz:'+item.code));return{code:item.code,title:item.title,count:item.count,ts:item.ts,v:d?d.v:null};}catch(e){return null;}}).filter(Boolean);
+  }
+  loading.style.display='none';
   if(!items.length){empty.style.display='block';return;}
-  empty.style.display='none';
   items.forEach(function(item){
     var div=document.createElement('div');div.className='qitem';
     var dateStr='';
-    if(item.ts){var d=new Date(item.ts);dateStr=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+ d.getDate();}
+    if(item.ts){var d=new Date(item.ts);dateStr=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();}
     div.innerHTML='<div class="qitem-code">'+item.code+'</div>'
       +'<div class="qitem-info"><div class="qitem-title">'+escHtml(item.title)+'</div>'
       +'<div class="qitem-meta">'+item.count+'問'+(dateStr?' · 作成日: '+dateStr:'')+'</div></div>'
       +'<div class="qitem-actions">'
-      +'<button class="btn btn-outline qopen-btn" data-code="'+item.code+'">▶ 解く</button>'
-      +'<button class="btn btn-outline qcopy-btn" data-code="'+item.code+'">URLをコピー</button>'
-      +'<button class="btn btn-red qdel-btn" data-code="'+item.code+'">削除</button>'
+      +'<button class="btn btn-outline qopen-btn">▶ 解く</button>'
+      +'<button class="btn btn-red qdel-btn">削除</button>'
       +'</div>';
+    div.querySelector('.qopen-btn').addEventListener('click',function(){if(item.v&&item.v.length)launchViewer(item.title,item.v,item.code);});
+    div.querySelector('.qdel-btn').addEventListener('click',async function(){
+      if(!confirm('「'+item.title+'」を削除しますか？'))return;
+      await deleteQuiz(item.code);toast('削除しました','#A8281D');renderManageScreen();
+    });
     list.appendChild(div);
-  });
-  list.querySelectorAll('.qopen-btn').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var code=this.dataset.code;
-      try{var d=JSON.parse(localStorage.getItem('quiz:'+code));if(d&&d.v)launchViewer(d.t,d.v,code);}catch(e){}
-    });
-  });
-  list.querySelectorAll('.qcopy-btn').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var code=this.dataset.code;
-      try{
-        var d=JSON.parse(localStorage.getItem('quiz:'+code));
-        if(d&&d.v){var encoded=b64enc(JSON.stringify({t:d.t,v:d.v}));var url=window.location.origin+window.location.pathname+'#'+code+'-'+encoded;copyText(url,'URLをコピーしました！');}
-      }catch(e){}
-    });
-  });
-  list.querySelectorAll('.qdel-btn').forEach(function(btn){
-    btn.addEventListener('click',async function(){
-      var code=this.dataset.code;
-      if(!confirm('コード「'+code+'」のクイズを削除しますか？'))return;
-      await deleteQuiz(code);toast('削除しました','#A8281D');renderManageScreen();
-    });
   });
 }
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -466,7 +467,7 @@ function checkPassword(){
   var val=document.getElementById('pw-input').value;
   if(val==='kyquiz'){
     if(pwDest==='creator')showScreen('screen-creator');
-    else if(pwDest==='manage'){renderManageScreen();showScreen('screen-manage');}
+    else if(pwDest==='manage'){showScreen('screen-manage');renderManageScreen();}
   }else{
     document.getElementById('pw-err').textContent='パスワードが違います';
     setTimeout(function(){showScreen('screen-home');},1000);
