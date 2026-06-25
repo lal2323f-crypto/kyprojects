@@ -233,6 +233,7 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
       <p>クイズがまだ作成されていません。</p>
     </div>
     <div id="public-list-loading" style="text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.9rem;">読み込み中...</div>
+    <div id="fb-status" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:.75rem 1rem;margin-bottom:.75rem;font-size:.82rem;color:#856404;line-height:1.5;"></div>
     <div class="qlist" id="public-qlist"></div>
   </div>
 </div>
@@ -378,11 +379,14 @@ var FIREBASE_URL='https://quiz-as-20efb-default-rtdb.asia-southeast1.firebasedat
 
 async function saveQuiz(code,data){
   var d=Object.assign({},data,{ts:Date.now()});
+  var fbOk=false,fbStatus=0;
   try{localStorage.setItem('quiz:'+code,JSON.stringify(d));}catch(e){}
   try{
-    await fetch(FIREBASE_URL+'/quizzes/'+code+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
+    var r=await fetch(FIREBASE_URL+'/quizzes/'+code+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
+    fbOk=r.ok;fbStatus=r.status;
+    if(!r.ok)console.warn('Firebase save error:',r.status,r.statusText);
   }catch(e){console.warn('Firebase save failed',e);}
-  return true;
+  return{fbOk:fbOk,fbStatus:fbStatus};
 }
 function listQuizzes(){var items=[];try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('quiz:')=== 0){var code=k.slice(5);try{var d=JSON.parse(localStorage.getItem(k));if(d&&d.t&&d.v)items.push({code:code,title:d.t,count:d.v.length,ts:d.ts||0});}catch(e){}}}}catch(e){}items.sort(function(a,b){return b.ts-a.ts;});return items;}
 function deleteQuiz(code){try{localStorage.removeItem('quiz:'+code);}catch(e){}}
@@ -482,16 +486,25 @@ async function renderPublicList(){
   var list=document.getElementById('public-qlist');
   var empty=document.getElementById('public-list-empty');
   var loading=document.getElementById('public-list-loading');
-  list.innerHTML='';empty.style.display='none';loading.style.display='block';
+  var fbBanner=document.getElementById('fb-status');
+  list.innerHTML='';empty.style.display='none';loading.style.display='block';fbBanner.style.display='none';
   var items=[];
+  var fbOk=false,fbStatus=0;
   try{
     var resp=await fetch(FIREBASE_URL+'/quizzes.json');
+    fbOk=resp.ok;fbStatus=resp.status;
     if(resp.ok){
       var data=await resp.json();
       if(data){items=Object.keys(data).map(function(code){return{code:code,title:data[code].t||'無題',count:(data[code].v||[]).length,ts:data[code].ts||0,v:data[code].v};}).sort(function(a,b){return b.ts-a.ts;});}
     }
-  }catch(e){}
-  if(!items.length){
+  }catch(e){fbStatus='接続エラー';}
+  if(!fbOk){
+    fbBanner.style.display='block';
+    if(fbStatus===401||fbStatus===403){
+      fbBanner.innerHTML='⚠ <b>Firebaseのルールが期限切れです（'+fbStatus+'）</b><br>Firebaseコンソール → Realtime Database → ルール で更新が必要です。<br>現在はこのデバイスで作成したクイズのみ表示されます。';
+    }else{
+      fbBanner.innerHTML='⚠ <b>Firebaseに接続できません（'+fbStatus+'）</b><br>現在はこのデバイスで作成したクイズのみ表示されます。';
+    }
     var local=listQuizzes();
     items=local.map(function(item){try{var d=JSON.parse(localStorage.getItem('quiz:'+item.code));return{code:item.code,title:item.title,count:item.count,ts:item.ts,v:d?d.v:null};}catch(e){return null;}}).filter(Boolean);
   }
@@ -533,7 +546,13 @@ document.getElementById('generate-btn').addEventListener('click',async function(
   var code=genCode();
   var data={t:title,v:parsedVocab};
   currentQuizData=data;currentCode=code;
-  await saveQuiz(code,data);
+  var saveResult=await saveQuiz(code,data);
+  if(!saveResult.fbOk){
+    var msg=saveResult.fbStatus===401||saveResult.fbStatus===403
+      ?'⚠ Firebaseのルールが期限切れのため別端末共有ができません（ステータス:'+saveResult.fbStatus+'）\nFirebaseコンソールでルールを更新してください。'
+      :'⚠ Firebaseへの保存に失敗しました（ステータス:'+saveResult.fbStatus+'）\n別端末では表示されない可能性があります。';
+    alert(msg);
+  }
   document.getElementById('success-title-display').textContent=title;
   showScreen('screen-success');
 });
