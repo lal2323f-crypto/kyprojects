@@ -426,8 +426,7 @@ async function renderManageScreen(){
     var div=document.createElement('div');div.className='qitem';
     var dateStr='';
     if(item.ts){var d=new Date(item.ts);dateStr=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();}
-    div.innerHTML='<div class="qitem-code">'+item.code+'</div>'
-      +'<div class="qitem-info"><div class="qitem-title">'+escHtml(item.title)+'</div>'
+    div.innerHTML='<div class="qitem-info"><div class="qitem-title">'+escHtml(item.title)+'</div>'
       +'<div class="qitem-meta">'+item.count+'問'+(dateStr?' · 作成日: '+dateStr:'')+'</div></div>'
       +'<div class="qitem-actions">'
       +'<button class="btn btn-outline qopen-btn">▶ 解く</button>'
