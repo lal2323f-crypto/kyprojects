@@ -160,6 +160,16 @@ legend{display:block;width:100%;padding:0;margin:0;}
 .results-table tbody tr:last-child td{border-bottom:none;}
 .st-input-row{display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1.1rem;margin-bottom:1.5rem;}
 .st-input-row input{width:3.2rem;text-align:center;font-size:1.3rem;padding:.5rem .3rem;font-family:'Kaisei Decol',serif;}
+.class-stats{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+.stat-chip{flex:1;min-width:4.5rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.5rem .4rem;text-align:center;}
+.stat-chip .sc-val{font-family:'Kaisei Decol',serif;font-size:1.3rem;font-weight:700;line-height:1.1;}
+.stat-chip .sc-lbl{font-size:.68rem;color:var(--muted);margin-top:.1rem;}
+.wrong-rank{margin-top:1rem;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;}
+.wrong-rank h3{font-family:'Klee One',cursive;font-size:.88rem;margin:0 0 .6rem;color:var(--muted);}
+.wrong-rank-item{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;border-bottom:1px dashed var(--border);font-size:.85rem;}
+.wrong-rank-item:last-child{border-bottom:none;}
+.wrong-rank-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.wrong-rank-bar-fill{height:100%;background:var(--red);border-radius:3px;}
 #vrnote{color:var(--pencil);font-size:.74rem;margin:-.3rem 0 .45rem;}
 #vwlw{text-align:left;max-width:540px;margin:0 auto 1.3rem;background:rgba(168,40,29,.04);border:1px solid var(--grid);border-radius:4px;padding:.85rem 1rem;}
 #vwlw h2{font-family:'Klee One',cursive;font-weight:600;font-size:.97rem;margin:0 0 .48rem;color:var(--ink);}
@@ -273,10 +283,13 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
 <div id="screen-results-view" class="screen">
   <div class="creator-header">
     <button class="btn-ghost" id="results-view-back">← 管理に戻る</button>
-    <h1 id="results-view-title" style="font-size:.95rem;">結果</h1>
+    <h1 id="results-view-title" style="font-size:.9rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">結果</h1>
+    <button class="btn-ghost" id="results-refresh-btn" style="font-size:.78rem;color:var(--blue);">🔄 更新</button>
+    <button class="btn-ghost" id="results-csv-btn" style="font-size:.78rem;color:var(--green);">📥 CSV</button>
   </div>
   <div class="container">
     <div id="results-view-loading" style="text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.9rem;">読み込み中...</div>
+    <div id="results-last-updated" style="display:none;text-align:right;font-size:.75rem;color:var(--muted);margin-bottom:.5rem;"></div>
     <div id="results-view-empty" style="display:none;text-align:center;padding:2.5rem 1rem;color:var(--muted);">まだ解答記録がありません。</div>
     <div id="results-tabs" style="display:none;">
       <div id="results-tab-btns" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;"></div>
@@ -394,6 +407,7 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
           <p id="vrmsg"></p><p id="vrrate"></p><p id="vrnote"></p>
           <div id="vwlw" style="display:none;"><h2>間違えた単語</h2><ul id="vwl"></ul></div>
           <div class="vrbtns">
+            <button id="vr-back-to-list" style="width:100%;margin-bottom:.4rem;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:.6rem 1rem;font-size:.9rem;cursor:pointer;font-family:inherit;color:var(--ink);">← クイズ一覧に戻る</button>
             <button id="vrbtn">選択肢をシャッフルしてもう一度</button>
             <button id="vrwbtn">間違えた単語のみもう一度</button>
           </div>
@@ -567,7 +581,8 @@ async function renderPublicList(){
   if(!items.length){empty.style.display='block';return;}
   items.forEach(function(item){
     var div=document.createElement('div');div.className='qitem';div.style.cursor='pointer';
-    div.innerHTML='<div class="qitem-info" style="flex:1;"><div class="qitem-title">'+escHtml(item.title)+'</div><div class="qitem-meta">'+item.count+'問</div></div>'
+    var mins=Math.max(1,Math.ceil(item.count/5));
+    div.innerHTML='<div class="qitem-info" style="flex:1;"><div class="qitem-title">'+escHtml(item.title)+'</div><div class="qitem-meta">'+item.count+'問 · 約'+mins+'分</div></div>'
       +'<span style="color:var(--green);font-weight:700;font-size:.9rem;">▶ 解く</span>';
     div.addEventListener('click',function(){if(item.v&&item.v.length)showStudentInput(item.title,item.v,item.code);});
     list.appendChild(div);
@@ -614,6 +629,7 @@ document.getElementById('generate-btn').addEventListener('click',async function(
 
 function showStudentInput(title,vocab,code){
   pendingQuiz={title:title,vocab:vocab,code:code};
+  if(stY&&stC&&stN){currentCode=code;launchViewer(title,vocab,code,true);return;}
   document.getElementById('st-year').value='';
   document.getElementById('st-class').value='';
   document.getElementById('st-num').value='';
@@ -698,80 +714,147 @@ function vSR(){
   if(Vwa.length>0){ww.style.display='block';Vwa.forEach(function(e){var li=document.createElement('li');var ws=document.createElement('span');ws.className='w';ws.lang='en';ws.textContent=e[0];var ms=document.createElement('span');ms.className='m';ms.textContent=e[1];li.appendChild(ws);li.appendChild(ms);wu.appendChild(li);});}else ww.style.display='none';
   var rb=document.getElementById('vrwbtn');if(Vwa.length>0){rb.style.display='inline-block';rb.textContent='間違えた'+Vwa.length+'問のみもう一度';}else rb.style.display='none';
   if(stY&&stC&&stN&&currentCode&&!resultSaved){resultSaved=true;saveResult(currentCode);}
+  setTimeout(function(){document.getElementById('vresults').scrollIntoView({behavior:'smooth',block:'start'});},300);
 }
 async function saveResult(quizCode){
   var key=stY+'-'+stC+'-'+stN;
-  var data={y:parseInt(stY),c:parseInt(stC),n:parseInt(stN),score:Vcc,total:VTOTAL,ts:Date.now()};
+  var data={y:parseInt(stY),c:parseInt(stC),n:parseInt(stN),score:Vcc,total:VTOTAL,ts:Date.now(),wa:Vwa.map(function(e){return e[0];})};
   try{
     await fetch(FIREBASE_URL+'/results/'+quizCode+'/'+key+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
   }catch(e){console.warn('Result save failed',e);}
 }
 document.getElementById('vrbtn').addEventListener('click',function(){resultSaved=false;vBuildQuiz(VallVocab);window.scrollTo({top:0,behavior:'smooth'});});
 document.getElementById('vrwbtn').addEventListener('click',function(){if(Vwa.length===0)return;resultSaved=false;vBuildQuiz(Vwa.slice());window.scrollTo({top:0,behavior:'smooth'});});
-document.getElementById('viewer-back-btn').addEventListener('click',function(){stY='';stC='';stN='';currentCode=null;showScreen('screen-home');});
+document.getElementById('vr-back-to-list').addEventListener('click',function(){renderPublicList();showScreen('screen-public-list');});
+document.getElementById('viewer-back-btn').addEventListener('click',function(){stY='';stC='';stN='';currentCode=null;try{history.replaceState(null,'',window.location.pathname);}catch(e){}showScreen('screen-home');});
 
-async function renderResultsView(code,title){
-  document.getElementById('results-view-title').textContent=escHtml(title)+' の結果';
+var resultsPollingTimer=null,currentResultsCode=null,currentResultsTitle='',currentResultsAllData=null,currentResultsActiveClass=null;
+function stopResultsPolling(){if(resultsPollingTimer){clearInterval(resultsPollingTimer);resultsPollingTimer=null;}}
+async function fetchAndRenderResults(code,preserveTab){
   var loading=document.getElementById('results-view-loading');
   var empty=document.getElementById('results-view-empty');
   var tabs=document.getElementById('results-tabs');
   var tabBtns=document.getElementById('results-tab-btns');
   var tabContent=document.getElementById('results-tab-content');
-  loading.style.display='block';empty.style.display='none';tabs.style.display='none';
-  tabBtns.innerHTML='';tabContent.innerHTML='';
-  showScreen('screen-results-view');
+  var lastUpd=document.getElementById('results-last-updated');
+  if(!preserveTab){loading.style.display='block';empty.style.display='none';tabs.style.display='none';tabBtns.innerHTML='';tabContent.innerHTML='';}
   try{
     var resp=await fetch(FIREBASE_URL+'/results/'+code+'.json');
     loading.style.display='none';
     if(!resp.ok){empty.textContent='データ取得に失敗しました（'+resp.status+'）';empty.style.display='block';return;}
     var data=await resp.json();
-    if(!data){empty.style.display='block';return;}
+    currentResultsAllData=data;
+    var now=new Date();lastUpd.textContent='最終更新：'+(now.getHours())+':'+(String(now.getMinutes()).padStart(2,'0'));lastUpd.style.display='block';
+    if(!data){empty.style.display='block';tabs.style.display='none';return;}
     var classes={};
     Object.keys(data).forEach(function(key){
       var r=data[key];
       var ck=r.y+'年'+r.c+'組';
       if(!classes[ck])classes[ck]=[];
-      classes[ck].push({n:r.n,score:r.score,total:r.total,ts:r.ts});
+      classes[ck].push({n:r.n,score:r.score,total:r.total,ts:r.ts,wa:r.wa||[]});
     });
     var keys=Object.keys(classes).sort(function(a,b){return a.localeCompare(b,undefined,{numeric:true});});
     if(!keys.length){empty.style.display='block';return;}
-    tabs.style.display='block';
-    keys.forEach(function(ck,i){
-      var btn=document.createElement('button');
-      btn.className='tab-btn'+(i===0?' tab-active':'');
-      btn.textContent=ck;
-      btn.addEventListener('click',function(){
-        tabBtns.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('tab-active');});
-        btn.classList.add('tab-active');
-        renderClassResults(tabContent,classes[ck]);
+    empty.style.display='none';tabs.style.display='block';
+    var activeKey=preserveTab&&currentResultsActiveClass&&classes[currentResultsActiveClass]?currentResultsActiveClass:keys[0];
+    if(!preserveTab){
+      tabBtns.innerHTML='';
+      keys.forEach(function(ck){
+        var btn=document.createElement('button');
+        btn.className='tab-btn'+(ck===activeKey?' tab-active':'');
+        btn.textContent=ck;
+        btn.addEventListener('click',function(){
+          tabBtns.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('tab-active');});
+          btn.classList.add('tab-active');
+          currentResultsActiveClass=ck;
+          renderClassResults(tabContent,classes[ck]);
+        });
+        tabBtns.appendChild(btn);
       });
-      tabBtns.appendChild(btn);
-    });
-    renderClassResults(tabContent,classes[keys[0]]);
+    }else{
+      tabBtns.querySelectorAll('.tab-btn').forEach(function(btn){btn.className='tab-btn'+(btn.textContent===activeKey?' tab-active':'');});
+    }
+    currentResultsActiveClass=activeKey;
+    renderClassResults(tabContent,classes[activeKey]);
   }catch(e){loading.style.display='none';empty.textContent='エラーが発生しました。';empty.style.display='block';}
+}
+async function renderResultsView(code,title){
+  currentResultsCode=code;currentResultsTitle=title;currentResultsActiveClass=null;
+  document.getElementById('results-view-title').textContent=title+' の結果';
+  showScreen('screen-results-view');
+  await fetchAndRenderResults(code,false);
+  stopResultsPolling();
+  resultsPollingTimer=setInterval(function(){
+    if(document.getElementById('screen-results-view').classList.contains('active')){fetchAndRenderResults(currentResultsCode,true);}
+    else{stopResultsPolling();}
+  },30000);
 }
 function renderClassResults(container,students){
   students.sort(function(a,b){return a.n-b.n;});
-  var table=document.createElement('table');
-  table.className='results-table';
-  table.innerHTML='<thead><tr><th>出席番号</th><th>スコア</th><th>正答率</th><th>日付</th></tr></thead>';
+  var total=students.length;
+  var sumPct=0,perfect=0,good=0,fair=0,poor=0;
+  var wrongCount={};
+  students.forEach(function(s){
+    var p=Math.round((s.score/s.total)*100);
+    sumPct+=p;
+    if(p===100)perfect++;else if(p>=80)good++;else if(p>=60)fair++;else poor++;
+    (s.wa||[]).forEach(function(w){wrongCount[w]=(wrongCount[w]||0)+1;});
+  });
+  var avg=total?Math.round(sumPct/total):0;
+  var frag=document.createDocumentFragment();
+  var stats=document.createElement('div');stats.className='class-stats';
+  [['平均',avg+'%',''],['満点',perfect+'人','#b8960a'],['80%+',good+'人','var(--green)'],['60%+',fair+'人','#c97d10'],['60%-',poor+'人','var(--red)']].forEach(function(d){
+    var chip=document.createElement('div');chip.className='stat-chip';
+    chip.innerHTML='<div class="sc-val" style="color:'+(d[2]||'var(--ink)')+'">'+d[1]+'</div><div class="sc-lbl">'+d[0]+'</div>';
+    stats.appendChild(chip);
+  });
+  frag.appendChild(stats);
+  var table=document.createElement('table');table.className='results-table';
+  table.innerHTML='<thead><tr><th>番号</th><th>スコア</th><th>正答率</th><th>日付</th></tr></thead>';
   var tb=document.createElement('tbody');
   students.forEach(function(s){
-    var d=new Date(s.ts);
-    var ds=(d.getMonth()+1)+'/'+d.getDate();
+    var d=new Date(s.ts);var ds=(d.getMonth()+1)+'/'+d.getDate();
     var pct=Math.round((s.score/s.total)*100);
     var color=pct===100?'#b8960a':pct>=80?'var(--green)':pct>=60?'#c97d10':'var(--red)';
     var tr=document.createElement('tr');
-    tr.innerHTML='<td>'+s.n+'番</td><td>'+s.score+'/'+s.total+'</td>'
-      +'<td style="font-weight:700;color:'+color+';">'+pct+'%</td>'
-      +'<td style="color:var(--muted);font-size:.82rem;">'+ds+'</td>';
+    tr.innerHTML='<td>'+s.n+'番</td><td>'+s.score+'/'+s.total+'</td><td style="font-weight:700;color:'+color+';">'+pct+'%</td><td style="color:var(--muted);font-size:.82rem;">'+ds+'</td>';
     tb.appendChild(tr);
   });
-  table.appendChild(tb);
-  container.innerHTML='';
-  container.appendChild(table);
+  table.appendChild(tb);frag.appendChild(table);
+  var wrongKeys=Object.keys(wrongCount).sort(function(a,b){return wrongCount[b]-wrongCount[a];}).slice(0,7);
+  if(wrongKeys.length){
+    var maxC=wrongCount[wrongKeys[0]];
+    var wr=document.createElement('div');wr.className='wrong-rank';
+    wr.innerHTML='<h3>よく間違えた単語 TOP'+wrongKeys.length+'</h3>';
+    wrongKeys.forEach(function(w){
+      var pct2=Math.round((wrongCount[w]/maxC)*100);
+      var item=document.createElement('div');item.className='wrong-rank-item';
+      item.innerHTML='<span style="font-family:\'Klee One\',cursive;min-width:6rem;">'+escHtml(w)+'</span>'
+        +'<div class="wrong-rank-bar"><div class="wrong-rank-bar-fill" style="width:'+pct2+'%"></div></div>'
+        +'<span style="min-width:2.5rem;text-align:right;font-size:.8rem;color:var(--muted);">'+wrongCount[w]+'人</span>';
+      wr.appendChild(item);
+    });
+    frag.appendChild(wr);
+  }
+  container.innerHTML='';container.appendChild(frag);
 }
-document.getElementById('results-view-back').addEventListener('click',function(){renderManageScreen();showScreen('screen-manage');});
+function downloadResultsCSV(){
+  if(!currentResultsAllData)return;
+  var rows=[['クラス','出席番号','スコア','正答率（%）','日付']];
+  Object.keys(currentResultsAllData).forEach(function(key){
+    var r=currentResultsAllData[key];
+    var d=new Date(r.ts);var ds=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();
+    var pct=Math.round((r.score/r.total)*100);
+    rows.push([r.y+'年'+r.c+'組',r.n+'番',r.score+'/'+r.total,pct,ds]);
+  });
+  rows.sort(function(a,b){return a[0]===b[0]?parseInt(a[1])-parseInt(b[1]):a[0].localeCompare(b[0]);});
+  var csv=rows.map(function(r){return r.join(',');}).join('\n');
+  var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=currentResultsTitle+'_結果.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+document.getElementById('results-view-back').addEventListener('click',function(){stopResultsPolling();renderManageScreen();showScreen('screen-manage');});
+document.getElementById('results-refresh-btn').addEventListener('click',function(){fetchAndRenderResults(currentResultsCode,true);});
+document.getElementById('results-csv-btn').addEventListener('click',downloadResultsCSV);
 document.getElementById('st-submit').addEventListener('click',function(){
   var y=document.getElementById('st-year').value.trim();
   var c=document.getElementById('st-class').value.trim();
