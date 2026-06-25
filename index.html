@@ -793,12 +793,10 @@ function renderClassResults(container,students){
   students.sort(function(a,b){return a.n-b.n;});
   var total=students.length;
   var sumPct=0,perfect=0,good=0,fair=0,poor=0;
-  var wrongCount={};
   students.forEach(function(s){
     var p=Math.round((s.score/s.total)*100);
     sumPct+=p;
     if(p===100)perfect++;else if(p>=80)good++;else if(p>=60)fair++;else poor++;
-    (s.wa||[]).forEach(function(w){wrongCount[w]=(wrongCount[w]||0)+1;});
   });
   var avg=total?Math.round(sumPct/total):0;
   var frag=document.createDocumentFragment();
@@ -821,21 +819,6 @@ function renderClassResults(container,students){
     tb.appendChild(tr);
   });
   table.appendChild(tb);frag.appendChild(table);
-  var wrongKeys=Object.keys(wrongCount).sort(function(a,b){return wrongCount[b]-wrongCount[a];}).slice(0,7);
-  if(wrongKeys.length){
-    var maxC=wrongCount[wrongKeys[0]];
-    var wr=document.createElement('div');wr.className='wrong-rank';
-    wr.innerHTML='<h3>よく間違えた単語 TOP'+wrongKeys.length+'</h3>';
-    wrongKeys.forEach(function(w){
-      var pct2=Math.round((wrongCount[w]/maxC)*100);
-      var item=document.createElement('div');item.className='wrong-rank-item';
-      item.innerHTML='<span style="font-family:\'Klee One\',cursive;min-width:6rem;">'+escHtml(w)+'</span>'
-        +'<div class="wrong-rank-bar"><div class="wrong-rank-bar-fill" style="width:'+pct2+'%"></div></div>'
-        +'<span style="min-width:2.5rem;text-align:right;font-size:.8rem;color:var(--muted);">'+wrongCount[w]+'人</span>';
-      wr.appendChild(item);
-    });
-    frag.appendChild(wr);
-  }
   container.innerHTML='';container.appendChild(frag);
 }
 function downloadResultsCSV(){
