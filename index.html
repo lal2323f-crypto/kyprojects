@@ -14,8 +14,8 @@ html,body{margin:0;padding:0;overflow-x:hidden;}
 body{font-family:'Zen Kaku Gothic New',sans-serif;color:var(--ink);background:var(--bg);}
 .screen{display:none;min-height:100vh;}
 .screen.active{display:block;}
-#screen-home,#screen-password{display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#E8E4D8 0%,#F4F3EF 100%);}
-#screen-home.active,#screen-password.active{display:flex;}
+#screen-home,#screen-password,#screen-student-input{display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#E8E4D8 0%,#F4F3EF 100%);}
+#screen-home.active,#screen-password.active,#screen-student-input.active{display:flex;}
 #screen-success{display:none;align-items:center;justify-content:center;background:var(--bg);padding:1rem 0;}
 #screen-success.active{display:flex;}
 .home-card,.success-card{background:var(--surface);border-radius:12px;box-shadow:0 4px 32px rgba(0,0,0,.10);padding:2.4rem 2rem;max-width:420px;width:100%;margin:1rem;text-align:center;}
@@ -143,11 +143,23 @@ legend{display:block;width:100%;padding:0;margin:0;}
 @keyframes rC{0%{background:rgba(168,40,29,.28);}100%{background:var(--red-tint);}}
 #vresults{margin-top:1.8rem;padding-top:1.3rem;border-top:2px solid var(--ink);text-align:center;}
 #vresults .vph{color:var(--pencil);font-size:.88rem;}
-.hanko{width:108px;height:108px;margin:0 auto .65rem;border:3px double var(--red);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--red);transform:rotate(-6deg);}
-.hanko .hnum{font-family:'Kaisei Decol',serif;font-weight:700;font-size:1.8rem;line-height:1;}
-.hanko .hden{font-family:'Kaisei Decol',serif;font-size:.8rem;}
-#vrmsg{font-family:'Klee One',cursive;font-size:1.15rem;margin:.32rem 0 .9rem;}
-#vrrate{color:var(--pencil);font-size:.83rem;margin:-.4rem 0 1rem;}
+.hanko{width:148px;height:148px;margin:0 auto .8rem;border:4px double var(--red);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--red);transform:rotate(-6deg);animation:hankoIn .55s cubic-bezier(.2,1.5,.5,1) both;}
+@keyframes hankoIn{from{transform:rotate(-6deg) scale(0);opacity:0;}to{transform:rotate(-6deg) scale(1);opacity:1;}}
+.hanko .hnum{font-family:'Kaisei Decol',serif;font-weight:700;font-size:2.4rem;line-height:1;}
+.hanko .hden{font-family:'Kaisei Decol',serif;font-size:.9rem;}
+.hanko-perfect{border-color:#b8960a;color:#b8960a;box-shadow:0 0 0 6px rgba(184,150,10,.12);}
+.hanko-good{border-color:var(--green);color:var(--green);}
+.hanko-fair{border-color:#c97d10;color:#c97d10;}
+#vrmsg{font-family:'Kaisei Decol',serif;font-size:1.35rem;font-weight:700;margin:.5rem 0 .5rem;color:var(--ink);}
+#vrrate{color:var(--pencil);font-size:.88rem;margin:0 0 1.1rem;}
+.tab-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:.38rem 1rem;font-size:.85rem;cursor:pointer;font-family:inherit;color:var(--ink);}
+.tab-btn.tab-active{background:var(--blue);color:#fff;border-color:var(--blue);}
+.results-table{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:.5rem;}
+.results-table th{background:var(--surface);padding:.5rem .75rem;text-align:left;border-bottom:2px solid var(--border);font-family:'Klee One',cursive;font-size:.82rem;color:var(--muted);}
+.results-table td{padding:.55rem .75rem;border-bottom:1px solid var(--border);}
+.results-table tbody tr:last-child td{border-bottom:none;}
+.st-input-row{display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1.1rem;margin-bottom:1.5rem;}
+.st-input-row input{width:3.2rem;text-align:center;font-size:1.3rem;padding:.5rem .3rem;font-family:'Kaisei Decol',serif;}
 #vrnote{color:var(--pencil);font-size:.74rem;margin:-.3rem 0 .45rem;}
 #vwlw{text-align:left;max-width:540px;margin:0 auto 1.3rem;background:rgba(168,40,29,.04);border:1px solid var(--grid);border-radius:4px;padding:.85rem 1rem;}
 #vwlw h2{font-family:'Klee One',cursive;font-weight:600;font-size:.97rem;margin:0 0 .48rem;color:var(--ink);}
@@ -178,9 +190,9 @@ legend{display:block;width:100%;padding:0;margin:0;}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;}}
 @media(prefers-color-scheme:dark){
 :root{--paper:#211F19;--grid:#34322A;--ink:#EFEDE4;--muted:#A8A498;--pencil:#A8A498;--blue:#9DB6E8;--green:#4aba7e;--bp:#9DB6E8;--red:#E8736A;--red-deep:#FF8C82;--red-tint:rgba(232,115,106,.16);--bg:#15140F;--surface:#2a2921;--border:#3a3830;}
-#screen-home,#screen-password{background:linear-gradient(135deg,#1a1914 0%,#25241e 100%);}
+#screen-home,#screen-password,#screen-student-input{background:linear-gradient(135deg,#1a1914 0%,#25241e 100%);}
 .home-card,.success-card{background:#2a2921;border:1px solid #3a3830;}
-#screen-creator,#screen-manage,#screen-viewer{background:#15140F;}
+#screen-creator,#screen-manage,#screen-viewer,#screen-results-view{background:#15140F;}
 .step{background:#2a2921;border-color:#3a3830;}
 .qitem{background:#2a2921;border-color:#3a3830;}
 input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
@@ -222,6 +234,26 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
   </div>
 </div>
 
+<div id="screen-student-input" class="screen">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
+    <div class="home-card" style="text-align:center;">
+      <div style="font-size:2rem;margin-bottom:.5rem;">✏️</div>
+      <h2 style="font-family:'Klee One',cursive;font-size:1.05rem;margin:0 0 1.5rem;color:var(--ink);">クラスと出席番号を入力してください</h2>
+      <div class="st-input-row">
+        <input type="number" id="st-year" inputmode="numeric" pattern="[0-9]*" min="1" max="9" placeholder="1">
+        <span style="color:var(--ink);">年</span>
+        <input type="number" id="st-class" inputmode="numeric" pattern="[0-9]*" min="1" max="9" placeholder="1">
+        <span style="color:var(--ink);">組</span>
+        <input type="number" id="st-num" inputmode="numeric" pattern="[0-9]*" min="1" max="99" placeholder="1">
+        <span style="color:var(--ink);">番</span>
+      </div>
+      <div class="err-inline" id="st-err" style="min-height:1.4em;text-align:center;margin-bottom:.5rem;"></div>
+      <button class="btn btn-green" id="st-submit" style="width:100%;padding:.72rem;font-size:.98rem;">クイズを始める ▶</button>
+      <button class="btn-ghost" id="st-cancel" style="margin-top:.5rem;width:100%;text-align:center;">← 一覧に戻る</button>
+    </div>
+  </div>
+</div>
+
 <div id="screen-public-list" class="screen">
   <div class="creator-header">
     <button class="btn-ghost" id="public-list-back">← ホーム</button>
@@ -235,6 +267,21 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
     <div id="public-list-loading" style="text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.9rem;">読み込み中...</div>
     <div id="fb-status" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:.75rem 1rem;margin-bottom:.75rem;font-size:.82rem;color:#856404;line-height:1.5;"></div>
     <div class="qlist" id="public-qlist"></div>
+  </div>
+</div>
+
+<div id="screen-results-view" class="screen">
+  <div class="creator-header">
+    <button class="btn-ghost" id="results-view-back">← 管理に戻る</button>
+    <h1 id="results-view-title" style="font-size:.95rem;">結果</h1>
+  </div>
+  <div class="container">
+    <div id="results-view-loading" style="text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.9rem;">読み込み中...</div>
+    <div id="results-view-empty" style="display:none;text-align:center;padding:2.5rem 1rem;color:var(--muted);">まだ解答記録がありません。</div>
+    <div id="results-tabs" style="display:none;">
+      <div id="results-tab-btns" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;"></div>
+      <div id="results-tab-content"></div>
+    </div>
   </div>
 </div>
 
@@ -337,7 +384,7 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
         <span class="vmn" aria-hidden="true">がんばって！ ✨</span>
         <h1 class="vtitle" id="vquiz-title">単語テスト<span class="sub">選択肢シャッフル版</span></h1>
         <p class="vinst" id="vinst">次の英単語の意味として最も適切なものをア〜エから選びなさい。選ぶと、その場で採点されます。</p>
-        <div class="vid-line"><span>クラス：&nbsp;</span><span>出席番号：&nbsp;</span><span>氏名：&nbsp;</span></div>
+        <div class="vid-line" id="vid-line"></div>
       </div>
       <div id="vquiz" aria-label="問題一覧"></div>
       <div id="vresults">
@@ -359,6 +406,7 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
 <script>
 (function(){"use strict";
 var currentQuizData=null,currentCode=null,parsedVocab=null,VallVocab=null,Vcl=null,VTOTAL=0,Vcc=0,Vac=0,Vwa=[];
+var stY='',stC='',stN='',pendingQuiz=null,resultSaved=false;
 var VLETTERS=['ア','イ','ウ','エ'];
 
 function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
@@ -430,9 +478,11 @@ async function renderManageScreen(){
       +'<div class="qitem-meta">'+item.count+'問'+(dateStr?' · 作成日: '+dateStr:'')+'</div></div>'
       +'<div class="qitem-actions">'
       +'<button class="btn btn-outline qopen-btn">▶ 解く</button>'
+      +'<button class="btn btn-outline qres-btn" style="color:var(--blue);border-color:var(--blue);">📊 結果</button>'
       +'<button class="btn btn-red qdel-btn">削除</button>'
       +'</div>';
-    div.querySelector('.qopen-btn').addEventListener('click',function(){if(item.v&&item.v.length)launchViewer(item.title,item.v,item.code);});
+    div.querySelector('.qopen-btn').addEventListener('click',function(){if(item.v&&item.v.length)launchViewer(item.title,item.v,item.code,true);});
+    div.querySelector('.qres-btn').addEventListener('click',function(){renderResultsView(item.code,item.title);});
     div.querySelector('.qdel-btn').addEventListener('click',async function(){
       if(!confirm('「'+item.title+'」を削除しますか？'))return;
       await deleteQuiz(item.code);toast('削除しました','#A8281D');renderManageScreen();
@@ -482,8 +532,7 @@ document.getElementById('go-manage-from-success').addEventListener('click',funct
 document.getElementById('manage-back').addEventListener('click',function(){showScreen('screen-home');});
 document.getElementById('creator-back').addEventListener('click',function(){showScreen('screen-home');});
 document.getElementById('make-another-btn').addEventListener('click',function(){showScreen('screen-creator');});
-document.getElementById('viewer-back-btn').addEventListener('click',function(){try{history.replaceState(null,'',window.location.pathname);}catch(e){}showScreen('screen-home');});
-document.getElementById('try-quiz-btn').addEventListener('click',function(){if(currentQuizData)launchViewer(currentQuizData.t,currentQuizData.v,currentCode);});
+document.getElementById('try-quiz-btn').addEventListener('click',function(){if(currentQuizData){stY='';stC='';stN='';showStudentInput(currentQuizData.t,currentQuizData.v,currentCode);}});
 
 document.getElementById('go-public-list').addEventListener('click',function(){renderPublicList();showScreen('screen-public-list');});
 document.getElementById('public-list-back').addEventListener('click',function(){showScreen('screen-home');});
@@ -520,7 +569,7 @@ async function renderPublicList(){
     var div=document.createElement('div');div.className='qitem';div.style.cursor='pointer';
     div.innerHTML='<div class="qitem-info" style="flex:1;"><div class="qitem-title">'+escHtml(item.title)+'</div><div class="qitem-meta">'+item.count+'問</div></div>'
       +'<span style="color:var(--green);font-weight:700;font-size:.9rem;">▶ 解く</span>';
-    div.addEventListener('click',function(){if(item.v&&item.v.length)launchViewer(item.title,item.v,item.code);});
+    div.addEventListener('click',function(){if(item.v&&item.v.length)showStudentInput(item.title,item.v,item.code);});
     list.appendChild(div);
   });
 }
@@ -563,13 +612,26 @@ document.getElementById('generate-btn').addEventListener('click',async function(
   showScreen('screen-success');
 });
 
-function launchViewer(title,vocab,code){
+function showStudentInput(title,vocab,code){
+  pendingQuiz={title:title,vocab:vocab,code:code};
+  document.getElementById('st-year').value='';
+  document.getElementById('st-class').value='';
+  document.getElementById('st-num').value='';
+  document.getElementById('st-err').textContent='';
+  showScreen('screen-student-input');
+  setTimeout(function(){document.getElementById('st-year').focus();},150);
+}
+function launchViewer(title,vocab,code,skipInput){
+  if(!skipInput&&!stY){showStudentInput(title,vocab,code);return;}
+  resultSaved=false;
   VallVocab=vocab;
   var titleEl=document.getElementById('vquiz-title');
   titleEl.innerHTML='';
   titleEl.appendChild(document.createTextNode(title));
   var sub=document.createElement('span');sub.className='sub';sub.textContent='選択肢シャッフル版';titleEl.appendChild(sub);
   document.getElementById('viewer-code-label').textContent=code?'コード: '+code:'';
+  var vidLine=document.getElementById('vid-line');
+  vidLine.textContent=stY&&stC&&stN?stY+'年'+stC+'組'+stN+'番':'';
   showScreen('screen-viewer');
   vBuildQuiz(vocab);
 }
@@ -622,19 +684,109 @@ function vSR(){
   document.getElementById('vrph').style.display='none';document.getElementById('vrc').style.display='block';
   document.getElementById('vfs').textContent=Vcc;document.getElementById('vft').textContent=VTOTAL;
   var p=Math.round((Vcc/VTOTAL)*100),msg;
-  if(p===100)msg='満点！ お見事です。';else if(p>=90)msg='素晴らしい！ あと一歩で満点です。';else if(p>=70)msg='よくできました。間違えた単語をもう一度確認しよう。';else if(p>=50)msg='もう少し！ ○がついた単語を見直そう。';else msg='復習が必要です。教科書を見直してみよう。';
-  document.getElementById('vrmsg').textContent=msg;document.getElementById('vrrate').textContent='正答率：'+p+'%';
+  if(p===100)msg='🎉 満点！ 完璧です！';else if(p>=90)msg='✨ 素晴らしい！ あと一歩で満点です。';else if(p>=70)msg='👍 よくできました！ 間違えた単語を確認しよう。';else if(p>=50)msg='💪 もう少し！ 見直せばきっと上がる！';else msg='📖 復習が必要です。教科書を見直してみよう。';
+  var hanko=document.querySelector('.hanko');
+  hanko.className='hanko';
+  if(p===100)hanko.classList.add('hanko-perfect');
+  else if(p>=80)hanko.classList.add('hanko-good');
+  else if(p>=60)hanko.classList.add('hanko-fair');
+  void hanko.offsetWidth;
+  document.getElementById('vrmsg').textContent=msg;
+  document.getElementById('vrrate').textContent='正答率：'+p+'%';
   document.getElementById('vrnote').textContent=(Vcl===VallVocab)?'':'前回間違えた'+VTOTAL+'問の復習ラウンドです。';
   var ww=document.getElementById('vwlw'),wu=document.getElementById('vwl');wu.innerHTML='';
   if(Vwa.length>0){ww.style.display='block';Vwa.forEach(function(e){var li=document.createElement('li');var ws=document.createElement('span');ws.className='w';ws.lang='en';ws.textContent=e[0];var ms=document.createElement('span');ms.className='m';ms.textContent=e[1];li.appendChild(ws);li.appendChild(ms);wu.appendChild(li);});}else ww.style.display='none';
   var rb=document.getElementById('vrwbtn');if(Vwa.length>0){rb.style.display='inline-block';rb.textContent='間違えた'+Vwa.length+'問のみもう一度';}else rb.style.display='none';
+  if(stY&&stC&&stN&&currentCode&&!resultSaved){resultSaved=true;saveResult(currentCode);}
 }
-document.getElementById('vrbtn').addEventListener('click',function(){vBuildQuiz(VallVocab);window.scrollTo({top:0,behavior:'smooth'});});
-document.getElementById('vrwbtn').addEventListener('click',function(){if(Vwa.length===0)return;vBuildQuiz(Vwa.slice());window.scrollTo({top:0,behavior:'smooth'});});
+async function saveResult(quizCode){
+  var key=stY+'-'+stC+'-'+stN;
+  var data={y:parseInt(stY),c:parseInt(stC),n:parseInt(stN),score:Vcc,total:VTOTAL,ts:Date.now()};
+  try{
+    await fetch(FIREBASE_URL+'/results/'+quizCode+'/'+key+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  }catch(e){console.warn('Result save failed',e);}
+}
+document.getElementById('vrbtn').addEventListener('click',function(){resultSaved=false;vBuildQuiz(VallVocab);window.scrollTo({top:0,behavior:'smooth'});});
+document.getElementById('vrwbtn').addEventListener('click',function(){if(Vwa.length===0)return;resultSaved=false;vBuildQuiz(Vwa.slice());window.scrollTo({top:0,behavior:'smooth'});});
+document.getElementById('viewer-back-btn').addEventListener('click',function(){stY='';stC='';stN='';currentCode=null;showScreen('screen-home');});
+
+async function renderResultsView(code,title){
+  document.getElementById('results-view-title').textContent=escHtml(title)+' の結果';
+  var loading=document.getElementById('results-view-loading');
+  var empty=document.getElementById('results-view-empty');
+  var tabs=document.getElementById('results-tabs');
+  var tabBtns=document.getElementById('results-tab-btns');
+  var tabContent=document.getElementById('results-tab-content');
+  loading.style.display='block';empty.style.display='none';tabs.style.display='none';
+  tabBtns.innerHTML='';tabContent.innerHTML='';
+  showScreen('screen-results-view');
+  try{
+    var resp=await fetch(FIREBASE_URL+'/results/'+code+'.json');
+    loading.style.display='none';
+    if(!resp.ok){empty.textContent='データ取得に失敗しました（'+resp.status+'）';empty.style.display='block';return;}
+    var data=await resp.json();
+    if(!data){empty.style.display='block';return;}
+    var classes={};
+    Object.keys(data).forEach(function(key){
+      var r=data[key];
+      var ck=r.y+'年'+r.c+'組';
+      if(!classes[ck])classes[ck]=[];
+      classes[ck].push({n:r.n,score:r.score,total:r.total,ts:r.ts});
+    });
+    var keys=Object.keys(classes).sort(function(a,b){return a.localeCompare(b,undefined,{numeric:true});});
+    if(!keys.length){empty.style.display='block';return;}
+    tabs.style.display='block';
+    keys.forEach(function(ck,i){
+      var btn=document.createElement('button');
+      btn.className='tab-btn'+(i===0?' tab-active':'');
+      btn.textContent=ck;
+      btn.addEventListener('click',function(){
+        tabBtns.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('tab-active');});
+        btn.classList.add('tab-active');
+        renderClassResults(tabContent,classes[ck]);
+      });
+      tabBtns.appendChild(btn);
+    });
+    renderClassResults(tabContent,classes[keys[0]]);
+  }catch(e){loading.style.display='none';empty.textContent='エラーが発生しました。';empty.style.display='block';}
+}
+function renderClassResults(container,students){
+  students.sort(function(a,b){return a.n-b.n;});
+  var table=document.createElement('table');
+  table.className='results-table';
+  table.innerHTML='<thead><tr><th>出席番号</th><th>スコア</th><th>正答率</th><th>日付</th></tr></thead>';
+  var tb=document.createElement('tbody');
+  students.forEach(function(s){
+    var d=new Date(s.ts);
+    var ds=(d.getMonth()+1)+'/'+d.getDate();
+    var pct=Math.round((s.score/s.total)*100);
+    var color=pct===100?'#b8960a':pct>=80?'var(--green)':pct>=60?'#c97d10':'var(--red)';
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+s.n+'番</td><td>'+s.score+'/'+s.total+'</td>'
+      +'<td style="font-weight:700;color:'+color+';">'+pct+'%</td>'
+      +'<td style="color:var(--muted);font-size:.82rem;">'+ds+'</td>';
+    tb.appendChild(tr);
+  });
+  table.appendChild(tb);
+  container.innerHTML='';
+  container.appendChild(table);
+}
+document.getElementById('results-view-back').addEventListener('click',function(){renderManageScreen();showScreen('screen-manage');});
+document.getElementById('st-submit').addEventListener('click',function(){
+  var y=document.getElementById('st-year').value.trim();
+  var c=document.getElementById('st-class').value.trim();
+  var n=document.getElementById('st-num').value.trim();
+  if(!y||!c||!n){document.getElementById('st-err').textContent='すべて入力してください';return;}
+  stY=y;stC=c;stN=n;
+  if(pendingQuiz){currentCode=pendingQuiz.code;launchViewer(pendingQuiz.title,pendingQuiz.vocab,pendingQuiz.code,true);}
+});
+document.getElementById('st-cancel').addEventListener('click',function(){renderPublicList();showScreen('screen-public-list');});
+document.getElementById('st-year').addEventListener('input',function(){if(this.value.length===1)document.getElementById('st-class').focus();});
+document.getElementById('st-class').addEventListener('input',function(){if(this.value.length===1)document.getElementById('st-num').focus();});
 
 (async function init(){
   var hc=getHashCode();
-  if(hc){var data=await loadQuiz(hc);if(data&&data.v&&data.v.length){launchViewer(data.t,data.v,hc);return;}}
+  if(hc){var data=await loadQuiz(hc);if(data&&data.v&&data.v.length){showStudentInput(data.t,data.v,hc);return;}}
   showScreen('screen-home');
 })();
 })();
