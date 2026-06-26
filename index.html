@@ -197,6 +197,10 @@ legend{display:block;width:100%;padding:0;margin:0;}
 .qitem-actions .btn{font-size:.78rem;padding:.36rem .7rem;}
 .btn-red{background:transparent;border:1.5px solid var(--red);color:var(--red);}
 .btn-red:hover{background:var(--red-tint);}
+.btn-vis-on{background:var(--green);color:#fff;border:1.5px solid var(--green);}
+.btn-vis-on:hover{background:#155c35;}
+.btn-vis-off{background:transparent;border:1.5px solid var(--muted);color:var(--muted);}
+.btn-vis-off:hover{background:var(--bg);}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;}}
 @media(prefers-color-scheme:dark){
 :root{--paper:#211F19;--grid:#34322A;--ink:#EFEDE4;--muted:#A8A498;--pencil:#A8A498;--blue:#9DB6E8;--green:#4aba7e;--bp:#9DB6E8;--red:#E8736A;--red-deep:#FF8C82;--red-tint:rgba(232,115,106,.16);--bg:#15140F;--surface:#2a2921;--border:#3a3830;}
@@ -322,7 +326,7 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
   <div class="container">
     <div class="step">
       <div class="step-label"><span class="step-num">1</span><span class="step-title">クイズのタイトルを入力</span></div>
-      <input type="text" id="quiz-title" placeholder="例：動詞テスト　Lesson 4" value="単語テスト">
+      <input type="text" id="quiz-title" placeholder="例：動詞テスト　Lesson 4">
     </div>
     <div class="step">
       <div class="step-label"><span class="step-num">2</span><span class="step-title">ファイルをアップロード（Excel / CSV）</span></div>
@@ -370,7 +374,7 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
     <div class="success-top">
       <div class="success-icon">🎉</div>
       <h2 class="success-title" id="success-title-display"></h2>
-      <p class="success-sub">作成できました！</p>
+      <p class="success-sub" id="success-sub-msg">作成できました！</p>
     </div>
     <div class="success-actions">
       <button class="btn btn-green" id="try-quiz-btn">▶ 自分でクイズを解いてみる</button>
@@ -383,6 +387,7 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
 <div id="screen-viewer" class="screen">
   <div class="viewer-back">
     <button id="viewer-back-btn">← ホームへ戻る</button>
+    <button id="viewer-manage-back-btn" style="display:none;">← 管理一覧に戻る</button>
     <span id="viewer-code-label" style="font-size:.78rem;color:var(--muted);margin-left:auto;"></span>
   </div>
   <div id="vprogress-strip">
@@ -421,6 +426,7 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
 (function(){"use strict";
 var currentQuizData=null,currentCode=null,parsedVocab=null,VallVocab=null,Vcl=null,VTOTAL=0,Vcc=0,Vac=0,Vwa=[];
 var stY='',stC='',stN='',pendingQuiz=null,resultSaved=false;
+var editingCode=null,editingHidden=false,isAuthenticated=false;
 var VLETTERS=['ア','イ','ウ','エ'];
 
 function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
@@ -460,6 +466,10 @@ async function deleteQuiz(code){
     if(!r.ok)console.warn('Firebase delete error:',r.status);
   }catch(e){console.warn('Firebase delete failed',e);}
 }
+async function updateQuizHidden(code,hidden){
+  try{var l=localStorage.getItem('quiz:'+code);if(l){var d=JSON.parse(l);d.hidden=hidden;localStorage.setItem('quiz:'+code,JSON.stringify(d));}}catch(e){}
+  try{await fetch(FIREBASE_URL+'/quizzes/'+code+'.json',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({hidden:hidden})});}catch(e){console.warn('Firebase visibility update failed',e);}
+}
 async function renderManageScreen(){
   var empty=document.getElementById('manage-empty');
   var list=document.getElementById('qlist');
@@ -473,14 +483,14 @@ async function renderManageScreen(){
     fbOk=resp.ok;
     if(resp.ok){
       var data=await resp.json();
-      if(data){items=Object.keys(data).map(function(code){var q=data[code];return{code:code,title:q.t||'無題',count:(q.v||[]).length,ts:q.ts||0,v:q.v};}).sort(function(a,b){return b.ts-a.ts;});}
+      if(data){items=Object.keys(data).map(function(code){var q=data[code];return{code:code,title:q.t||'無題',count:(q.v||[]).length,ts:q.ts||0,v:q.v,hidden:q.hidden||false};}).sort(function(a,b){return b.ts-a.ts;});}
     }
   }catch(e){}
   if(!fbOk){
     fbBanner.style.display='block';
     fbBanner.innerHTML='⚠ Firebaseに接続できません。このデバイスで作成したクイズのみ表示されます。';
     var local=listQuizzes();
-    items=local.map(function(item){try{var d=JSON.parse(localStorage.getItem('quiz:'+item.code));return{code:item.code,title:item.title,count:item.count,ts:item.ts,v:d?d.v:null};}catch(e){return null;}}).filter(Boolean);
+    items=local.map(function(item){try{var d=JSON.parse(localStorage.getItem('quiz:'+item.code));return{code:item.code,title:item.title,count:item.count,ts:item.ts,v:d?d.v:null,hidden:d?d.hidden||false:false};}catch(e){return null;}}).filter(Boolean);
   }
   loading.style.display='none';
   if(!items.length){empty.style.display='block';return;}
@@ -488,15 +498,32 @@ async function renderManageScreen(){
     var div=document.createElement('div');div.className='qitem';
     var dateStr='';
     if(item.ts){var d=new Date(item.ts);dateStr=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();}
+    var visClass=item.hidden?'btn-vis-off':'btn-vis-on';
+    var visLabel=item.hidden?'🙈 非公開':'👁 公開中';
     div.innerHTML='<div class="qitem-info"><div class="qitem-title">'+escHtml(item.title)+'</div>'
       +'<div class="qitem-meta">'+item.count+'問'+(dateStr?' · 作成日: '+dateStr:'')+'</div></div>'
       +'<div class="qitem-actions">'
       +'<button class="btn btn-outline qopen-btn">▶ 解く</button>'
       +'<button class="btn btn-outline qres-btn" style="color:var(--blue);border-color:var(--blue);">📊 結果</button>'
+      +'<button class="btn btn-outline qedit-btn" style="color:var(--green);border-color:var(--green);">✏️ 編集</button>'
+      +'<button class="btn '+visClass+' qvis-btn">'+visLabel+'</button>'
       +'<button class="btn btn-red qdel-btn">削除</button>'
       +'</div>';
-    div.querySelector('.qopen-btn').addEventListener('click',function(){if(item.v&&item.v.length)launchViewer(item.title,item.v,item.code,true);});
+    div.querySelector('.qopen-btn').addEventListener('click',function(){if(item.v&&item.v.length)launchViewer(item.title,item.v,item.code,true,true);});
     div.querySelector('.qres-btn').addEventListener('click',function(){renderResultsView(item.code,item.title);});
+    div.querySelector('.qedit-btn').addEventListener('click',function(){
+      editingCode=item.code;editingHidden=item.hidden||false;
+      document.getElementById('quiz-title').value=item.title;
+      parsedVocab=item.v||[];
+      if(parsedVocab.length)renderPreview(parsedVocab);
+      document.getElementById('generate-btn').textContent='✅ クイズを更新する';
+      document.getElementById('success-sub-msg').textContent='更新できました！';
+      showScreen('screen-creator');
+    });
+    div.querySelector('.qvis-btn').addEventListener('click',async function(){
+      await updateQuizHidden(item.code,!item.hidden);
+      toast(item.hidden?'公開にしました':'非公開にしました');renderManageScreen();
+    });
     div.querySelector('.qdel-btn').addEventListener('click',async function(){
       if(!confirm('「'+item.title+'」を削除しますか？'))return;
       await deleteQuiz(item.code);toast('削除しました','#A8281D');renderManageScreen();
@@ -525,10 +552,18 @@ async function loadQuiz(code){
 function getHashCode(){try{var h=window.location.hash;if(h&&h.length>1){var m=h.match(/^#([A-Z0-9]{4})(-[A-Za-z0-9_-]+)?$/i);if(m)return m[1].toUpperCase();}}catch(e){}return null;}
 
 var pwDest=null;
-function showPassword(dest){pwDest=dest;document.getElementById('pw-input').value='';document.getElementById('pw-err').textContent='';showScreen('screen-password');setTimeout(function(){document.getElementById('pw-input').focus();},150);}
+function showPassword(dest){
+  if(isAuthenticated){
+    if(dest==='creator')showScreen('screen-creator');
+    else if(dest==='manage'){showScreen('screen-manage');renderManageScreen();}
+    return;
+  }
+  pwDest=dest;document.getElementById('pw-input').value='';document.getElementById('pw-err').textContent='';showScreen('screen-password');setTimeout(function(){document.getElementById('pw-input').focus();},150);
+}
 function checkPassword(){
   var val=document.getElementById('pw-input').value;
   if(val==='kyquiz'){
+    isAuthenticated=true;
     if(pwDest==='creator')showScreen('screen-creator');
     else if(pwDest==='manage'){showScreen('screen-manage');renderManageScreen();}
   }else{
@@ -544,7 +579,10 @@ document.getElementById('go-creator').addEventListener('click',function(){showPa
 document.getElementById('go-manage').addEventListener('click',function(){showPassword('manage');});
 document.getElementById('go-manage-from-success').addEventListener('click',function(){showPassword('manage');});
 document.getElementById('manage-back').addEventListener('click',function(){showScreen('screen-home');});
-document.getElementById('creator-back').addEventListener('click',function(){showScreen('screen-home');});
+document.getElementById('creator-back').addEventListener('click',function(){
+  if(editingCode){editingCode=null;editingHidden=false;document.getElementById('generate-btn').textContent='✅ クイズを作成する';renderManageScreen();showScreen('screen-manage');return;}
+  showScreen('screen-home');
+});
 document.getElementById('make-another-btn').addEventListener('click',function(){showScreen('screen-creator');});
 document.getElementById('try-quiz-btn').addEventListener('click',function(){if(currentQuizData){stY='';stC='';stN='';showStudentInput(currentQuizData.t,currentQuizData.v,currentCode);}});
 
@@ -564,7 +602,7 @@ async function renderPublicList(){
     fbOk=resp.ok;fbStatus=resp.status;
     if(resp.ok){
       var data=await resp.json();
-      if(data){items=Object.keys(data).map(function(code){return{code:code,title:data[code].t||'無題',count:(data[code].v||[]).length,ts:data[code].ts||0,v:data[code].v};}).sort(function(a,b){return b.ts-a.ts;});}
+      if(data){items=Object.keys(data).filter(function(code){return !data[code].hidden;}).map(function(code){return{code:code,title:data[code].t||'無題',count:(data[code].v||[]).length,ts:data[code].ts||0,v:data[code].v};}).sort(function(a,b){return b.ts-a.ts;});}
     }
   }catch(e){fbStatus='接続エラー';}
   if(!fbOk){
@@ -613,16 +651,20 @@ document.getElementById('sample-btn').addEventListener('click',function(){var cs
 document.getElementById('generate-btn').addEventListener('click',async function(){
   if(!parsedVocab||!parsedVocab.length){showErr('先にファイルを読み込んでください。');return;}
   var title=document.getElementById('quiz-title').value.trim()||'単語テスト';
-  var code=genCode();
+  var code=editingCode||genCode();
   var data={t:title,v:parsedVocab};
+  if(editingCode)data.hidden=editingHidden;
   currentQuizData=data;currentCode=code;
-  var saveResult=await saveQuiz(code,data);
-  if(!saveResult.fbOk){
-    var msg=saveResult.fbStatus===401||saveResult.fbStatus===403
-      ?'⚠ Firebaseのルールが期限切れのため別端末共有ができません（ステータス:'+saveResult.fbStatus+'）\nFirebaseコンソールでルールを更新してください。'
-      :'⚠ Firebaseへの保存に失敗しました（ステータス:'+saveResult.fbStatus+'）\n別端末では表示されない可能性があります。';
+  var saveRes=await saveQuiz(code,data);
+  if(!saveRes.fbOk){
+    var msg=saveRes.fbStatus===401||saveRes.fbStatus===403
+      ?'⚠ Firebaseのルールが期限切れのため別端末共有ができません（ステータス:'+saveRes.fbStatus+'）\nFirebaseコンソールでルールを更新してください。'
+      :'⚠ Firebaseへの保存に失敗しました（ステータス:'+saveRes.fbStatus+'）\n別端末では表示されない可能性があります。';
     alert(msg);
   }
+  document.getElementById('success-sub-msg').textContent=editingCode?'更新できました！':'作成できました！';
+  editingCode=null;editingHidden=false;
+  document.getElementById('generate-btn').textContent='✅ クイズを作成する';
   document.getElementById('success-title-display').textContent=title;
   showScreen('screen-success');
 });
@@ -637,7 +679,7 @@ function showStudentInput(title,vocab,code){
   showScreen('screen-student-input');
   setTimeout(function(){document.getElementById('st-year').focus();},150);
 }
-function launchViewer(title,vocab,code,skipInput){
+function launchViewer(title,vocab,code,skipInput,fromManage){
   if(!skipInput&&!stY){showStudentInput(title,vocab,code);return;}
   resultSaved=false;
   VallVocab=vocab;
@@ -648,6 +690,8 @@ function launchViewer(title,vocab,code,skipInput){
   document.getElementById('viewer-code-label').textContent=code?'コード: '+code:'';
   var vidLine=document.getElementById('vid-line');
   vidLine.textContent=stY&&stC&&stN?stY+'年'+stC+'組'+stN+'番':'';
+  var mback=document.getElementById('viewer-manage-back-btn');
+  if(mback)mback.style.display=fromManage?'inline':'none';
   showScreen('screen-viewer');
   vBuildQuiz(vocab);
 }
@@ -727,6 +771,7 @@ document.getElementById('vrbtn').addEventListener('click',function(){resultSaved
 document.getElementById('vrwbtn').addEventListener('click',function(){if(Vwa.length===0)return;resultSaved=false;vBuildQuiz(Vwa.slice());window.scrollTo({top:0,behavior:'smooth'});});
 document.getElementById('vr-back-to-list').addEventListener('click',function(){renderPublicList();showScreen('screen-public-list');});
 document.getElementById('viewer-back-btn').addEventListener('click',function(){stY='';stC='';stN='';currentCode=null;try{history.replaceState(null,'',window.location.pathname);}catch(e){}showScreen('screen-home');});
+document.getElementById('viewer-manage-back-btn').addEventListener('click',function(){document.getElementById('viewer-manage-back-btn').style.display='none';renderManageScreen();showScreen('screen-manage');});
 
 var resultsPollingTimer=null,currentResultsCode=null,currentResultsTitle='',currentResultsAllData=null,currentResultsActiveClass=null;
 function stopResultsPolling(){if(resultsPollingTimer){clearInterval(resultsPollingTimer);resultsPollingTimer=null;}}
