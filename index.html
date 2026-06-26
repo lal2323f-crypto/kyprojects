@@ -425,7 +425,7 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
 <script>
 (function(){"use strict";
 var currentQuizData=null,currentCode=null,parsedVocab=null,VallVocab=null,Vcl=null,VTOTAL=0,Vcc=0,Vac=0,Vwa=[];
-var stY='',stC='',stN='',pendingQuiz=null,resultSaved=false;
+var stY='',stC='',stN='',pendingQuiz=null,resultSaved=false,sessionBestScore=-1;
 var editingCode=null,editingHidden=false,isAuthenticated=false;
 var VLETTERS=['ア','イ','ウ','エ'];
 
@@ -681,7 +681,7 @@ function showStudentInput(title,vocab,code){
 }
 function launchViewer(title,vocab,code,skipInput,fromManage){
   if(!skipInput&&!stY){showStudentInput(title,vocab,code);return;}
-  resultSaved=false;
+  resultSaved=false;sessionBestScore=-1;
   VallVocab=vocab;
   var titleEl=document.getElementById('vquiz-title');
   titleEl.innerHTML='';
@@ -757,14 +757,16 @@ function vSR(){
   var ww=document.getElementById('vwlw'),wu=document.getElementById('vwl');wu.innerHTML='';
   if(Vwa.length>0){ww.style.display='block';Vwa.forEach(function(e){var li=document.createElement('li');var ws=document.createElement('span');ws.className='w';ws.lang='en';ws.textContent=e[0];var ms=document.createElement('span');ms.className='m';ms.textContent=e[1];li.appendChild(ws);li.appendChild(ms);wu.appendChild(li);});}else ww.style.display='none';
   var rb=document.getElementById('vrwbtn');if(Vwa.length>0){rb.style.display='inline-block';rb.textContent='間違えた'+Vwa.length+'問のみもう一度';}else rb.style.display='none';
-  if(stY&&stC&&stN&&currentCode&&!resultSaved){resultSaved=true;saveResult(currentCode);}
+  if(stY&&stC&&stN&&currentCode&&Vcc>sessionBestScore){sessionBestScore=Vcc;saveResult(currentCode);}
   setTimeout(function(){document.getElementById('vresults').scrollIntoView({behavior:'smooth',block:'start'});},300);
 }
 async function saveResult(quizCode){
   var key=stY+'-'+stC+'-'+stN;
-  var data={y:parseInt(stY),c:parseInt(stC),n:parseInt(stN),score:Vcc,total:VTOTAL,ts:Date.now(),wa:Vwa.map(function(e){return e[0];})};
+  var newData={y:parseInt(stY),c:parseInt(stC),n:parseInt(stN),score:Vcc,total:VTOTAL,ts:Date.now(),wa:Vwa.map(function(e){return e[0];})};
   try{
-    await fetch(FIREBASE_URL+'/results/'+quizCode+'/'+key+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    var ex=await fetch(FIREBASE_URL+'/results/'+quizCode+'/'+key+'.json');
+    if(ex.ok){var prev=await ex.json();if(prev&&prev.score>=Vcc)return;}
+    await fetch(FIREBASE_URL+'/results/'+quizCode+'/'+key+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(newData)});
   }catch(e){console.warn('Result save failed',e);}
 }
 document.getElementById('vrbtn').addEventListener('click',function(){resultSaved=false;vBuildQuiz(VallVocab);window.scrollTo({top:0,behavior:'smooth'});});
