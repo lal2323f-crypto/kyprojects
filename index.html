@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>速さ・年齢算 練習テスト</title>
+<style>
+  :root {
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --correct: #16a34a;
+    --correct-light: #dcfce7;
+    --wrong: #dc2626;
+    --wrong-light: #fee2e2;
+    --neutral: #64748b;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --subtext: #475569;
+    --radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px 16px 60px;
+  }
+  header { text-align: center; margin-bottom: 24px; }
+  header .subject-label {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+  header h1 { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.3; }
+  header p { font-size: 13px; color: var(--subtext); margin-top: 6px; }
+
+  .progress-wrap {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 14px 20px;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 14px;
+  }
+  .progress-text { font-size: 14px; font-weight: 700; color: var(--primary); white-space: nowrap; }
+  .progress-bar-outer {
+    flex: 1; height: 8px; background: var(--border);
+    border-radius: 99px; overflow: hidden;
+  }
+  .progress-bar-inner {
+    height: 100%; background: var(--primary);
+    border-radius: 99px; transition: width .4s; width: 0%;
+  }
+  .cheer { font-size: 13px; color: var(--subtext); white-space: nowrap; }
+
+  .quiz-section { max-width: 720px; margin: 0 auto; }
+
+  .question-card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 22px 22px 18px;
+    margin-bottom: 18px; border-left: 4px solid var(--primary);
+  }
+  .question-card.answered-correct { border-left-color: var(--correct); }
+  .question-card.answered-wrong   { border-left-color: var(--wrong); }
+
+  .q-number {
+    font-size: 11px; font-weight: 800; letter-spacing: .1em;
+    color: var(--primary); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .question-card.answered-correct .q-number { color: var(--correct); }
+  .question-card.answered-wrong   .q-number { color: var(--wrong); }
+
+  .q-context {
+    font-size: 14px; color: var(--subtext); background: #f1f5f9;
+    border-radius: 6px; padding: 10px 14px; margin-bottom: 10px;
+    line-height: 1.75; border-left: 3px solid #cbd5e1;
+  }
+  .q-text { font-size: 15px; font-weight: 600; line-height: 1.75; margin-bottom: 16px; }
+
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; margin: 0 2px; font-size: .9em; line-height: 1.1;
+  }
+  .frac span:first-child { border-bottom: 1.5px solid currentColor; padding-bottom: 1px; }
+  .frac span:last-child  { padding-top: 1px; }
+
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 480px) { .choices { grid-template-columns: 1fr; } }
+
+  .choice-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: #fff; cursor: pointer;
+    font-size: 14px; font-weight: 500; color: var(--text);
+    text-align: left; transition: border-color .15s, background .15s, color .15s;
+    line-height: 1.5;
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--primary); background: var(--primary-light);
+  }
+  .choice-btn .choice-label {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #e2e8f0; color: var(--subtext);
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+    transition: background .15s, color .15s;
+  }
+  .choice-btn:hover:not(:disabled) .choice-label { background: var(--primary); color: #fff; }
+  .choice-btn.correct { border-color: var(--correct); background: var(--correct-light); color: var(--correct); }
+  .choice-btn.correct .choice-label { background: var(--correct); color: #fff; }
+  .choice-btn.wrong   { border-color: var(--wrong);   background: var(--wrong-light);   color: var(--wrong); }
+  .choice-btn.wrong   .choice-label { background: var(--wrong);   color: #fff; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback { margin-top: 10px; font-size: 13px; font-weight: 600; display: none; }
+  .feedback.correct { color: var(--correct); display: block; }
+  .feedback.wrong   { color: var(--wrong);   display: block; }
+
+  #result-box {
+    display: none; background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 28px 24px; margin-bottom: 24px;
+    text-align: center; max-width: 720px; margin-left: auto; margin-right: auto;
+  }
+  #result-box h2 { font-size: 20px; margin-bottom: 6px; }
+  #result-box .score-big {
+    font-size: 48px; font-weight: 900; color: var(--primary); line-height: 1.1; margin: 10px 0 6px;
+  }
+  #result-box .score-sub { font-size: 14px; color: var(--subtext); margin-bottom: 16px; }
+
+  #wrong-list { max-width: 720px; margin: 0 auto 20px; display: none; }
+  #wrong-list h3 { font-size: 15px; font-weight: 700; color: var(--wrong); margin-bottom: 10px; }
+  .wrong-item {
+    background: var(--card); border-radius: 8px; padding: 12px 16px;
+    margin-bottom: 8px; border-left: 3px solid var(--wrong);
+    font-size: 13px; line-height: 1.6;
+  }
+  .wrong-item .wi-q { font-weight: 600; margin-bottom: 4px; }
+  .wrong-item .wi-a { color: var(--correct); }
+
+  #record-section { max-width: 720px; margin: 0 auto 20px; }
+  #record-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  #record-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    background: var(--card); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  #record-table th {
+    background: var(--primary); color: #fff;
+    padding: 8px 12px; font-weight: 700; text-align: center;
+  }
+  #record-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; }
+  #record-table tr:last-child td { border-bottom: none; }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+  .btn {
+    padding: 10px 22px; border-radius: 8px; border: none;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity .15s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-danger  { background: var(--wrong); color: #fff; }
+  .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="subject-label">数的推理</div>
+  <h1>速さ・年齢算 練習テスト</h1>
+  <p>選択肢を選ぶと、その場で採点されます。出題順は毎回ランダムです。</p>
+</header>
+
+<div class="progress-wrap">
+  <span class="progress-text" id="prog-text">0 / 0</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" id="prog-bar"></div></div>
+  <span class="cheer" id="cheer-text">がんばって！</span>
+</div>
+
+<div id="result-box">
+  <h2>全問解答完了！</h2>
+  <div class="score-big" id="score-big">0／0</div>
+  <div class="score-sub" id="score-sub"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="restartAll()">選択肢をシャッフルしてもう一度</button>
+    <button class="btn btn-outline" onclick="restartWrong()">間違えた問題のみもう一度</button>
+  </div>
+</div>
+
+<div id="wrong-list">
+  <h3>間違えた問題</h3>
+  <div id="wrong-items"></div>
+</div>
+
+<div class="quiz-section" id="quiz"></div>
+
+<div id="record-section">
+  <h3>成長記録</h3>
+  <table id="record-table">
+    <thead>
+      <tr><th>回</th><th>日付</th><th>正解数</th><th>正答率</th><th>前回比</th></tr>
+    </thead>
+    <tbody id="record-body"></tbody>
+  </table>
+  <div class="btn-row" style="margin-top:12px">
+    <button class="btn btn-danger" onclick="clearRecord()">記録をリセット</button>
+  </div>
+</div>
+
+<script>
+// =====================
+// 問題データ
+// =====================
+const QUESTIONS_MASTER = [
+  {
+    id: "ex1-1",
+    context: "家から1600m離れた学校へ行く途中に図書館がある。家から図書館までは、900mある。Pさんは家から図書館までは分速で60mで、図書館から学校までは分速70mで歩いた。",
+    text: "家から学校まで行くのに何分かかったか。",
+    choices: ["A：21分","B：23分","C：25分","D：27分","E：29分","F：31分","G：33分","H：A〜Gのどれでもない"],
+    answer: 2
+  },
+  {
+    id: "ex1-2",
+    context: "家から1600m離れた学校へ行く途中に図書館がある。家から図書館までは、900mある。Pさんは家から図書館までは分速で60mで、図書館から学校までは分速70mで歩いた。",
+    text: "Pさんの平均の速さは、分速何mか。",
+    choices: ["A：分速52m","B：分速56m","C：分速60m","D：分速64m","E：分速68m","F：分速72m","G：分速76m","H：A〜Gのどれでもない"],
+    answer: 3
+  },
+  {
+    id: "ex2",
+    context: null,
+    text: "例2　5km離れたとなり町まで往復するのに、行きは10km/時、帰りは6km/時で進んだ。往復したときの平均の速さは何km/時か。",
+    choices: ["A：6.5km/時","B：7km/時","C：7.5km/時","D：8km/時","E：8.5km/時","F：9km/時","G：9.5km/時","H：A〜Gのどれでもない"],
+    answer: 2
+  },
+  {
+    id: "sp-q1",
+    context: null,
+    text: "P地点とQ地点は24km離れている。P地点からQ地点まで電車に乗っていくと、36分かかった。このときの電車の平均速度は何km/時か。",
+    choices: ["A：35km/時","B：40km/時","C：48km/時","D：56km/時","E：60km/時","F：72km/時","G：84km/時","H：A〜Gのどれでもない"],
+    answer: 1
+  },
+  {
+    id: "sp-q2",
+    context: null,
+    text: "MさんがA地点を出発して速さ5km/時で24分歩いたところ、B地点に到着した。AB間の距離はいくらか。",
+    choices: ["A：1.2km","B：1.8km","C：2km","D：2.6km","E：3km","F：3.6km","G：4.2km","H：A〜Gのどれでもない"],
+    answer: 2
+  },
+  {
+    id: "sp-q3",
+    context: null,
+    text: "Nさんが自宅を8時5分に出発して平均速度70m/分で歩いて、1.4km離れた学校に向かった。学校に着く時刻を求めよ。",
+    choices: ["A：8時19分","B：8時20分","C：8時25分","D：8時30分","E：8時33分","F：8時35分","G：8時40分","H：A〜Gのどれでもない"],
+    answer: 2
+  },
+  {
+    id: "sp-q4",
+    context: null,
+    text: "ハイキングで登山口から山頂まで8kmの道のりを往復した。登山口から3km/時で登り、山頂で1時間20分休憩して、山頂から4km/時で下った。登山口を出発して、再び登山口に戻ってくるまでに何時間何分かかったか。",
+    choices: ["A：4時間40分","B：5時間","C：5時間20分","D：5時間30分","E：5時間40分","F：6時間","G：6時間20分","H：A〜Gのどれでもない"],
+    answer: 5
+  },
+  {
+    id: "sp-q5-1",
+    context: "A地点をスタート地点としてB地点で折り返し、A地点をゴール地点として往復するマラソンコースがある。SさんはA→B間を時速15kmで48分かかって折り返した。",
+    text: "AB間の距離を求めよ。",
+    choices: ["A：6km","B：7km","C：8km","D：9km","E：10km","F：11km","G：12km","H：A〜Gのどれでもない"],
+    answer: 6
+  },
+  {
+    id: "sp-q5-2",
+    context: "A地点をスタート地点としてB地点で折り返し、A地点をゴール地点として往復するマラソンコースがある。SさんはA→B間を時速15kmで48分かかって折り返した。",
+    text: "SさんはB地点を折り返した後、後半のB→A間を時速12kmで走り、A地点にゴールした。Sさんの往復の平均の時速を求めよ。（必要な時は小数第2位を四捨五入せよ。）",
+    choices: ["A：8.5km/時","B：9km/時","C：10km/時","D：10.4km/時","E：11km/時","F：11.6km/時","G：13.3km/時","H：A〜Gのどれでもない"],
+    answer: 6
+  },
+  {
+    id: "sp-q6",
+    context: null,
+    text: "自宅から25km離れたP地点まで行くのに、はじめは7km/時で走った。しかし、途中で42km/時のバスで移動したので、合わせて1時間で到着した。走った距離を求めよ。",
+    choices: ["A：2.3km","B：2.8km","C：3.1km","D：3.3km","E：3.4km","F：4.6km","G：4.8km","H：A〜Gのどれでもない"],
+    answer: 4
+  },
+  {
+    id: "sp-q7",
+    context: null,
+    text: "往路は6km/時の速さでS駅からT駅まで移動し、T駅で2時間買い物をした。復路は10km/時の速さでT駅からS駅まで移動した。すると、買い物時間も含めて往復に全部で4時間かかった。往復の移動時間の平均時速を求めよ。ただし、買い物の時間は含めない。必要に応じて小数第3位以下を四捨五入すること。",
+    choices: ["A：5km/時","B：5.5km/時","C：6km/時","D：6.5km/時","E：7km/時","F：7.5km/時","G：8km/時","H：A〜Gのどれでもない"],
+    answer: 5
+  },
+  {
+    id: "age-ex1",
+    context: null,
+    text: "現在、41歳の母と13歳の子がいる。母の年齢が子の年齢の2倍になるのは、何年後か。",
+    choices: ["A　11年後","B　12年後","C　13年後","D　14年後","E　15年後","F　16年後","G　17年後","H　A〜Gのいずれでもない"],
+    answer: 4
+  },
+  {
+    id: "age-ex2",
+    context: null,
+    text: "現在、父の年齢は子の年齢の9倍である。4年後には父の年齢は子の年齢の5倍になるという。現在の子の年齢を求めよ。",
+    choices: ["A　3歳","B　4歳","C　5歳","D　6歳","E　8歳","F　9歳","G　11歳","H　A〜Gのいずれでもない"],
+    answer: 1
+  },
+  {
+    id: "age-q1",
+    context: null,
+    text: "現在、父は37歳、息子は4歳である。父の年齢が息子の年齢の4倍になるのは何年後か。",
+    choices: ["A　3年後","B　4年後","C　5年後","D　6年後","E　7年後","F　8年後","G　9年後","H　A〜Gのいずれでもない"],
+    answer: 4
+  },
+  {
+    id: "age-q2",
+    context: null,
+    text: "現在、母は33歳、娘は5歳である。母の年齢が娘の年齢の5倍になるのは何年後か。",
+    choices: ["A　1年後","B　2年後","C　3年後","D　4年後","E　5年後","F　6年後","G　7年後","H　A〜Gのいずれでもない"],
+    answer: 1
+  },
+  {
+    id: "age-q3",
+    context: null,
+    text: "現在、AさんはBさんより22歳若く、6年後にはAさんの年齢はBさんの年齢の<span class='frac'><span>1</span><span>3</span></span>になる。現在のAさんの年齢を求めよ。",
+    choices: ["A　1歳","B　2歳","C　3歳","D　4歳","E　5歳","F　6歳","G　7歳","H　A〜Gのいずれでもない"],
+    answer: 4
+  },
+  {
+    id: "age-q4",
+    context: null,
+    text: "ある家族の父と息子の年齢は、現在父が41歳であり、10年後に父の年齢が息子の年齢の3倍になるという。現在の息子の年齢は何歳か。",
+    choices: ["A　4歳","B　5歳","C　6歳","D　7歳","E　8歳","F　9歳","G　10歳","H　A〜Gのいずれでもない"],
+    answer: 3
+  },
+  {
+    id: "age-q5",
+    context: null,
+    text: "ある家族の母と息子の年齢は、現在息子が9歳であり、16年後に母の年齢が息子の年齢の2倍になるという。現在の母の年齢は何歳か。",
+    choices: ["A　33歳","B　34歳","C　35歳","D　36歳","E　37歳","F　38歳","G　39歳","H　A〜Gのいずれでもない"],
+    answer: 1
+  },
+  {
+    id: "age-q6",
+    context: null,
+    text: "現在、母の年齢は娘の年齢の6倍であるが、20年後には2倍になるという。20年後に母は何歳になるか。",
+    choices: ["A　44歳","B　46歳","C　48歳","D　50歳","E　52歳","F　54歳","G　56歳","H　A〜Gのいずれでもない"],
+    answer: 3
+  },
+  {
+    id: "age-q7",
+    context: null,
+    text: "現在、AさんはBさんの年齢の4倍で、6年後には3倍になるという。現在のBさんは何歳か。",
+    choices: ["A　12歳","B　15歳","C　18歳","D　22歳","E　24歳","F　28歳","G　30歳","H　A〜Gのいずれでもない"],
+    answer: 0
+  },
+  {
+    id: "age-q8",
+    context: null,
+    text: "現在、母と子の年齢の差は24歳で、12年後に母の年齢は子の年齢の2.5倍になるという。現在の母の年齢は何歳か。",
+    choices: ["A　4歳","B　13歳","C　18歳","D　21歳","E　25歳","F　28歳","G　32歳","H　A〜Gのいずれでもない"],
+    answer: 5
+  },
+  {
+    id: "age-q9",
+    context: null,
+    text: "現在、父、母、子ども1人の家族の年齢の合計は80歳である。父は母より4歳年上で、父と母の年齢の和と、子どもの年齢の比は9：1である。父は何歳か。",
+    choices: ["A　30歳","B　32歳","C　34歳","D　35歳","E　37歳","F　38歳","G　40歳","H　A〜Gのいずれでもない"],
+    answer: 5
+  },
+  {
+    id: "age-q10",
+    context: null,
+    text: "現在、父と娘の年齢を足すと60歳になる。4年前、父の年齢は娘の年齢の3倍であった。現在の娘の年齢はいくつか。",
+    choices: ["A　11歳","B　12歳","C　13歳","D　14歳","E　15歳","F　16歳","G　17歳","H　A〜Gのいずれでもない"],
+    answer: 6
+  },
+  {
+    id: "age-q11",
+    context: null,
+    text: "太郎君はお母さんが24歳のときに生まれた。お母さんの年齢が太郎君の年齢の5倍のときに次郎君が生まれた。現在、太郎君は9歳ですが、次郎君は何歳か。",
+    choices: ["A　1歳","B　2歳","C　3歳","D　4歳","E　5歳","F　6歳","G　7歳","H　A〜Gのいずれでもない"],
+    answer: 2
+  },
+  {
+    id: "ueki-q5",
+    context: null,
+    text: "1階から5階へ上がるのに12秒かかるエレベーターがある。このエレベーターで1階から25階へ上がるとすると何秒かかるか。",
+    choices: ["A　52秒","B　56秒","C　60秒","D　64秒","E　68秒","F　72秒","G　76秒","H　A〜Gのいずれでもない"],
+    answer: 5
+  },
+  {
+    id: "ueki-q6",
+    context: null,
+    text: "長さ220mの直線道路に、5mの車をとめる。直線道路の両端と車の間隔、車と車の間隔をすべて同じ長さにして24台をとめるとする。車と車の間隔は何mになるか。",
+    choices: ["A　2m","B　3m","C　4m","D　5m","E　6m","F　7m","G　8m","H　A〜Gのいずれでもない"],
+    answer: 2
+  }
+];
+
+let questions = [];
+let answered = {};
+let wrongIds = new Set();
+let isAllMode = true; // 全問モードかどうか
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function init(qList) {
+  questions = qList;
+  answered = {};
+  document.getElementById("prog-bar").style.width = "0%";
+  document.getElementById("prog-text").textContent = "0 / " + qList.length;
+  document.getElementById("cheer-text").textContent = "がんばって！";
+  renderQuiz();
+}
+
+function restartAll() {
+  document.getElementById("result-box").style.display = "none";
+  document.getElementById("wrong-list").style.display = "none";
+  wrongIds = new Set();
+  isAllMode = true;
+  init(shuffle([...QUESTIONS_MASTER]));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function restartWrong() {
+  if (wrongIds.size === 0) { alert("間違えた問題はありません！"); return; }
+  const wrongQs = QUESTIONS_MASTER.filter(q => wrongIds.has(q.id));
+  document.getElementById("result-box").style.display = "none";
+  document.getElementById("wrong-list").style.display = "none";
+  wrongIds = new Set();
+  isAllMode = false;
+  init(shuffle(wrongQs));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderQuiz() {
+  const container = document.getElementById("quiz");
+  container.innerHTML = "";
+  questions.forEach((q, idx) => {
+    const card = document.createElement("div");
+    card.className = "question-card";
+    card.id = "card-" + q.id;
+
+    let html = `<div class="q-number">問 ${idx + 1}</div>`;
+    if (q.context) html += `<div class="q-context">${q.context}</div>`;
+    html += `<div class="q-text">${q.text}</div>`;
+    html += `<div class="choices" id="choices-${q.id}">`;
+    q.choices.forEach((c, ci) => {
+      html += `<button class="choice-btn" id="btn-${q.id}-${ci}"
+        onclick="selectAnswer('${q.id}', ${ci})">
+        <span class="choice-label">${String.fromCharCode(65 + ci)}</span>${c}</button>`;
+    });
+    html += `</div><div class="feedback" id="fb-${q.id}"></div>`;
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+}
+
+function selectAnswer(qid, chosen) {
+  if (answered[qid] !== undefined) return;
+  const q = questions.find(x => x.id === qid);
+  const correct = q.answer;
+  answered[qid] = chosen;
+
+  const card = document.getElementById("card-" + qid);
+  const fb = document.getElementById("fb-" + qid);
+  const isCorrect = (chosen === correct);
+
+  q.choices.forEach((_, ci) => {
+    const btn = document.getElementById(`btn-${qid}-${ci}`);
+    btn.disabled = true;
+    if (ci === correct) btn.classList.add("correct");
+    if (ci === chosen && !isCorrect) btn.classList.add("wrong");
+  });
+
+  if (isCorrect) {
+    card.classList.add("answered-correct");
+    fb.className = "feedback correct";
+    fb.textContent = "✓ 正解！";
+  } else {
+    card.classList.add("answered-wrong");
+    fb.className = "feedback wrong";
+    fb.textContent = "✗ 不正解。正解は「" + q.choices[correct] + "」";
+    wrongIds.add(qid);
+  }
+
+  updateProgress();
+  checkAllDone();
+}
+
+function updateProgress() {
+  const done = Object.keys(answered).length;
+  const total = questions.length;
+  document.getElementById("prog-text").textContent = done + " / " + total;
+  document.getElementById("prog-bar").style.width = (total ? done / total * 100 : 0) + "%";
+  let cheer = "がんばって！";
+  if (done === total && total > 0) cheer = "全問解答完了！";
+  else if (done / total >= 0.8) cheer = "もう少し！";
+  else if (done / total >= 0.5) cheer = "折り返し！";
+  else if (done / total >= 0.2) cheer = "いい調子！";
+  document.getElementById("cheer-text").textContent = cheer;
+}
+
+function checkAllDone() {
+  if (Object.keys(answered).length < questions.length) return;
+  const correctCount = questions.filter(q => answered[q.id] === q.answer).length;
+  const total = questions.length;
+  const pct = Math.round(correctCount / total * 100);
+
+  const rb = document.getElementById("result-box");
+  rb.style.display = "block";
+  document.getElementById("score-big").textContent = correctCount + "／" + total;
+  document.getElementById("score-sub").textContent = "正答率 " + pct + "%";
+
+  if (wrongIds.size > 0) {
+    const wl = document.getElementById("wrong-list");
+    const wi = document.getElementById("wrong-items");
+    wi.innerHTML = "";
+    wrongIds.forEach(id => {
+      const q = QUESTIONS_MASTER.find(x => x.id === id);
+      if (!q) return;
+      const div = document.createElement("div");
+      div.className = "wrong-item";
+      div.innerHTML = `<div class="wi-q">${q.text}</div><div class="wi-a">正解：${q.choices[q.answer]}</div>`;
+      wi.appendChild(div);
+    });
+    wl.style.display = "block";
+    // 間違い一覧の少し上（result-boxの先頭）にスクロール
+    setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  } else {
+    // 全問正解の場合は result-box へスクロール
+    setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+  }
+
+  if (isAllMode) saveRecord(correctCount, total, pct);
+}
+
+function saveRecord(correct, total, pct) {
+  let records = [];
+  try { records = JSON.parse(localStorage.getItem("mathQuizRecords") || "[]"); } catch(e) {}
+  records.push({ date: new Date().toLocaleDateString("ja-JP"), correct, total, pct });
+  try { localStorage.setItem("mathQuizRecords", JSON.stringify(records)); } catch(e) {}
+  renderRecord();
+}
+
+function renderRecord() {
+  let records = [];
+  try { records = JSON.parse(localStorage.getItem("mathQuizRecords") || "[]"); } catch(e) {}
+  const tbody = document.getElementById("record-body");
+  tbody.innerHTML = "";
+  records.forEach((r, i) => {
+    const prev = i > 0 ? records[i - 1] : null;
+    const diff = prev ? (r.pct - prev.pct) : null;
+    const diffStr = diff === null ? "—" : diff > 0 ? "▲" + diff + "%" : diff < 0 ? "▼" + Math.abs(diff) + "%" : "±0%";
+    const diffColor = diff > 0 ? "color:#16a34a" : diff < 0 ? "color:#dc2626" : "";
+    tbody.innerHTML += `<tr>
+      <td>${i + 1}</td><td>${r.date}</td>
+      <td>${r.correct}／${r.total}</td><td>${r.pct}%</td>
+      <td style="${diffColor}">${diffStr}</td></tr>`;
+  });
+}
+
+function clearRecord() {
+  if (!confirm("記録をリセットしますか？")) return;
+  try { localStorage.removeItem("mathQuizRecords"); } catch(e) {}
+  renderRecord();
+}
+
+window.onload = () => { renderRecord(); restartAll(); };
+</script>
+</body>
+</html>
