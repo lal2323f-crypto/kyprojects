@@ -376,6 +376,19 @@ input[type="text"]{background:#15140F;border-color:#3a3830;color:var(--ink);}
       <h2 class="success-title" id="success-title-display"></h2>
       <p class="success-sub" id="success-sub-msg">作成できました！</p>
     </div>
+    <div class="share-section">
+      <div class="share-label">共有URL（開くとすぐにクイズが始まります）</div>
+      <div class="share-url-row">
+        <input type="text" id="share-url-input" readonly>
+        <button class="btn btn-outline" id="copy-url-btn" style="white-space:nowrap;flex:0 0 auto;">コピー</button>
+      </div>
+      <p class="share-note">このURLを生徒に共有するか、下のQRコードを印刷して配布できます。</p>
+    </div>
+    <div class="qr-section">
+      <div class="qr-label">QRコードで共有 <strong>（スマホでスキャン）</strong></div>
+      <div id="qrcode-wrap"><div id="qrcode"></div></div>
+      <p class="qr-hint">QRコードを読み込むとすぐにクイズが始まります。</p>
+    </div>
     <div class="success-actions">
       <button class="btn btn-green" id="try-quiz-btn">▶ 自分でクイズを解いてみる</button>
       <button class="btn-ghost" id="make-another-btn">← 別のクイズを作る</button>
@@ -575,6 +588,7 @@ document.getElementById('pw-submit').addEventListener('click',checkPassword);
 document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.key==='Enter')checkPassword();});
 document.getElementById('pw-cancel').addEventListener('click',function(){showScreen('screen-home');});
 
+document.getElementById('copy-url-btn').addEventListener('click',function(){var url=document.getElementById('share-url-input').value;if(url)copyText(url,'URLをコピーしました！');});
 document.getElementById('go-creator').addEventListener('click',function(){showPassword('creator');});
 document.getElementById('go-manage').addEventListener('click',function(){showPassword('manage');});
 document.getElementById('go-manage-from-success').addEventListener('click',function(){showPassword('manage');});
@@ -666,6 +680,11 @@ document.getElementById('generate-btn').addEventListener('click',async function(
   editingCode=null;editingHidden=false;
   document.getElementById('generate-btn').textContent='✅ クイズを作成する';
   document.getElementById('success-title-display').textContent=title;
+  var shareUrl=window.location.href.split('#')[0]+'#'+code;
+  document.getElementById('share-url-input').value=shareUrl;
+  var qrDiv=document.getElementById('qrcode');
+  qrDiv.innerHTML='';
+  try{new QRCode(qrDiv,{text:shareUrl,width:160,height:160,colorDark:'#2B2B28',colorLight:'#ffffff'});}catch(e){}
   showScreen('screen-success');
 });
 
@@ -899,7 +918,7 @@ document.getElementById('st-class').addEventListener('input',function(){if(this.
 
 (async function init(){
   var hc=getHashCode();
-  if(hc){var data=await loadQuiz(hc);if(data&&data.v&&data.v.length){showStudentInput(data.t,data.v,hc);return;}}
+  if(hc){var data=await loadQuiz(hc);if(data&&data.v&&data.v.length){currentCode=hc;launchViewer(data.t,data.v,hc,true);return;}}
   showScreen('screen-home');
 })();
 })();
