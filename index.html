@@ -627,10 +627,10 @@ async function renderPublicList(){
   });
 }
 
-function parseCSV(text){text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');var rows=[];text.split('\n').forEach(function(line){if(!line.trim())return;var row=[],inQ=false,cell='';for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){if(inQ&&line[i+1]==='"'){cell+='"';i++;}else{inQ=!inQ;}}else if(ch===','&&!inQ){row.push(cell.trim());cell='';}else{cell+=ch;}}row.push(cell.trim());rows.push(row);});return rows;}
+function parseCSV(text){text=text.replace(/^﻿/,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');var rows=[];text.split('\n').forEach(function(line){if(!line.trim())return;var row=[],inQ=false,cell='';for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){if(inQ&&line[i+1]==='"'){cell+='"';i++;}else{inQ=!inQ;}}else if(ch===','&&!inQ){row.push(cell.trim());cell='';}else{cell+=ch;}}row.push(cell.trim());rows.push(row);});return rows;}
 function parseXLSX(buf){var wb=XLSX.read(buf,{type:'array'});var ws=wb.Sheets[wb.SheetNames[0]];var raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});return raw.map(function(row){return row.map(function(c){return String(c===null||c===undefined?'':c).trim();});});}
 var HA=['英語','英単語','単語','word','english'],HB=['意味','正解','meaning','japanese'];
-function isHdr(row){if(!row||row.length<2)return false;var a=(row[0]||'').toLowerCase().trim(),b=(row[1]||'').toLowerCase().trim();return HA.indexOf(a)>-1||HB.indexOf(b)>-1;}
+function isHdr(row){if(!row||row.length<2)return false;var a=(row[0]||'').replace(/^﻿/,'').toLowerCase().trim(),b=(row[1]||'').toLowerCase().trim(),c=(row[2]||'').toLowerCase().trim();return HA.indexOf(a)>-1||HB.indexOf(b)>-1||c==='ダミー'||c==='dummy';}
 function validate(rows){var start=isHdr(rows[0])?1:0,valid=[],skip=[];for(var i=start;i<rows.length;i++){var r=rows[i];if(r.length>=5&&r[0]&&r[1]&&r[2]&&r[3]&&r[4])valid.push([r[0],r[1],r[2],r[3],r[4]]);else if(r.some(function(c){return c&&c.trim();}))skip.push(i+1);}return{valid:valid,skipped:skip};}
 function showErr(m){var e=document.getElementById('error-msg');e.textContent=m;e.style.display='block';}
 function hideErr(){document.getElementById('error-msg').style.display='none';}
