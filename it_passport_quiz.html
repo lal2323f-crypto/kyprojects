@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITパスポート 4択問題集</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+  :root {
+    --bg:#f5f3ee; --surface:#ffffff; --border:#e0ddd6;
+    --accent:#2563eb; --accent-light:#eff6ff;
+    --green:#0f766e; --green-light:#f0fdfa;
+    --text:#1a1a1a; --text2:#555; --text3:#999;
+    --sans:'Noto Sans JP',sans-serif;
+    --mono:'JetBrains Mono',monospace;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+
+  /* ── ポータル画面 ── */
+  #portal{max-width:680px;margin:0 auto;padding:40px 20px 80px;}
+  .portal-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+  .portal-title{font-size:28px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:6px;}
+  .portal-icon{font-size:32px;}
+  .portal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+  .portal-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:32px;border-bottom:2px solid var(--text);padding-bottom:20px;}
+  .section-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+
+  .card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:18px 20px;
+    margin-bottom:12px;cursor:pointer;
+    transition:box-shadow .15s, border-color .15s, transform .1s;
+    display:flex;align-items:center;gap:16px;
+    text-decoration:none;
+  }
+  .card:hover{
+    box-shadow:0 4px 16px rgba(0,0,0,.08);
+    border-color:var(--accent);
+    transform:translateY(-1px);
+  }
+  .card-bar{width:4px;border-radius:2px;align-self:stretch;flex-shrink:0;}
+  .bar-gold{background:#d97706;}
+  .bar-green{background:var(--green);}
+  .card-body{flex:1;}
+  .card-badge{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;}
+  .card-name{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:3px;}
+  .card-count{font-size:12px;color:var(--text3);}
+  .card-arrow{color:var(--text3);font-size:18px;}
+
+  .section-gap{margin-top:24px;}
+
+  /* ── クイズ画面（共通） ── */
+  #quiz-screen{display:none;}
+  header{
+    background:#1a1d27;border-bottom:1px solid #2e3350;
+    padding:16px 20px;position:sticky;top:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .hdr-left{display:flex;align-items:center;gap:10px;}
+  .back-btn{
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+    color:#e8eaf2;font-size:12px;font-family:var(--sans);
+    padding:5px 12px;border-radius:6px;cursor:pointer;
+    transition:background .12s;
+  }
+  .back-btn:hover{background:rgba(255,255,255,.15);}
+  .hdr-badge{
+    font-family:var(--mono);font-size:10px;font-weight:600;
+    letter-spacing:.08em;color:#4f7cff;
+    background:rgba(79,124,255,0.18);
+    border:1px solid rgba(79,124,255,.3);
+    padding:3px 8px;border-radius:4px;
+  }
+  header h1{font-size:13px;font-weight:700;color:#e8eaf2;}
+  .hdr-score{font-family:var(--mono);font-size:13px;color:#8b90a8;white-space:nowrap;}
+  .hdr-score span{color:#4f7cff;font-weight:600;}
+
+  .progress-wrap{max-width:760px;margin:20px auto 0;padding:0 20px;display:flex;align-items:center;gap:14px;}
+  .progress-bar{flex:1;height:6px;background:#22263a;border-radius:99px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#4f7cff,#7c6fff);border-radius:99px;transition:width .4s ease;width:0%;}
+  .progress-label{font-family:var(--mono);font-size:12px;color:#8b90a8;white-space:nowrap;}
+  .progress-label strong{color:#e8eaf2;}
+  .quiz-intro{max-width:760px;margin:12px auto 24px;padding:0 20px;font-size:12px;color:#5a5f7a;}
+
+  main{max-width:760px;margin:0 auto;padding:0 20px 80px;}
+
+  .q-card{background:#1a1d27;border:1px solid #2e3350;border-radius:12px;margin-bottom:14px;overflow:hidden;transition:border-color .2s;}
+  .q-card.done-ok{border-color:rgba(34,197,94,.35);}
+  .q-card.done-ng{border-color:rgba(248,113,113,.35);}
+  .q-meta{padding:8px 16px;background:#22263a;border-bottom:1px solid #2e3350;display:flex;align-items:center;gap:8px;}
+  .q-num{font-family:var(--mono);font-size:10px;font-weight:600;color:#4f7cff;background:rgba(79,124,255,0.18);border:1px solid rgba(79,124,255,.25);padding:2px 7px;border-radius:4px;}
+  .q-topic{font-size:11px;color:#5a5f7a;}
+  .q-result-badge{margin-left:auto;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;display:none;}
+  .badge-ok{background:rgba(34,197,94,0.12);color:#22c55e;display:inline-block!important;}
+  .badge-ng{background:rgba(248,113,113,0.12);color:#f87171;display:inline-block!important;}
+  .q-body{padding:18px 18px 4px;}
+  .q-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#5a5f7a;margin-bottom:7px;}
+  .q-text{font-size:13.5px;line-height:1.8;color:#e8eaf2;}
+  .q-ask{font-size:11px;color:#5a5f7a;margin-top:11px;padding-top:11px;border-top:1px solid #2e3350;font-weight:500;}
+  .options{padding:8px 14px 14px;display:grid;gap:7px;}
+  .opt{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;background:#0f1117;border:1.5px solid #2e3350;border-radius:8px;cursor:pointer;transition:border-color .12s,background .12s,transform .08s;text-align:left;width:100%;font-family:var(--sans);}
+  .opt:hover:not(:disabled){border-color:#4f7cff;background:rgba(79,124,255,0.18);transform:translateX(2px);}
+  .opt:disabled{cursor:default;}
+  .opt-key{flex-shrink:0;width:23px;height:23px;border-radius:5px;background:#22263a;border:1px solid #2e3350;font-family:var(--mono);font-size:10px;font-weight:600;color:#8b90a8;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s;}
+  .opt-text{font-size:13px;line-height:1.5;color:#e8eaf2;padding-top:2px;}
+  .opt.correct{border-color:#22c55e;background:rgba(34,197,94,0.12);}
+  .opt.correct .opt-key{background:#22c55e;color:#0f1117;border-color:#22c55e;}
+  .opt.wrong{border-color:#f87171;background:rgba(248,113,113,0.12);}
+  .opt.wrong .opt-key{background:#f87171;color:#0f1117;border-color:#f87171;}
+  .opt.dimmed{opacity:.38;}
+  .feedback{margin:0 14px 12px;padding:9px 13px;border-radius:7px;font-size:12px;line-height:1.6;display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,.3);color:#22c55e;}
+  .feedback.ng{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,.3);color:#f87171;}
+  .feedback strong{font-weight:700;}
+  .feedback .hint{color:#8b90a8;font-size:11px;margin-top:4px;}
+
+  #result{display:none;background:#1a1d27;border:1px solid #2e3350;border-radius:12px;padding:36px 24px 28px;text-align:center;margin-bottom:14px;}
+  #result.show{display:block;}
+  .result-emoji{font-size:46px;margin-bottom:12px;}
+  .result-title{font-size:19px;font-weight:700;color:#e8eaf2;margin-bottom:5px;}
+  .result-score{font-family:var(--mono);font-size:44px;font-weight:600;color:#4f7cff;line-height:1;margin-bottom:4px;}
+  .result-sub{font-size:13px;color:#8b90a8;margin-bottom:24px;}
+  .result-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+  .result-btns button{padding:11px 20px;border-radius:9px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;border:none;transition:opacity .15s;}
+  .result-btns button:hover{opacity:.85;}
+  .btn-primary{background:#4f7cff;color:#fff;}
+  .btn-secondary{background:#22263a;color:#e8eaf2;border:1px solid #2e3350!important;}
+  .btn-portal{background:#22263a;color:#8b90a8;border:1px solid #2e3350!important;}
+  .wrong-section{display:none;margin-top:24px;text-align:left;}
+  .wrong-section.show{display:block;}
+  .wrong-section h3{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5a5f7a;margin-bottom:10px;}
+  .wrong-item{background:#0f1117;border:1px solid #2e3350;border-radius:8px;padding:12px 14px;margin-bottom:8px;}
+  .wi-term{font-weight:700;color:#f87171;font-size:13px;margin-bottom:3px;}
+  .wi-def{font-size:12px;color:#8b90a8;line-height:1.6;}
+  .wi-your{font-size:11px;color:#5a5f7a;margin-top:4px;}
+  .history-section{background:#1a1d27;border:1px solid #2e3350;border-radius:12px;padding:20px;margin-top:20px;}
+  .history-section h3{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5a5f7a;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+  .history-section h3 button{font-size:11px;color:#5a5f7a;background:none;border:1px solid #2e3350;border-radius:6px;padding:3px 10px;cursor:pointer;font-family:var(--sans);}
+  .history-section h3 button:hover{color:#f87171;border-color:#f87171;}
+  .history-empty{font-size:13px;color:#5a5f7a;}
+  table.hist{width:100%;border-collapse:collapse;font-size:12px;}
+  table.hist th{text-align:left;color:#5a5f7a;font-weight:500;font-size:11px;padding:0 0 8px;border-bottom:1px solid #2e3350;}
+  table.hist td{padding:8px 0;border-bottom:1px solid #2e3350;color:#8b90a8;vertical-align:middle;}
+  table.hist td:first-child{color:#e8eaf2;font-family:var(--mono);font-size:11px;}
+  .score-chip{font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;}
+  .chip-great{background:rgba(34,197,94,0.12);color:#22c55e;}
+  .chip-ok{background:rgba(79,124,255,0.18);color:#4f7cff;}
+  .chip-low{background:rgba(248,113,113,0.12);color:#f87171;}
+  .delta-up{color:#22c55e;font-size:11px;}
+  .delta-down{color:#f87171;font-size:11px;}
+  .delta-eq{color:#5a5f7a;font-size:11px;}
+  @media(max-width:540px){header h1{font-size:12px;}.q-text{font-size:13px;}.opt-text{font-size:12px;}}
+</style>
+</head>
+<body>
+
+<!-- ポータル画面 -->
+<div id="portal">
+  <div class="portal-header">
+    <div>
+      <div class="portal-eyebrow">総合実践分野</div>
+      <div class="portal-title">ITパスポート<br>4択問題集</div>
+    </div>
+    <div class="portal-icon">📋</div>
+  </div>
+  <div class="portal-desc">
+    令和6年度（問50〜100）と令和7年度（問1〜17）の用語4択問題です。<br>
+    説明文を読んで最も適する用語を選んでください。選択肢を選ぶと、その場で採点されます。
+  </div>
+
+  <div class="section-label">FULL SET</div>
+  <div class="card" onclick="startQuiz('all')">
+    <div class="card-bar bar-gold"></div>
+    <div class="card-body">
+      <div class="card-badge">FULL SET</div>
+      <div class="card-name">全範囲ミックス</div>
+      <div class="card-count">全168問</div>
+    </div>
+    <div class="card-arrow">›</div>
+  </div>
+
+  <div class="section-gap"></div>
+  <div class="section-label">CHAPTER</div>
+
+  <div class="card" onclick="startQuiz('r6_50')">
+    <div class="card-bar bar-green"></div>
+    <div class="card-body">
+      <div class="card-badge">CHAPTER</div>
+      <div class="card-name">令和6年度 問50〜75</div>
+      <div class="card-count">全59問</div>
+    </div>
+    <div class="card-arrow">›</div>
+  </div>
+
+  <div class="card" onclick="startQuiz('r6_76')">
+    <div class="card-bar bar-green"></div>
+    <div class="card-body">
+      <div class="card-badge">CHAPTER</div>
+      <div class="card-name">令和6年度 問76〜100</div>
+      <div class="card-count">全59問</div>
+    </div>
+    <div class="card-arrow">›</div>
+  </div>
+
+  <div class="card" onclick="startQuiz('r7_1')">
+    <div class="card-bar bar-green"></div>
+    <div class="card-body">
+      <div class="card-badge">CHAPTER</div>
+      <div class="card-name">令和7年度 問1〜17</div>
+      <div class="card-count">全50問</div>
+    </div>
+    <div class="card-arrow">›</div>
+  </div>
+</div>
+
+<!-- クイズ画面 -->
+<div id="quiz-screen">
+  <header>
+    <div class="hdr-left">
+      <button class="back-btn" onclick="goPortal()">← 戻る</button>
+      <span class="hdr-badge" id="hdr-badge">R6</span>
+      <h1 id="hdr-title">問題</h1>
+    </div>
+    <div class="hdr-score"><span id="hdr-correct">0</span> / <span id="hdr-answered">0</span></div>
+  </header>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+    <div class="progress-label"><strong id="prog-cur">0</strong> / <strong id="prog-tot">0</strong> 問</div>
+  </div>
+  <div class="quiz-intro">選択肢を選ぶと、その場で採点されます。出題順は毎回ランダムです。</div>
+  <main>
+    <div id="quiz-area"></div>
+    <div id="result">
+      <div class="result-emoji" id="res-emoji">🎉</div>
+      <div class="result-title" id="res-title">テスト終了！</div>
+      <div class="result-score" id="res-score">0／0</div>
+      <div class="result-sub" id="res-sub"></div>
+      <div class="result-btns">
+        <button class="btn-primary" onclick="restartQuiz()">🔀 もう一度</button>
+        <button class="btn-secondary" id="retry-wrong-btn" onclick="retryWrong()" style="display:none">❌ 間違えた問題のみ</button>
+        <button class="btn-portal" onclick="goPortal()">← 選択に戻る</button>
+      </div>
+      <div class="wrong-section" id="wrong-section">
+        <h3>間違えた問題</h3>
+        <div id="wrong-list"></div>
+      </div>
+    </div>
+    <div class="history-section">
+      <h3>成長記録 <button onclick="clearHistory()">リセット</button></h3>
+      <div id="history-area"><p class="history-empty">まだ記録がありません</p></div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ===== データ =====
+const R6_50 = [{ q:'問51', term:'パレート図', meaning:'データを「値の大きい順」に左から棒グラフで並べて、その上に累積の割合を折れ線グラフで重ねた図です。例えば「クレームの原因」を多い順に並べると、上位2〜3項目で全体の8割を占めることがわかり、どこを重点的に改善すべきかが一目でわかります。QC七つ道具の一つで、問題の「主犯」を絞り込むときに使います。', pool:['散布図','チェックシート','特性要因図'] },
+  { q:'問51', term:'散布図', meaning:'2つの数値データの関係を、縦軸と横軸にとって点を打って表した図です。例えば「気温」と「アイスの売上」の関係をグラフにすると、右肩上がりに点が並んでいれば「気温が上がるほど売上が増える」という相関関係が見えてきます。QC七つ道具の一つで、2つのデータに関係があるかどうかを視覚的に確かめるために使います。', pool:['パレート図','特性要因図','チェックシート'] },
+  { q:'問51', term:'チェックシート', meaning:'あらかじめ点検・記録したい項目を一覧表にしておき、該当したらチェックを入れるだけで簡単にデータを集められる帳票のことです。工場での検品作業や設備点検など、「何が・何回起きたか」を漏れなく記録するのに役立ちます。QC七つ道具の一つで、データ収集を効率化するシンプルな道具です。', pool:['散布図','パレート図','特性要因図'] },
+  { q:'問51', term:'特性要因図', meaning:'「なぜこの問題が起きたのか？」という原因を、魚の骨のような形で整理した図です。真ん中の太い矢印（背骨）の先に問題（特性）を書き、そこから枝分かれするように原因（要因）を書き出していきます。フィッシュボーン図・石川ダイアグラムとも呼ばれ、QC七つ道具の一つです。原因を整理して根本的な対策を考えるときに使います。', pool:['パレート図','散布図','チェックシート'] },
+  { q:'問52', term:'WBS', meaning:'プロジェクトを完成させるために必要な作業を、細かい単位まで階層的に分解して整理した構成図のことです。「システム開発」という大きな仕事を「要件定義→設計→開発→テスト」のように分け、さらに細かく「画面設計・DB設計…」と分けていくイメージです。これを作ることで、作業の漏れをなくし、担当者や期間の割り当てがしやすくなります。', pool:['プロジェクトスコープマネジメント','CMMI','正規化'] },
+  { q:'問52', term:'プロジェクトスコープマネジメント', meaning:'プロジェクトで「何をやるか・何をやらないか」という作業の範囲（スコープ）を明確に定義して管理するプロセスのことです。スコープが曖昧だと、後から「あれも必要だった」「これは想定外だった」という問題が起きてしまいます。WBSの作成や変更管理もここに含まれます。プロジェクトを予定通りに完成させるために欠かせない管理活動です。', pool:['WBS','ITガバナンス','内部統制'] },
+  { q:'問53', term:'ITガバナンス', meaning:'会社がITを使って目標を達成できているかどうかを、経営者がきちんと評価・指示・監視する仕組みのことです。「ITはただ便利なツールではなく、経営戦略の一部として管理すべきだ」という考え方に基づいています。コーポレートガバナンス（企業統治）のITバージョンで、経営層がIT投資の価値やリスクに責任を持つことを指します。', pool:['内部統制','リスクマネジメント','情報セキュリティポリシー'] },
+  { q:'問54', term:'内部統制', meaning:'会社が「ちゃんとした業務運営・正しい財務報告・法令遵守」を確保するために社内に整備する仕組み全体のことです。不正や間違いが起きないよう、チェック体制や承認ルールを設けることがその中心です。日本では2008年に金融商品取引法で上場企業に整備が義務付けられました。統制環境・リスク評価・統制活動・情報伝達・モニタリング・ITへの対応の6つの基本要素からなります。', pool:['ITガバナンス','リスクマネジメント','情報セキュリティポリシー'] },
+  { q:'問54', term:'CMMI', meaning:'ソフトウェア開発やシステム開発の「プロセスの成熟度（レベル）」を5段階で評価し、改善につなげるためのモデルです。レベル1（初期）〜レベル5（最適化）の段階があり、自社の開発プロセスがどのレベルにあるかを測ることができます。アメリカのカーネギーメロン大学が開発したもので、開発の品質・コスト・スケジュールを安定させたい組織が活用します。', pool:['ITIL','ISMSクラウドセキュリティ認証','WBS'] },
+  { q:'問54', term:'ITIL', meaning:'ITサービスの設計・導入・運用・改善について、世界中の成功事例をまとめた「ベストプラクティス集」のことです。もともとイギリス政府が作ったフレームワークで、現在はIT業界のデファクトスタンダードとして世界中で活用されています。「どうすればITサービスを効率よく・高品質に提供できるか」のノウハウが体系的にまとまっています。', pool:['CMMI','ISMSクラウドセキュリティ認証','内部統制'] },
+  { q:'問54', term:'リスクマネジメント', meaning:'組織やプロジェクトに影響を与えうるリスクを「特定→分析→評価→対応」という流れで管理する活動のことです。リスクとは「悪いことが起きる可能性」のことで、それをゼロにすることはできないので、どのリスクにどう対処するかを事前に考えておくことが重要です。リスクへの対応策には「回避・低減・移転・保有」の4種類があります。', pool:['内部統制','情報セキュリティポリシー','ITガバナンス'] },
+  { q:'問55', term:'システム監査', meaning:'情報システムが、組織の目標達成に本当に役立っているか、リスク管理が適切かどうかを、システムの開発・運用に直接関与していない独立した立場の「監査人」が点検・評価する活動のことです。会計監査の「IT版」のようなイメージで、セキュリティや信頼性の観点からシステムの問題点を発見し、改善を促すことが目的です。', pool:['内部統制','ITガバナンス','リスクマネジメント'] },
+  { q:'問55', term:'システム要件定義', meaning:'「どんなシステムを作るか」を具体的に決める工程のことです。ユーザーが「こんなことがしたい」という業務要件をヒアリングして、それをシステムが満たすべき機能・性能・セキュリティなどの要件として文書化します。ここで要件を曖昧にしてしまうと、完成したシステムが「思っていたものと違う！」という事態になるため、開発の中でも特に重要な工程です。', pool:['システム監査','正規化','WBS'] },
+  { q:'問56', term:'DRAM', meaning:'パソコンのメインメモリ（主記憶装置）に使われる半導体メモリです。電源を切るとデータが消えてしまう「揮発性メモリ」で、コンデンサに電荷を蓄える方式のため、定期的にデータを読み書きし直す「リフレッシュ」が必要です。高速にデータのやりとりができるため、CPUが処理するデータの一時置き場として使われています。', pool:['ROM','フラッシュメモリ','SSD'] },
+  { q:'問56', term:'DVD-RAM', meaning:'データの書き込み・読み出し・消去を何度でも繰り返せるDVD規格の光ディスクです。電源を切ってもデータが消えない「不揮発性」で、長期保存にも使えます。DVD-RやDVD-RWと同じDVDの仲間ですが、ランダムアクセス（好きな場所に直接書き込み・読み出しができる）に対応しているのが特徴です。', pool:['DRAM','ROM','フラッシュメモリ'] },
+  { q:'問56', term:'ROM', meaning:'Read Only Memory（読み取り専用メモリ）の略で、基本的に「読み出し専用」の不揮発性メモリです。電源を切ってもデータが消えないため、パソコンの起動プログラム（BIOS/UEFI）の格納などに使われています。工場出荷時にデータが書き込まれており、通常のユーザーは内容を書き換えられません。RAMと違い、電源オフでもデータが保持される点が大きな特徴です。', pool:['DRAM','フラッシュメモリ','SSD'] },
+  { q:'問56', term:'フラッシュメモリ', meaning:'電気的にデータの消去・書き込みができる不揮発性半導体メモリです。電源を切ってもデータが消えないため、USBメモリ・SDカード・SSD・スマートフォンのストレージなど、身の回りのあらゆるところで使われています。DRAMのようなリフレッシュが不要で、小型・軽量・省電力という特徴があります。', pool:['DRAM','ROM','SSD'] },
+  { q:'問57', term:'公開鍵暗号方式', meaning:'暗号化と復号に「2種類の異なる鍵（公開鍵と秘密鍵）」を使う暗号方式です。公開鍵は誰でも入手できるようにしておき、秘密鍵は本人だけが持ちます。「公開鍵で暗号化したデータは、対応する秘密鍵でしか復号できない」という仕組みです。鍵を事前に相手に渡す必要がないため、インターネット上での安全な通信に広く使われていますが、処理速度は共通鍵方式より遅いです。', pool:['共通鍵暗号方式','PKI','デジタル署名'] },
+  { q:'問57', term:'共通鍵暗号方式', meaning:'暗号化するときも復号するときも「同じ1つの鍵」を使う暗号方式です。処理速度が速いという利点がありますが、「通信相手に鍵を安全に渡す」という「鍵配送問題」が難しいのが弱点です。例えば、AさんとBさんが暗号通信をしたいとき、鍵をどうやってお互いに安全に共有するか、という問題が生じます。AES・DESなどが代表的なアルゴリズムです。', pool:['公開鍵暗号方式','PKI','ハッシュ値'] },
+  { q:'問58', term:'マクロ', meaning:'ExcelやWordなどのアプリで、複数の操作手順をあらかじめ記録しておき、ボタン一つで自動的に実行させる機能です。例えば「毎月の売上データを集計して表にまとめてグラフを作る」という繰り返し作業を一発でこなせるようになります。VBA（Visual Basic for Applications）というプログラミング言語で記述することもでき、業務効率化に広く使われています。', pool:['オートコンプリート','プラグアンドプレイ','ソースコード'] },
+  { q:'問58', term:'オートコンプリート', meaning:'キーボードで文字を入力し始めると、過去の入力履歴や登録データをもとに候補を自動表示して入力を補完してくれる機能です。ブラウザのアドレスバーで「goo」と打つと「google.com」が候補に出てきたり、メールアプリで名前を打つとアドレスが自動補完されたりする、あの機能がこれにあたります。タイプミスの防止や入力速度向上に役立ちます。', pool:['マクロ','プラグアンドプレイ','ウィザード'] },
+  { q:'問58', term:'ソースコード', meaning:'プログラマーがPythonやJavaなどのプログラミング言語で書いた、人間が読める形のプログラムの「設計図テキスト」のことです。コンピュータはそのままでは読めないので、コンパイラやインタプリタを使って機械語に変換してから実行します。これを見れば「このプログラムがどんな処理をしているか」がわかるため、ソフトウェアの著作権においても重要な意味を持ちます。', pool:['マクロ','オートコンプリート','JavaScript'] },
+  { q:'問58', term:'プラグアンドプレイ', meaning:'プリンターやUSBメモリなどの周辺機器をパソコンに接続するだけで、ドライバのインストールや各種設定が自動的に行われ、すぐに使えるようになる仕組みのことです。昔は機器を使うたびに手動でドライバを入れたり設定を変えたりが必要でしたが、この仕組みのおかげで「差したら使える」が当たり前になりました。Plug and Playを略してPnPとも呼ばれます。', pool:['マクロ','オートコンプリート','NUI'] },
+  { q:'問59', term:'OCR', meaning:'紙に印刷された文字や手書きの文字を光学的（カメラやスキャナ）に読み取り、コンピュータが扱えるテキストデータに変換する技術・装置のことです。例えば紙の請求書をスキャンして自動的にデータ化したり、手書きのアンケート用紙を自動で入力したりするのに使われます。Optical Character Recognitionの略で、AI技術の進歩により精度が大幅に向上しています。', pool:['音声認識','自然言語処理','バイオメトリクス認証'] },
+  { q:'問60', term:'関係データベース（RDB）', meaning:'データを「行と列からなる表（テーブル）」の形で管理するデータベースのことです。Excelの表をイメージすると近いですが、複数の表を「共通のキー（ID）」で関連付けて使えるのが特徴です。例えば「顧客テーブル」と「注文テーブル」を顧客IDで紐づけて、「誰が何を注文したか」を一度に調べることができます。MySQLやOracleが代表的で、現在最も広く使われているデータベースの形式です。', pool:['正規化','ログ','排他制御'] },
+  { q:'問61', term:'Cookie', meaning:'WebサイトがあなたのブラウザにこっそりDB保存させる小さなテキストデータのことです。例えばネットショッピングサイトにログインすると、「この人はログイン済み」という情報が保存され、ページを移動してもログイン状態が維持されます。また「最近見た商品」を記憶して広告に使ったりもします。便利な反面、プライバシーの観点から問題視されることもあり、近年は規制が強まっています。', pool:['シングルサインオン','ESSIDステルス','ダークウェブ'] },
+  { q:'問63', term:'SSD', meaning:'フラッシュメモリを記録媒体として使う補助記憶装置のことです。HDDと違って「ディスク（円盤）」が存在しないため、読み書きが速く・振動に強く・軽量・省電力というメリットがあります。ただし、HDDのデータ消去で使う「磁気消去」は効果がありません。電気的に記録するフラッシュメモリには磁気は通じないため、専用のコマンドで消去する必要があります。', pool:['磁気消去','Secure Erase','DRAM'] },
+  { q:'問63', term:'Secure Erase', meaning:'SSDのデータを完全に消去するために、ATAコマンドセットで規定された専用の消去コマンドのことです。SSD内部のコントローラが全セルを初期化するため、ファイルを削除するだけでは残ってしまうデータも確実に消せます。SSDを廃棄・譲渡するときにデータ漏えいを防ぐために使われる、最も確実な消去方法の一つです。', pool:['磁気消去','データの完全消去','論理フォーマット'] },
+  { q:'問63', term:'磁気消去', meaning:'強力な磁気（消磁器）を当てることで、HDDなどの磁気記録媒体のデータを消去する方法です。磁気でデータを記録しているHDDには効果的ですが、フラッシュメモリで電気的にデータを記録している記憶装置には全く効果がありません。廃棄時のデータ消去方法は記録媒体の種類によって使い分ける必要があります。', pool:['Secure Erase','データの完全消去','論理フォーマット'] },
+  { q:'問63', term:'セキュアブート', meaning:'パソコンを起動するとき、OSやブートローダーの「デジタル署名」を確認して、正規のソフトウェアしか起動しないようにするセキュリティ機能のことです。もし起動プロセスにウイルスやマルウェアが紛れ込んでいた場合、署名が合わないため起動をブロックしてくれます。UEFI（BIOSの後継）に組み込まれており、ルートキットなどの高度なマルウェア対策として有効です。', pool:['WAF','データの完全消去','ランサムウェア'] },
+  { q:'問63', term:'データクレンジング', meaning:'データベースや収集したデータの中に含まれる「重複・誤り・欠損・形式の不統一」などの不良データを見つけ出して修正・削除し、データの品質を高める作業のことです。例えば「山田太郎」「山田 太郎」「ヤマダタロウ」が同一人物なのにバラバラに登録されているケースを統一したりします。AIの精度はデータの質に大きく左右されるため、分析前の重要な前処理です。', pool:['正規化','データの完全消去','論理フォーマット'] },
+  { q:'問64', term:'リスク移転（リスク共有）', meaning:'リスクが実際に発生したときの損失を、保険への加入や外部委託などによって「第三者に肩代わりしてもらう」リスク対応策のことです。例えば火災保険に入っておけば、万が一火災が起きても損失を保険会社に移転（転嫁）できます。リスクをゼロにするわけではなく、損失の負担を他者に移すという考え方です。', pool:['リスク回避','リスク低減','リスク保有（受容）'] },
+  { q:'問64', term:'リスク回避', meaning:'リスクが生じる可能性のある活動や事業そのものを「やめる・参入しない」ことで、リスクをなくす対応策のことです。例えば「新興国への進出はリスクが高いから中止する」「危険な薬品を使う工程をなくす」といった判断がこれにあたります。リスクを完全になくせる最も確実な方法ですが、ビジネスチャンスも失ってしまう可能性があるというトレードオフもあります。', pool:['リスク移転（リスク共有）','リスク低減','リスク保有（受容）'] },
+  { q:'問64', term:'リスク低減', meaning:'対策を講じることで「リスクが起きる確率」や「起きたときの損害の大きさ」を小さくするリスク対応策のことです。例えばシステムにウイルス対策ソフトを導入する、定期バックアップを取る、従業員に情報セキュリティ教育をするといった対策がこれにあたります。最も一般的なリスク対応のアプローチで、多くの企業が日常的に取り組んでいます。', pool:['リスク移転（リスク共有）','リスク回避','リスク保有（受容）'] },
+  { q:'問64', term:'リスク保有（受容）', meaning:'リスクへの対策を「あえてとらない」で、リスクをそのまま受け入れるという対応策のことです。リスクの影響が小さかったり、対策コストのほうが高くついたりする場合に選択されます。例えば「このシステムが1時間止まっても損害は数千円なので、高額な冗長化対策は不要」と判断するケースです。リスクを無視するのではなく、「受け入れる」と意識的に判断することがポイントです。', pool:['リスク移転（リスク共有）','リスク回避','リスク低減'] },
+  { q:'問65', term:'分類', meaning:'機械学習の教師あり学習の手法の一つで、正解ラベル付きのデータを学習させて「新しいデータがどのカテゴリ（クラス）に属するか」を予測するものです。例えばメールが「スパムか否か」を判定したり、写真に写っているのが「犬か猫か」を識別したりするのがこれにあたります。答えが「どちらか」「どのカテゴリか」という離散的な値になるのが特徴です。', pool:['回帰','クラスタリング','教師あり学習'] },
+  { q:'問65', term:'回帰', meaning:'機械学習の教師あり学習の手法の一つで、入力データから「連続した数値」を予測するものです。例えば「この家の広さ・立地・築年数から家賃はいくらになるか」とか「明日の気温は何度になるか」といった予測がこれにあたります。「どちら？」という問いではなく「いくつ？」という数値を出すのが特徴です。', pool:['分類','クラスタリング','ニューラルネットワーク'] },
+  { q:'問65', term:'クラスタリング', meaning:'機械学習の教師なし学習の手法の一つで、正解ラベルなしにデータの「似ている・似ていない」という類似性に基づいて自動的にグループ（クラスタ）に分ける方法です。例えば「購買履歴が似ているお客さんをグループ分けして、それぞれに合ったおすすめ商品を提案する」といった使い方をします。正解を教えずに「勝手にまとめてくれる」のが特徴です。', pool:['分類','回帰','教師なし学習'] },
+  { q:'問65', term:'教師あり学習', meaning:'「正解ラベル（答え）付きの訓練データ」を使ってモデルに学習させる機械学習の手法です。例えば「これはスパムメール（正解）」「これは正常メール（正解）」というデータをたくさん見せることで、新しいメールがスパムかどうか判断できるようになります。分類や回帰がこれにあたります。正解を「教えながら」学習させるというイメージです。', pool:['教師なし学習','ディープラーニング（深層学習）','クラスタリング'] },
+  { q:'問65', term:'教師なし学習', meaning:'正解ラベルのないデータから、コンピュータが自分でパターンや構造を発見する機械学習の手法です。「正解を教えないで、自分で考えてグループ分けしてね」というイメージです。クラスタリング（グループ化）や次元削減がこれにあたります。正解データを用意する手間がいらない分、何が発見されるかは事前にわからないという特徴があります。', pool:['教師あり学習','ディープラーニング（深層学習）','分類'] },
+  { q:'問66', term:'認証局（CA）', meaning:'PKI（公開鍵基盤）において、「この公開鍵は本物です」とお墨付きを与えるデジタル証明書を発行・管理する信頼された第三者機関のことです。インターネットバンキングやECサイトでHTTPS通信するとき、そのサイトの正当性を保証しているのが認証局です。VeriSignやCybertrustなどが有名で、認証局を信頼しているからこそ安全な通信が成り立っています。', pool:['PKI','デジタル署名','ファイアウォール'] },
+  { q:'問66', term:'プロキシ', meaning:'社内のパソコンに代わってインターネットへアクセスする「代理サーバ」のことです。社内のユーザーが直接インターネットに接続するのではなく、この代理サーバを経由することで、セキュリティチェックや不正サイトのブロック、アクセスログの記録などを一括して行えます。また、一度アクセスしたWebページをキャッシュしておくことで、再アクセス時の速度向上にも役立ちます。', pool:['ファイアウォール','WAF','プロキシサーバ'] },
+  { q:'問66', term:'ファイアウォール', meaning:'社内ネットワークとインターネット（外部）の境界に置かれ、通信パケットを監視して「許可されていない通信を遮断する」セキュリティの仕組みのことです。お城のお堀や城壁のようなイメージで、外からの不正侵入を防ぎます。「このIPアドレスからの通信はOK」「このポートへの通信はNG」といったルールを設定して、通信の可否を制御します。', pool:['WAF','プロキシ','ESSIDステルス'] },
+  { q:'問66', term:'PKI', meaning:'公開鍵暗号方式を使って「安全な通信」と「なりすまし防止」を実現するための基盤（インフラ）の仕組み全体のことです。公開鍵・秘密鍵のペアと、認証局（CA）が発行するデジタル証明書を組み合わせることで、「この公開鍵は本物の〇〇さんのものです」という信頼性を確保します。HTTPSやデジタル署名など、インターネット上のセキュリティの根幹を支える仕組みです。', pool:['認証局（CA）','デジタル署名','SEO'] },
+  { q:'問68', term:'シグニファイア', meaning:'ユーザーが「どう操作すればいいか」を直感的に理解できるよう示す手がかりやデザイン上の特徴のことです。例えばドアのノブがついていれば「回す・引く」、フラットな板なら「押す」と感じるように、形やデザイン自体がユーザーに操作方法を伝えてくれます。スマートフォンの「下線付き青文字」を見れば「タップするとリンク先に飛ぶ」とわかるのも、この概念の一つです。', pool:['NUI','マルチタッチ','ウィザード'] },
+  { q:'問68', term:'NUI', meaning:'Natural User Interface（自然なユーザーインターフェース）の略で、タッチ・音声・ジェスチャー・視線など、人間が普段から自然に行う動作でコンピュータを操作できるインターフェースのことです。マウスやキーボードを覚えなくても使えるため、子どもからお年寄りまで直感的に使えるのが特徴です。スマートスピーカーへの音声操作や、ゲーム機のモーションコントローラーなどがこれにあたります。', pool:['シグニファイア','マルチタッチ','バイオメトリクス認証'] },
+  { q:'問68', term:'ウィザード', meaning:'ソフトウェアのインストールや複雑な設定を、「次へ→次へ→完了」という形で、段階的な質問と選択肢の提示によって順番に案内してくれる機能のことです。専門知識がなくても迷わず設定を完了できるよう、ユーザーを「魔法使い（wizard）のように手助けする」というイメージからこの名前がつきました。初心者に優しいUIの代表的な形式です。', pool:['シグニファイア','マクロ','オートコンプリート'] },
+  { q:'問68', term:'マルチタッチ', meaning:'画面上の複数の指の接触点を同時に認識する入力方式のことです。2本指を使って「ピンチイン（縮小）」「ピンチアウト（拡大）」したり、3本指でスワイプしたりといった操作ができます。スマートフォンやタブレットでは当たり前のこの機能も、一昔前のタッチパネルは1点しか認識できませんでした。静電容量方式のタッチパネルが普及してはじめて実現しました。', pool:['静電容量方式','感圧式','NUI'] },
+  { q:'問70', term:'ESSIDステルス', meaning:'Wi-Fiのアクセスポイントが定期的に発信しているビーコン信号に、ネットワーク名（ESSID/SSID）を含めないようにして、周囲からネットワークの存在を見えにくくするセキュリティ機能のことです。普段スマートフォンのWi-Fi設定を開くと周囲のネットワーク名が表示されますが、ステルスに設定されていると一覧に表示されません。ただし、完全な隠蔽はできず、通信を傍受すれば検出可能です。', pool:['ファイアウォール','WAF','バイオメトリクス認証'] },
+  { q:'問71', term:'ドメイン名', meaning:'インターネット上のWebサーバやメールサーバを人間が覚えやすい文字列で識別するための名前のことです。例えば「www.google.com」の「google.com」の部分がこれにあたります。コンピュータはIPアドレス（数字）で通信しているため、DNSというシステムが文字列をIPアドレスに変換（名前解決）する役割を担っています。', pool:['IPアドレス','ホスト名','ポート番号'] },
+  { q:'問72', term:'バイオメトリクス認証', meaning:'指紋・顔・静脈・声紋・虹彩など、「その人固有の身体的・行動的特徴」を使って本人確認を行う認証方式のことです。パスワードは「知っていること」、ICカードは「持っていること」での認証ですが、バイオメトリクスは「その人自身であること」での認証です。スマートフォンの指紋・顔認証が典型例で、「忘れる・盗まれる」リスクが低い反面、一度漏えいしたら変更できないという弱点もあります。', pool:['PIN','シングルサインオン','ソーシャルエンジニアリング'] },
+  { q:'問73', term:'ソーシャルエンジニアリング', meaning:'コンピュータへの不正アクセスを、高度な技術ではなく「人の心理・行動の隙」を利用して行う手口のことです。例えば電話で「IT部門の者ですが、緊急のメンテナンスでパスワードが必要です」とだましてパスワードを聞き出したり、背後からのぞいてパスワードを盗み見る「ショルダーハッキング」、捨てられた書類から情報を得る「ゴミ箱あさり（スキャベンジング）」などが代表的な手口です。', pool:['クロスサイトスクリプティング','ランサムウェア','DNSキャッシュポイズニング'] },
+  { q:'問74', term:'ログ', meaning:'システム・アプリケーション・ネットワーク機器などが、「いつ・誰が・何をしたか」という動作・操作の履歴を時系列に記録したファイルのことです。例えばサーバへの不正アクセスがあったとき、これを調べることで「どのIPアドレスから・いつ・どんな操作をしたか」が追跡できます。障害原因の調査、セキュリティインシデントの検知、監査証跡として非常に重要な情報です。', pool:['コミット','ロールバック','排他制御'] },
+  { q:'問74', term:'コミット', meaning:'データベースで複数のSQLを一まとめにした「トランザクション」が正常に完了したとき、その変更内容を正式にデータベースに確定・反映させることです。銀行の振込で「A口座から引落し→B口座に入金」という2つの処理が両方成功したとき、はじめてこの操作で確定させます。途中でエラーが起きたらロールバックで元に戻すことで、データの矛盾が起きないよう保護します。', pool:['ロールバック','排他制御','ログ'] },
+  { q:'問74', term:'排他制御', meaning:'複数のユーザーやプログラムが同じデータに同時アクセスしても矛盾が生じないよう、一方のアクセスが完了するまで他方を待機させる制御のことです。例えば2人が同時に「在庫数：1個」の商品を購入しようとすると、適切な管理がなければ「残1→残1→残-1（マイナス在庫）」という矛盾が起きます。データベースのロック機能がその代表例です。', pool:['コミット','ロールバック','正規化'] },
+  { q:'問74', term:'ロールバック', meaning:'トランザクションの処理中に障害やエラーが発生したとき、処理開始前の状態にデータを巻き戻すことです。「なかったことにする」ボタンのようなイメージです。銀行の振込で「A口座から引落し」は成功したが「B口座への入金」が失敗したとき、この操作によってA口座の引落しも取り消し、元の状態に戻します。コミットと対になる重要な仕組みです。', pool:['コミット','排他制御','正規化'] },
+  { q:'問75', term:'機密性', meaning:'情報セキュリティの3大要素（CIAトライアド）の一つです。「許可された人だけが情報にアクセスできる状態を保つこと」を指します。例えば社外秘の書類が部外者に見られてしまったり、パスワードが漏えいしてしまったりすると、この要素が損なわれた状態です。暗号化・アクセス制御・パスワード管理などが守るための対策です。', pool:['完全性','可用性','情報セキュリティポリシー'] },
+  { q:'問75', term:'完全性', meaning:'情報セキュリティの3大要素（CIAトライアド）の一つです。「情報が正確で完全であり、不正に改ざん・削除されていないことを保証すること」を指します。例えばデータが送信途中で改ざんされたり、ウイルスによってファイルが書き換えられたりすると、この要素が損なわれた状態です。ハッシュ値やデジタル署名が確認するための代表的な手段です。', pool:['機密性','可用性','デジタル署名'] },
+  { q:'問75', term:'可用性', meaning:'情報セキュリティの3大要素（CIAトライアド）の一つです。「許可されたユーザーが必要なときに情報やシステムをいつでも使える状態を保つこと」を指します。例えばDDoS攻撃でサーバがダウンして使えなくなったり、障害でシステムが止まったりすると、この要素が損なわれた状態です。冗長化・バックアップ・BCP（事業継続計画）などが高めるための対策です。', pool:['機密性','完全性','フォールトトレラント'] }];
+const R6_76 = [{ q:'問76', term:'静電容量方式', meaning:'指が画面に触れたとき、指と画面の間に生じる「静電容量の変化」を検知してタッチした位置を特定するタッチパネルの方式のことです。現在のスマートフォンやタブレットのほぼすべてに使われており、複数の指を同時に認識できる「マルチタッチ」に対応しています。素手でないと反応しにくい（手袋では操作しにくい）のが弱点ですが、感度・精度・耐久性に優れています。', pool:['感圧式','光学式','電磁誘導方式'] },
+  { q:'問76', term:'感圧式', meaning:'画面を一定以上の圧力で押したときに生じる「抵抗値の変化」から接触位置を検出するタッチパネルの方式です。指だけでなくスタイラスペンや手袋でも操作でき、押した力の強さも検知できます。昔の携帯電話やカーナビに多く使われていました。静電容量方式と違い、物理的に押す必要があるためマルチタッチには対応しにくく、現在のスマートフォンではほとんど使われなくなっています。', pool:['静電容量方式','光学式','電磁誘導方式'] },
+  { q:'問76', term:'光学式', meaning:'赤外線センサーやカメラを使って指やペンの影・遮断を検出することでタッチ位置を特定するタッチパネルの方式です。画面自体を改造する必要が少なく、大型のディスプレイやホワイトボードに対応しやすいという特徴があります。ただし、強い光の下では誤検知しやすかったり、センサー部分が埃で汚れると誤動作するといった弱点もあります。電子黒板などで多く使われています。', pool:['静電容量方式','感圧式','電磁誘導方式'] },
+  { q:'問76', term:'電磁誘導方式', meaning:'電磁誘導の原理を使った専用のスタイラスペンとパネルとの相互作用で、ペンの位置を検出するタッチパネルの方式です。筆圧の強弱まで検知できるため、細かな手書き入力や絵を描く作業に向いており、ペンタブレット（WacomのIntuosなど）や一部のタブレット端末（Surface・Galaxyのペン入力機能など）に採用されています。指では反応しないことが多いです。', pool:['静電容量方式','感圧式','光学式'] },
+  { q:'問77', term:'デジタル署名', meaning:'データの送信者が「秘密鍵」を使ってデータから生成した署名情報のことです。受信者は送信者の「公開鍵」を使って署名を検証することで、「確かにこの人が送ったデータであること（本人確認）」と「途中で改ざんされていないこと（完全性確認）」の2つを同時に確かめられます。印鑑や手書きサインのデジタル版で、電子契約・電子申請・ソフトウェア配布などで広く使われています。', pool:['ハッシュ値','公開鍵暗号方式','PKI'] },
+  { q:'問77', term:'ハッシュ値', meaning:'ハッシュ関数という特殊な計算式に任意のデータを入れると出てくる、固定長の「指紋」のようなデータのことです。元のデータが1文字でも変わると全く違う値になるため、改ざん検知に使えます。また、この値から元のデータを逆算することは（理論上）不可能です。パスワードの保存、ファイルの同一性確認、デジタル署名など、セキュリティの多くの場面で活用されています。', pool:['デジタル署名','完全性','暗号化'] },
+  { q:'問78', term:'音声認識', meaning:'人間の話し声をコンピュータが解析して、テキストデータや操作命令に変換する技術のことです。スマートフォンの音声入力・SiriやGoogleアシスタントへの話しかけ・議事録の自動書き起こし・コールセンターでの自動応答などが代表的な活用例です。AIの進化によって精度が大幅に向上し、方言や早口にも対応できるようになってきています。', pool:['音声合成','自然言語処理','OCR'] },
+  { q:'問78', term:'音声合成', meaning:'テキストデータをコンピュータが音声に変換して出力する技術のことです。カーナビの「200m先を右折です」、電車の乗り換えアナウンス、視覚障害者向けのスクリーンリーダーなどがこれにあたります。最近はAIを使った技術が進歩し、人間の声と区別がつかないほど自然な声も実現しています。', pool:['音声認識','自然言語処理','OCR'] },
+  { q:'問78', term:'自然言語処理', meaning:'人間が日常的に使っている「自然言語（日本語・英語など）」をコンピュータで解析・理解・生成する技術のことです。機械翻訳・チャットボット・文章の要約・感情分析・ChatGPTなどの生成AIがすべてこの技術を使っています。コンピュータにとって「人間の言葉」を理解するのは非常に難しく、NLPとも呼ばれ、AI研究の中でも最も活発な分野の一つです。', pool:['音声認識','音声合成','ニューラルネットワーク'] },
+  { q:'問79', term:'プロキシサーバ', meaning:'社内のクライアントPCに代わって、インターネットへアクセスする「代理（プロキシ）」のサーバのことです。すべての通信がプロキシを経由するため、不正サイトへのアクセスブロック・ウイルスチェック・社員のWebアクセスログ記録などを一括管理できます。また、一度取得したWebページをキャッシュとして保存し、次回から高速に配信するキャッシュサーバの機能も持つことが多いです。', pool:['DNSサーバ','ファイアウォール','WAF'] },
+  { q:'問79', term:'DNSサーバ', meaning:'「ドメイン名（www.google.com など）」を「IPアドレス（142.250.196.46 など）」に変換する「名前解決」を行うサーバのことです。電話帳のようなイメージで、人間が覚えやすいドメイン名をコンピュータが理解できるIPアドレスに変換してくれます。DNSが止まると、IPアドレスを直接入力しないとWebサイトにアクセスできなくなるため、インターネットの根幹を支える重要なシステムです。', pool:['プロキシサーバ','ドメイン名','IPアドレス'] },
+  { q:'問80', term:'OSS', meaning:'Open Source Software（オープンソースソフトウェア）の略で、ソースコードが無償で公開されており、誰でも自由に使用・複製・改変・再配布できるソフトウェアのことです。LinuxやAndroid、Python、MySQLなどが有名です。「タダだから粗末なもの」というわけではなく、世界中の開発者が共同で改良を重ねることで、高品質なソフトウェアが多く存在します。', pool:['Linux','Android','ソースコード'] },
+  { q:'問81', term:'正規化', meaning:'データベースの設計において、データの「重複・矛盾・更新時の不整合」が起きないよう、テーブル（表）を適切に分割・整理する作業のことです。例えば「注文テーブル」に顧客の住所も一緒に入れてしまうと、顧客が引っ越したとき注文の件数分すべて更新しなければなりません。テーブルを分けることで、更新がシンプルになり、データの整合性を保ちやすくなります。', pool:['関係データベース（RDB）','排他制御','データクレンジング'] },
+  { q:'問82', term:'ISMSクラウドセキュリティ認証', meaning:'ISMSの認証を取得している組織が、さらにクラウドサービスに関する情報セキュリティ管理策（ISO/IEC 27017）にも適合していることを証明する認証制度のことです。クラウドサービスの利用・提供に関するセキュリティ対策が適切に行われているかを第三者機関が審査します。クラウドを使うお客様に「安心して使ってください」と証明できるお墨付きです。', pool:['情報セキュリティポリシー','CMMI','ITIL'] },
+  { q:'問84', term:'マルチホップ', meaning:'IoTデバイスなどが、インターネットに直接接続するのではなく、近くの端末を「中継地点（ホップ）」として次々に通信を繋いで最終的な目的地に到達させる通信方式のことです。山間部など直接電波が届かない場所でも、中継端末を点々と経由することで通信を確立できます。スマートメーターや農業IoTなど、広いエリアに低コストでネットワークを展開する場面で活躍します。', pool:['キャリアアグリゲーション','MIMO','GPS'] },
+  { q:'問84', term:'GPS', meaning:'Global Positioning System（全地球測位システム）の略で、地球を周回するアメリカの測位衛星から送られてくる電波を受信して、現在地の緯度・経度・高度を計算するシステムのことです。カーナビ・スマートフォンの地図・宅配の配送追跡など、私たちの生活に欠かせない存在です。複数の衛星（最低4機）からの電波の時間差を計算して位置を特定します。', pool:['SBAS','アシストGPS','準天頂衛星'] },
+  { q:'問84', term:'MIMO', meaning:'Multiple Input Multiple Output（多入力多出力）の略で、送信側と受信側の両方で複数のアンテナを使い、複数のデータストリームを同時に送受信することで通信速度と信頼性を大幅に向上させる技術のことです。Wi-Fiの規格（Wi-Fi 6など）や5G携帯通信に使われており、1本のアンテナのときより何倍もの速度が出ます。複数のレーンで同時に車が走るイメージです。', pool:['キャリアアグリゲーション','マルチホップ','ESSIDステルス'] },
+  { q:'問84', term:'キャリアアグリゲーション', meaning:'複数の周波数帯（キャリア）を束ねて1つの広い通信路として使用し、通信速度を向上させる技術のことです。例えば「800MHz帯」と「2GHz帯」を同時に使うことで、それぞれ単独で使うよりも速いデータ通信ができます。複数の細い水道管を束ねて太い管にするイメージです。LTEや5Gスマートフォンの高速通信を支える重要な技術の一つです。', pool:['MIMO','マルチホップ','ESSIDステルス'] },
+  { q:'問86', term:'PDCAのCheck（点検）', meaning:'PDCAサイクル（Plan計画→Do実行→Check点検→Action改善）のC（点検）の段階のことです。「実行した結果、計画通りに進んでいるか？目標と現実のギャップはどのくらいか？」を測定・評価・分析します。この点検があることで、何が良くて何が悪かったかを把握でき、次の改善（Action）につなげられます。「測定できなければ改善できない」という考え方の要です。', pool:['情報セキュリティポリシー','ISMSクラウドセキュリティ認証','内部統制'] },
+  { q:'問87', term:'ダークウェブ', meaning:'通常のブラウザ（ChromeやSafariなど）ではアクセスできない、TorなどAの特殊なソフトウェアを使わないと接続できない匿名性の高いWebの領域のことです。アクセスした人が誰かを追跡・特定するのが非常に困難なため、盗まれた個人情報・クレジットカード番号・マルウェアの売買など、違法な取引の場として悪用されています。Webの「裏側」とも呼ばれます。', pool:['RSS','SEO','クロスサイトスクリプティング'] },
+  { q:'問87', term:'RSS', meaning:'Webサイトが新しい記事・ニュースを更新したとき、その情報をXMLベースの決まったフォーマットで配信する仕組みのことです。「フィードリーダー」というアプリに複数のサイトを登録しておけば、各サイトを一つひとつ見に行かなくても、更新情報を一か所でまとめてチェックできます。ニュースサイトやブログが更新情報を配信するために広く使っています。', pool:['ダークウェブ','SEO','Cookie'] },
+  { q:'問87', term:'SEO', meaning:'Search Engine Optimization（検索エンジン最適化）の略で、GoogleやYahoo!などの検索エンジンで「特定のキーワードで検索したとき、自社のWebサイトをできるだけ上位に表示させる」ための施策のことです。Webサイトの構造改善・コンテンツの充実・他サイトからのリンク獲得などが主な手段です。検索上位に表示されるほどアクセス数が増えるため、デジタルマーケティングの重要分野です。', pool:['RSS','ダークウェブ','クロスサイトスクリプティング'] },
+  { q:'問87', term:'クロスサイトスクリプティング', meaning:'Webアプリケーションのセキュリティ上の脆弱性を悪用して、悪意のあるスクリプト（プログラム）を正規のWebサイトのページに埋め込む攻撃手法のことです。その脆弱なサイトを訪れた別のユーザーのブラウザ上で悪意のあるスクリプトが実行され、Cookieや個人情報が盗まれたり、フィッシングサイトへ誘導されたりします。XSS（Cross-Site Scripting）とも呼ばれます。', pool:['DNSキャッシュポイズニング','ランサムウェア','ドライブバイダウンロード'] },
+  { q:'問88', term:'JavaScript', meaning:'Webブラウザ上で動作するプログラミング言語で、Webページに「動き・インタラクション」を追加するために使われます。例えばボタンを押したらメニューが開く、入力フォームのリアルタイムバリデーション、地図の操作、画像のスライドショーなどがこの言語で実現されています。現在はNode.jsというサーバサイド環境でも使えるようになり、フロントエンドからバックエンドまで幅広く活躍します。', pool:['ソースコード','マクロ','自然言語処理'] },
+  { q:'問89', term:'PIN', meaning:'Personal Identification Number（個人識別番号）の略で、本人確認に使用する「数字のみで構成された暗証番号」のことです。キャッシュカードの4桁の数字、スマートフォンのロック解除番号、クレジットカードの暗証番号などがこれにあたります。英数字が混じったパスワードより桁数は少なめですが、数字のみで覚えやすく、テンキーでの入力に向いています。', pool:['バイオメトリクス認証','シングルサインオン','Cookie'] },
+  { q:'問89', term:'シングルサインオン', meaning:'一度ログインするだけで、連携している複数のシステムやサービスを追加の認証なしに利用できるようにする仕組みのことです。例えば会社のポータルサイトにログインしたら、グループウェア・社内SNS・経費精算システムすべてに自動でログインされているイメージです。ユーザーの利便性を高めながら、パスワード管理の手間を減らせます。SSOとも呼ばれます。', pool:['PIN','バイオメトリクス認証','Cookie'] },
+  { q:'問90', term:'WAF', meaning:'Web Application Firewall（ウェブアプリケーションファイアウォール）の略で、WebサイトやWebアプリへの攻撃を検知・遮断するセキュリティの仕組みのことです。SQLインジェクション・クロスサイトスクリプティング（XSS）・クロスサイトリクエストフォージェリ（CSRF）など、Webアプリに特有の攻撃パターンを識別してブロックします。通常のファイアウォールでは防げないアプリ層の攻撃に対応します。', pool:['ファイアウォール','プロキシサーバ','ESSIDステルス'] },
+  { q:'問91', term:'データの完全消去', meaning:'廃棄・譲渡するパソコンや記録媒体から、データを「二度と復元できない状態」にする消去方法のことです。専用ソフトウェアを使って意味のないデータ（0や乱数）を複数回上書きすることで、元のデータの痕跡を完全に消します。ただのファイル削除やフォーマットでは管理情報が消えるだけでデータ本体は残るため、情報漏えい防止には必ずこの方法を選ぶ必要があります。', pool:['論理フォーマット','Secure Erase','磁気消去'] },
+  { q:'問91', term:'ファイル削除機能', meaning:'WindowsやMacのOSが持つ、ファイルを削除する標準機能のことです。「削除した」と思っていても、実際にはファイルの管理情報（どこにあるかのポインタ）が削除されるだけで、ファイルのデータ本体は記録媒体に残ったままです。そのため、データ復元ソフトを使えば簡単に元に戻すことができます。廃棄・譲渡前のデータ消去には絶対に使わないよう注意が必要です。', pool:['データの完全消去','論理フォーマット','アンインストール'] },
+  { q:'問91', term:'アンインストール', meaning:'コンピュータにインストールされているアプリケーションを削除する操作のことです。しかし、この操作をしても、そのアプリが作成・保存した利用者データ（ゲームのセーブデータ・設定ファイルなど）が残ることがあります。パソコンを廃棄・譲渡する際にこの操作だけでは不十分で、データの完全消去が別途必要です。', pool:['データの完全消去','ファイル削除機能','論理フォーマット'] },
+  { q:'問91', term:'論理フォーマット', meaning:'ディスクドライブのファイルシステム（データの管理構造）を初期化する操作のことです。「初期化した」「フォーマットした」と言っても、実際には管理情報がリセットされるだけで、データの実体はディスク上に残っています。データ復元ソフトを使えば多くのデータを取り戻せてしまいます。廃棄・譲渡前の安全なデータ消去には、データの完全消去やSecure Eraseを使う必要があります。', pool:['データの完全消去','ファイル削除機能','Secure Erase'] },
+  { q:'問92', term:'ポート番号', meaning:'TCP/IPネットワークで、1台のサーバ上で動いている複数のサービス（アプリ）のうち「どれと通信するか」を識別するための番号のことです。例えばWebサーバ（HTTP）は80番、セキュアなWeb（HTTPS）は443番、メール（SMTP）は25番というように決まっています。IPアドレスが「どの建物か（住所）」なら、これは「何号室か（部屋番号）」に相当します。', pool:['IPアドレス','ドメイン','ホスト名'] },
+  { q:'問92', term:'IPアドレス', meaning:'ネットワーク上のコンピュータや機器を一意に識別するための「住所」のような番号のことです。現在主流のIPv4では「192.168.0.1」のように32ビット（4つの数字をドットで区切った形）で表します。インターネット上に同じ番号は存在せず、これがあることでデータを正しい相手に届けることができます。IPv6は128ビットで表し、枯渇問題に対応しています。', pool:['ポート番号','ドメイン','ホスト名'] },
+  { q:'問92', term:'ドメイン', meaning:'インターネット上でコンピュータやネットワークを人間が管理しやすい「文字列」で識別するための名前空間のことです。「google.com」「example.co.jp」のような形で表します。DNSによってIPアドレスに変換（名前解決）されてはじめて通信に使われます。企業や個人が申請・取得して使用し、世界で一意性が保証されています。', pool:['ドメイン名','ホスト名','IPアドレス'] },
+  { q:'問92', term:'ホスト名', meaning:'ネットワーク上の個々のコンピュータに付けた「名前（識別子）」のことです。例えば「www（ウェブサーバ）」「mail（メールサーバ）」「ftp（ファイルサーバ）」のように、機能ごとに名前を付けます。ドメイン名と組み合わせて「www.example.com」のように書いた形をFQDN（完全修飾ドメイン名）と呼び、インターネット上でサーバを特定するのに使います。', pool:['ドメイン名','ドメイン','IPアドレス'] },
+  { q:'問94', term:'情報セキュリティポリシー', meaning:'組織が情報セキュリティに取り組む「基本方針・対策基準・実施手順」をまとめた文書群の総称のことです。「うちの会社は情報をこうやって守ります」という方針（基本方針）から、「パスワードは8文字以上にする」という具体的なルール（対策基準）、「パスワードを忘れたときはこの手順で対処する」という手順書（実施手順）まで、3層構造で整備するのが一般的です。', pool:['内部統制','ITガバナンス','ISMSクラウドセキュリティ認証'] },
+  { q:'問95', term:'ニューラルネットワーク', meaning:'人間の脳の神経細胞（ニューロン）のネットワーク構造を数学的に模倣した機械学習のモデルのことです。入力層・中間層（隠れ層）・出力層からなり、大量のデータから自動的に特徴を学習します。「猫の画像を何万枚も見せると、自分で猫の特徴を学んで新しい画像が猫かどうか判断できるようになる」のがこのモデルの仕組みです。ディープラーニングの基盤技術です。', pool:['ディープラーニング（深層学習）','教師あり学習','ソーシャルネットワーク'] },
+  { q:'問95', term:'ディープラーニング（深層学習）', meaning:'多層（ディープ）のニューラルネットワークを使った機械学習手法のことです。層を深くすることで、画像・音声・言語など複雑なデータから特徴を自動的かつ高精度に抽出できるようになりました。画像認識・音声認識・自動翻訳・ChatGPTなどの生成AI、すべてこの技術が使われています。人間が特徴を手動で設定する必要がなく、AIが自分で「何が重要か」を学ぶのが最大の特徴です。', pool:['ニューラルネットワーク','教師あり学習','クラスタリング'] },
+  { q:'問95', term:'ソーシャルネットワーク', meaning:'人や組織同士のつながり・関係性をグラフ（ノードとエッジ）の構造で表したもののことです。FacebookやInstagram・X（旧Twitter）などのSNS（Social Networking Service）は、この概念をインターネット上で実現したサービスです。人と人のつながりの分析・口コミの広がり方・影響力の測定などに活用されます。', pool:['ニューラルネットワーク','ディープラーニング（深層学習）','RSS'] },
+  { q:'問95', term:'フィージビリティスタディ', meaning:'新しいシステムや事業を本格的にスタートさせる前に「本当にできるのか？」を事前に調査・検証する活動のことです。「技術的に実現可能か」「採算がとれるか」「運用面での問題はないか」という3つの観点で検討します。日本語では「実現可能性調査」や「F/S」とも呼ばれます。大きな投資をする前に失敗リスクを事前に把握するための重要なプロセスです。', pool:['システム監査','リスクマネジメント','WBS'] },
+  { q:'問95', term:'フォールトトレラント', meaning:'システムの一部に障害（フォールト）が発生しても、全体として機能し続けられる「耐障害性」の設計・性質のことです。例えばサーバを2台並べておき、1台が壊れてももう1台が動き続けるようにする「冗長化」がその代表例です。航空機の飛行制御システムや銀行の決済システムなど、止まることが絶対に許されないシステムで特に重視される考え方です。', pool:['可用性','マルチホップ','リスク低減'] },
+  { q:'問96', term:'Bcc', meaning:'メールの宛先設定の一つです。Blind Carbon Copyの略で、ここに指定した宛先は「ToやCcに入っている受信者には表示されない」という特徴があります。例えば大量の顧客にメールを送るとき、全員をここに入れれば、お互いのメールアドレスを見せずに同じ内容を送れます。意図せずToに入れてしまうと全員にアドレスが丸見えになるため、取り扱いに注意が必要です。', pool:['To','Cc','Cookie'] },
+  { q:'問96', term:'To', meaning:'メールの「主な宛先」を指定するフィールドのことです。ここに入れた相手は「このメールのメインの受信者」として扱われます。宛先に入っている人たちは互いのアドレスを確認できます。複数人を入れることもでき、全員が宛先一覧を見ることができます。', pool:['Bcc','Cc','ホスト名'] },
+  { q:'問96', term:'Cc', meaning:'メールで「参考として送る宛先」を指定するフィールドです。Carbon Copyの略で、「念のため見ておいてください」という意味合いで使います。メインの宛先とここに入った人は互いのアドレスを確認できるため、「誰に送ったか」が全員にわかります。上司や関係者に情報共有したいときに使う欄です。', pool:['To','Bcc','ドメイン名'] },
+  { q:'問97', term:'Linux', meaning:'Linus Torvaldsが1991年に開発したUNIX系のオープンソースのOSカーネルです。無償で使え、ソースコードが公開されているため、世界中の開発者が改良を重ねています。Webサーバやスーパーコンピュータのほとんどはこのカーネルをベースで動いており、AndroidもこのOSカーネルを採用しています。OSSの代表格で、信頼性・安定性・カスタマイズ性の高さから企業システムでも広く使われています。', pool:['Android','FreeBSD','iOS'] },
+  { q:'問97', term:'Android', meaning:'Googleが開発したスマートフォン・タブレット向けのモバイルOSです。Linuxカーネルをベースにしており、OSSとして公開されているため、世界中のメーカーが独自にカスタマイズして搭載できます。世界のスマートフォンシェアの約7割を占める最も普及したモバイルOSです。Google PlayストアからアプリをインストールしてiOSと並ぶ2大プラットフォームの一角を担っています。', pool:['Linux','FreeBSD','iOS'] },
+  { q:'問97', term:'FreeBSD', meaning:'BSD（Berkeley Software Distribution）系のUNIXを起源とするオープンソースのOSです。安定性・信頼性・高性能なネットワーク機能が特徴で、サーバ用途を中心に使われています。PlayStation 4・PlayStation 5のOSのベースにも使われており、商業製品にも活用されています。Linuxと同じくOSSですが、ライセンスが異なりビジネス利用に柔軟という特徴があります。', pool:['Linux','Android','iOS'] },
+  { q:'問97', term:'iOS', meaning:'Appleが開発したiPhone・iPad向けの独自モバイルOSです。AndroidとOSS（オープンソースソフトウェア）についてよく比べられますが、このOSはAppleが全て管理するプロプライエタリ（独占的）なソフトウェアで、ソースコードは非公開です。セキュリティの高さ・ユーザー体験の一貫性が評価されており、世界のスマートフォンシェアの約3割を占めます。', pool:['Android','Linux','FreeBSD'] },
+  { q:'問98', term:'ランサムウェア', meaning:'コンピュータ内のファイルを暗号化して「人質（ランサム＝身代金）」にとり、復号する代わりに金銭を要求するマルウェア（悪意あるソフトウェア）のことです。感染すると会社の重要データや業務システムが使えなくなり、身代金を払わないと永久に取り戻せない事態になります。近年は「データを暗号化するだけでなく、盗んだデータを公開するぞ」と二重に脅す「二重恐喝型」も増えています。', pool:['クロスサイトスクリプティング','ドライブバイダウンロード','DNSキャッシュポイズニング'] },
+  { q:'問99', term:'SBAS', meaning:'Satellite Based Augmentation System（衛星型補強システム）の略で、GPS衛星の測位誤差を補正するための情報を静止衛星から配信し、測位精度を高める仕組みのことです。GPS単体では数メートルの誤差が生じますが、この仕組みを使うことで誤差を1〜2メートル程度に抑えられます。日本では「MSAS」がこれに相当し、航空機の精密進入着陸などにも利用されています。', pool:['アシストGPS','準天頂衛星','GPS'] },
+  { q:'問99', term:'GPS', meaning:'Global Positioning System（全地球測位システム）の略で、地球を周回するアメリカが運営する測位衛星群からの電波を受信して、現在地の緯度・経度・高度を測定するシステムです。最低4機の衛星からの電波の到達時間差から現在位置を計算します。カーナビ・スマートフォンの地図・宅配の配送管理・農業の自動走行トラクターまで、幅広い分野で活用されています。', pool:['SBAS','アシストGPS','準天頂衛星'] },
+  { q:'問99', term:'アシストGPS', meaning:'衛星からの電波だけでなく、携帯電話の基地局やWi-Fiの位置情報データを組み合わせて、GPS測位を補助するシステムのことです。屋内やビルの谷間など衛星電波が届きにくい場所でも位置を特定しやすく、測位開始までの時間（TTFF）を大幅に短縮できます。スマートフォンの「現在地」取得に多く活用されており、A-GPSとも表記されます。', pool:['SBAS','GPS','準天頂衛星'] },
+  { q:'問99', term:'ジャイロセンサー', meaning:'物体の「角速度（回転の速さ・方向）」を検知するセンサーのことです。スマートフォンを傾けると画面が縦横に自動回転したり、カーナビがトンネルに入ってGPS電波が届かなくなっても方向や移動量を推定する「自律航法」に使われたりしています。ゲームのコントローラーの傾き検出や、ドローンの姿勢制御にも欠かせない部品です。', pool:['アシストGPS','プローブカー','SBAS'] },
+  { q:'問99', term:'準天頂衛星', meaning:'日本の測位衛星システム「みちびき」を構成する衛星のことです。通常のGPS衛星が様々な方向から見えるのに対し、この衛星は長時間「日本の真上（天頂付近）」に留まるよう設計された独自の軌道を飛びます。日本の都市部ではビルの間に遮られてGPS電波を受信しにくいですが、真上から来る電波なら受信しやすくなります。GPSの補完・補強によって国内の測位精度と信頼性を向上させます。', pool:['SBAS','GPS','アシストGPS'] },
+  { q:'問99', term:'プローブカー', meaning:'GPSや各種センサーを搭載し、走行しながら位置・速度・方向・道路の状況などのデータを自動収集する車両のことです。「プローブ（probe）」は「探針・調査」という意味で、道路を走りながら情報を集める「移動する観測装置」のようなイメージです。タクシーや路線バスなどをこのような車両として活用し、収集した大量の走行データをカーナビのリアルタイム渋滞情報などに役立てています。', pool:['ジャイロセンサー','SBAS','アシストGPS'] },
+  { q:'問100', term:'DNSキャッシュポイズニング', meaning:'DNSサーバが一時的に記憶している（キャッシュしている）ドメイン名とIPアドレスの対応表に、偽の情報を書き込む攻撃のことです。例えば「www.bank.co.jp」を「攻撃者が用意した偽サイトのIPアドレス」に書き換えると、正しいURLを入力したユーザーが気づかないまま偽サイトへ誘導されます。フィッシング詐欺に悪用されることが多い、非常に危険な攻撃手法です。', pool:['ドライブバイダウンロード','クロスサイトスクリプティング','ランサムウェア'] },
+  { q:'問100', term:'DDoS攻撃', meaning:'Distributed Denial of Service Attack（分散型サービス妨害攻撃）の略で、世界中に散らばるマルウェアに感染した多数のコンピュータ（ボットネット）から、標的のサーバに対して同時に大量のパケットを送りつけ、サーバを過負荷状態にしてサービスを停止させる攻撃のことです。1台からの攻撃（DoS攻撃）では防ぎやすいですが、無数の端末から一斉に攻撃するDDoSは防御が非常に困難です。', pool:['DNSキャッシュポイズニング','ランサムウェア','クロスサイトスクリプティング'] },
+  { q:'問100', term:'ソーシャルエンジニアリング', meaning:'高度なハッキング技術を使わず、「人の心理的な隙や行動」を巧みに利用して機密情報を盗む手口のことです。例えば「システム管理者を名乗って電話し、パスワードを聞き出す」「オフィスの近くで一緒に入口を通り抜ける（共連れ・テールゲーティング）」「捨てられた書類から情報を拾う（スキャベンジング）」「背後からのぞいてパスワードを盗み見る（ショルダーハッキング）」などが代表例です。', pool:['ランサムウェア','ドライブバイダウンロード','クロスサイトスクリプティング'] },
+  { q:'問100', term:'ドライブバイダウンロード', meaning:'悪意を持って細工されたWebサイトにアクセスするだけで、ユーザーが何もダウンロードボタンを押していないのに、気づかないうちにマルウェアが自動的にダウンロード・インストールされてしまう攻撃手法のことです。OSやブラウザ・プラグインの脆弱性を悪用します。「ちょっとのぞいただけなのに感染した」という最悪の事態を招くため、常にソフトウェアを最新の状態に保つことが重要な対策です。', pool:['DNSキャッシュポイズニング','ランサムウェア','ソーシャルエンジニアリング'] }];
+const R7_1  = [// R7問1 偽装請負
+  { q:'R7問1', term:'偽装請負', meaning:'契約の形式は「請負契約（成果物を完成させる契約）」なのに、実態は発注側の社員が請負側の従業員に直接「あれをやって」「こうしてください」と業務指示を出している状態のことです。請負契約では、指示を出せるのは本来請負側だけのはずです。この状態は労働者派遣法に違反する脱法行為にあたります。ITの現場でも多く問題になっており、摘発された事例があります。', pool:['請負契約','特定電子メール法','不正アクセス禁止法'] },
+  { q:'R7問1', term:'請負契約', meaning:'ある仕事の「完成（成果物の納品）」を約束する契約のことです。発注側は「何を作ってほしいか」は指定できますが、「どうやって作るか・誰にやらせるか」という細かい業務指示は請負側だけが出せます。つまり発注側は請負側の従業員に直接指示できません。これが「委任（準委任）契約」や「派遣」との大きな違いで、ITシステムの開発委託などでよく使われる契約形態です。', pool:['偽装請負','不正アクセス禁止法','IPランドスケープ'] },
+  // R7問2 クラウドのセキュリティ認証
+  { q:'R7問2', term:'ISO/IEC 27017', meaning:'ISMS（情報セキュリティマネジメントシステム）を基盤に、クラウドサービスに特有の情報セキュリティ管理策を追加でまとめた国際規格のことです。クラウドサービスを提供する側・利用する側それぞれが果たすべきセキュリティ対策が規定されています。「クラウドを安全に使いたい・提供したい」企業が参照する世界標準のガイドラインで、ISMSクラウドセキュリティ認証の基準にもなっています。', pool:['ISO 14001','JIS Q 15001','ISO 9001'] },
+  { q:'R7問2', term:'ISO 14001', meaning:'企業や組織が環境に与える影響を適切に管理・改善するための仕組み（環境マネジメントシステム）を構築するための国際規格のことです。CO2削減・廃棄物の適正処理・化学物質の管理などの取り組みを体系的に進めるための基準で、第三者機関の審査を受けて認証を取得することができます。「環境に配慮している企業」の証明として取引先や社会への信頼向上につながります。', pool:['ISO/IEC 27017','JIS Q 15001','ISO 9001'] },
+  { q:'R7問2', term:'JIS Q 15001', meaning:'個人情報を適切に保護するためのマネジメントシステムを構築するための日本産業規格（JIS）のことです。この規格に準拠していることが、プライバシーマーク（Pマーク）の取得要件となっています。プライバシーマークは「個人情報を正しく扱っています」と社会に示すことができ、特に個人情報を多く扱う企業・団体が取得を目指します。', pool:['ISO/IEC 27017','ISO 14001','ISO 9001'] },
+  { q:'R7問2', term:'ISO 9001', meaning:'製品やサービスの「品質」を継続的に維持・向上させるためのマネジメントシステム（品質マネジメントシステム：QMS）を構築するための国際規格のことです。「お客様の要求を満たす製品・サービスを安定して提供できる仕組みがある」ことを第三者機関が認証します。製造業からサービス業まで幅広い業種で取得されており、入札要件になっている企業も多いです。', pool:['ISO/IEC 27017','ISO 14001','JIS Q 15001'] },
+  // R7問3 官民データ
+  { q:'R7問3', term:'官民データ', meaning:'国・地方自治体・民間企業・個人などが持つ、電子的に扱えるデータ全般のことです。行政が持つ統計データや公文書だけでなく、民間企業が持つ購買履歴・センサーデータ・SNSの投稿など、デジタル化されたあらゆる情報が対象です。これらを積極的に活用・連携することで、新しいサービスや社会課題の解決につなげることを目指す法律も整備されています。', pool:['官民データ活用推進基本法','IPランドスケープ','RFI'] },
+  { q:'R7問3', term:'官民データ活用推進基本法', meaning:'国・自治体・民間が持つデータをもっと積極的に活用・連携させて、新産業の創出や行政サービスの向上につなげるための基本方針と施策を定めた法律のことです。2016年に施行され、マイナンバーの利活用・オープンデータの推進・データ流通市場の整備などが盛り込まれています。「官民データを宝の持ち腐れにしない」という考え方が背景にあります。', pool:['官民データ','特定電子メール法','不正アクセス禁止法'] },
+  // R7問4 経営資源を分析する手法
+  { q:'R7問4', term:'VRIO分析', meaning:'自社の経営資源（ヒト・モノ・カネ・情報・技術など）が「競争優位の源泉になっているか」を、4つの観点で評価する分析手法のことです。V（Value：経済的価値があるか）・R（Rarity：希少で他社にはないか）・I（Imitability：真似されにくいか）・O（Organization：組織として活かせているか）の頭文字をとっています。自社の強みが本当に「強み」かどうかを客観的に評価するためのフレームワークです。', pool:['4P','PPM','SWOT分析'] },
+  { q:'R7問4', term:'4P', meaning:'マーケティング戦略を考えるフレームワークで、Product（製品）・Price（価格）・Place（流通・販路）・Promotion（販促）の4つの観点を組み合わせて戦略を立てることを「マーケティングミックス」といいます。例えば「高品質な製品（P）を高価格（P）で百貨店のみ（P）で上品な広告（P）を使って売る」というように、4つのPを整合させて最適な組み合わせを設計します。', pool:['VRIO分析','PPM','SWOT分析'] },
+  { q:'R7問4', term:'PPM', meaning:'Product Portfolio Management（プロダクト・ポートフォリオ・マネジメント）の略で、市場の成長率（縦軸）と自社の市場シェア（横軸）の2軸で、自社の事業・製品を「花形・金のなる木・問題児・負け犬」の4つに分類し、経営資源の配分を考える手法のことです。例えば「花形事業に投資して育てる」「金のなる木で稼いだお金で問題児を育成する」といった戦略判断に活用します。', pool:['VRIO分析','4P','SWOT分析'] },
+  { q:'R7問4', term:'SWOT分析', meaning:'企業や事業の現状を「内部環境（自社）」と「外部環境（市場・競合）」に分けて、S（Strengths：強み）・W（Weaknesses：弱み）・O（Opportunities：機会）・T（Threats：脅威）の4つの観点で整理する分析手法のことです。自社の強みを活かして機会をつかむ戦略や、弱みを補って脅威を回避する戦略など、方向性を見つけるためのスタート地点としてよく使われます。', pool:['VRIO分析','4P','PPM'] },
+  // R7問6 特定電子メール法
+  { q:'R7問6', term:'特定電子メール法', meaning:'広告・宣伝を目的とした電子メールの送信を規制する法律（特定電子メールの送信の適正化等に関する法律）のことです。受信者が事前に「送ってください」と同意（オプトイン）していない相手に一方的に広告メールを送ることを原則禁止しています。また、受信拒否の通知をした相手へのメール送信も禁止されています。違反すると行政指導・命令・1億円以下の罰金などの罰則があります。', pool:['オプトイン','不正アクセス禁止法','官民データ活用推進基本法'] },
+  { q:'R7問6', term:'オプトイン', meaning:'受信者が「このメールを受け取ることに同意する」と事前に意思表示することのことです。特定電子メール法のもとでは、広告宣伝メールを送る前に受信者からこの同意を得ることが義務付けられています。逆に「送ってほしくない」と断ることを「オプトアウト」といいます。メルマガ登録の「チェックボックスにチェックを入れて登録する」という操作がその典型例です。', pool:['特定電子メール法','不正アクセス禁止法','偽装請負'] },
+  // R7問7 開発前段階での実証検証
+  { q:'R7問7', term:'PoC', meaning:'Proof of Concept（概念実証）の略で、新しいアイデアや技術・システムが「本当に実現可能か・有効か」を本格的な開発に入る前に、小規模な試作・実験で検証することです。「やってみないとわからない」段階でいきなり大規模投資をするリスクを避けるために行います。ITプロジェクトでは「とりあえず小さく作って動かして確かめる」という意味でよく使われる言葉です。', pool:['CRM','RAS','SLA'] },
+  { q:'R7問7', term:'CRM', meaning:'Customer Relationship Management（顧客関係管理）の略で、顧客一人ひとりの情報を一元管理し、購買履歴・問い合わせ内容・好みなどを分析して「顧客との長期的な良い関係」を構築するための仕組み・手法・ツールのことです。Salesforceなどのシステムが有名で、「誰が・いつ・何を買ったか・どんな問い合わせをしたか」を把握することで、最適なタイミングに最適なアプローチができるようになります。', pool:['PoC','RAS','SLA'] },
+  { q:'R7問7', term:'RAS', meaning:'Reliability（信頼性）・Availability（可用性）・Serviceability（保守性）の頭文字をとった、システムの品質・信頼性を評価する指標群のことです。「信頼性」は故障しにくいか、「可用性」は使いたいときに使えるか、「保守性」は壊れたとき素早く直せるかを表します。重要なシステムを評価・選定する際の基準として使われます。これにIntegrity・Securityを加えた5指標セットも存在します。', pool:['PoC','CRM','SLA'] },
+  { q:'R7問7', term:'SLA', meaning:'Service Level Agreement（サービスレベル合意）の略で、サービス提供者（ITベンダーやクラウド事業者）と利用者（企業・顧客）の間で「このサービスはこのくらいの品質で提供します」という水準を定めた合意文書のことです。例えば「システムの稼働率99.9%以上を保証する」「障害発生時は2時間以内に対応する」といった具体的な数値目標が書かれています。達成できなかった場合のペナルティも規定されることが多いです。', pool:['PoC','CRM','RAS'] },
+  // R7問9 短期間で成果を競う開発イベント
+  { q:'R7問9', term:'ハッカソン', meaning:'Hack（ハッキング）とMarathon（マラソン）を合わせた造語で、プログラマー・エンジニア・デザイナーなどが短期間（1日〜数日）チームを組んで集中してプロトタイプ（試作品）を作り、最後に発表して競い合うイベントのことです。「アイデアをすぐ形にする」「普段関わらない人と一緒に作る」という刺激的な体験ができ、大企業・スタートアップ・大学など様々な主催者が行っています。', pool:['ディベート','セキュリティキャンプ','ゲーミフィケーション'] },
+  { q:'R7問9', term:'ディベート', meaning:'特定のテーマについて、肯定側と否定側に分かれてそれぞれの立場から論拠をもとに主張し合い、第三者（審判や聴衆）が判定するフォーマルな議論の形式のことです。自分の本来の意見に関わらず割り当てられた立場を守って論じるため、多角的な思考力・論理的表現力・相手の主張を聞く力が鍛えられます。学校教育・企業研修・学術討論など幅広い場面で行われています。', pool:['ハッカソン','セキュリティキャンプ','ゲーミフィケーション'] },
+  { q:'R7問9', term:'セキュリティキャンプ', meaning:'情報セキュリティを学びたい意欲ある若者（主に学生）が合宿形式で集まり、第一線のエンジニア・研究者から実践的な技術を学ぶ教育イベントのことです。IPA（情報処理推進機構）が主催する全国大会が有名で、マルウェア解析・脆弱性診断・暗号技術など、実務レベルの内容を短期集中で学べます。参加者の中から業界のプロが多数輩出されています。', pool:['ハッカソン','ディベート','ゲーミフィケーション'] },
+  { q:'R7問9', term:'ゲーミフィケーション', meaning:'ゲームに使われるデザインの要素（ポイント・バッジ・ランキング・レベルアップ・クリア報酬など）を、ゲーム以外のサービスや活動に取り入れることで、ユーザーの行動意欲・継続率・達成感を高める手法のことです。例えばフィットネスアプリで「今日のウォーキング1000歩達成！バッジゲット！」のような仕掛けや、学習アプリの「連続学習日数ランキング」がこれにあたります。', pool:['ハッカソン','ディベート','セキュリティキャンプ'] },
+  // R7問10 生成AIがもっともらしい誤りを出す
+  { q:'R7問10', term:'ハルシネーション', meaning:'ChatGPTなどの生成AIが、実際には存在しない情報や事実と異なる内容を、まるで本当のことのように自信を持って出力してしまう現象のことです。例えば「存在しない論文の引用」「実在しない人物の経歴」「架空の法律」などをさも本物かのように出力することがあります。AIが「確率的に次に来やすい言葉」を選んで生成しているため起きる問題で、生成AIを使う際の最大の注意点の一つです。', pool:['エコーチェンバー','シンギュラリティ','ディープフェイク'] },
+  { q:'R7問10', term:'エコーチェンバー', meaning:'SNSのアルゴリズムや自分の選択によって、同じ意見・価値観を持つ人とばかりつながってしまい、自分の意見がまるで「こだまのように（エコーのように）」部屋の中で反響・増幅されていく現象のことです。偏った情報ばかりに接することで、自分の考えが社会全体の意見だと思い込み、異なる意見を受け入れにくくなるリスクがあります。フィルターバブルとも関連が深い概念です。', pool:['ハルシネーション','シンギュラリティ','ディープフェイク'] },
+  { q:'R7問10', term:'シンギュラリティ', meaning:'技術的特異点とも呼ばれ、AIの知能が人間の知能の総量を超えた瞬間（転換点）のことです。この点を超えると、AIが自分よりも賢いAIを自律的に作り出し続け、指数関数的に知能が向上するため、人類にとって予測不可能な未来が訪れると言われています。未来学者のレイ・カーツワイルが提唱し、「2045年問題」とも呼ばれています。', pool:['ハルシネーション','エコーチェンバー','ディープフェイク'] },
+  { q:'R7問10', term:'ディープフェイク', meaning:'ディープラーニング（深層学習）のAI技術を使って、実在する人物の顔・声・動きを本物そっくりに合成した偽の動画・音声・画像を作り出す技術のことです。有名人の顔を別の映像に合成したり、本人が言っていないことを喋らせたりすることが可能で、フェイクニュースの拡散・詐欺・なりすましなどに悪用されることが社会問題となっています。', pool:['ハルシネーション','エコーチェンバー','シンギュラリティ'] },
+  // R7問11 機械やロボットを統括制御する生産
+  { q:'R7問11', term:'FMS', meaning:'Flexible Manufacturing System（フレキシブル生産システム）の略で、複数のNC工作機械や産業用ロボット、搬送装置をコンピュータでネットワーク化してつなぎ、生産の流れ全体を自動制御・管理するシステムのことです。品種や生産量の変更に柔軟に対応できる「多品種変量生産」が強みで、自動車や電子部品などの製造現場で活用されています。', pool:['MOT','MRP','JIT'] },
+  { q:'R7問11', term:'MOT', meaning:'Management of Technology（技術経営）の略で、企業が持つ技術・研究開発の成果を、事業価値の創出や競争優位の確立に結びつけるための経営手法・考え方のことです。「良い技術があるだけでは儲からない。技術をいかにビジネスに活かすか」という視点が重要で、技術者と経営者をつなぐ架け橋的な役割を担います。大学院などでも専門コースとして教えられています。', pool:['FMS','MRP','JIT'] },
+  { q:'R7問11', term:'MRP', meaning:'Material Requirements Planning（資材所要量計画）の略で、製品の生産計画をもとに「いつ・どの部品が・何個必要か」を計算して、資材の調達・在庫を効率的に管理する手法のことです。例えば車を100台作る計画があれば、タイヤは400本・エンジンは100基…と逆算して部品の発注タイミングを管理します。在庫の過不足を防ぎ、生産ラインを止めないための「工場の司令塔」的なシステムです。', pool:['FMS','MOT','JIT'] },
+  { q:'R7問11', term:'JIT', meaning:'Just In Time（ジャスト・イン・タイム）の略で、「必要なものを・必要なときに・必要な量だけ」供給することで、在庫・手待ち・作り過ぎなどの無駄を最小化する生産方式のことです。トヨタ自動車が開発した「トヨタ生産方式（TPS）」の核心的な考え方で、「かんばん方式」によって実現されます。過剰在庫を抱えないことでコスト削減と品質向上を同時に実現します。', pool:['FMS','MOT','MRP'] },
+  // R7問12 役務を区別する商標
+  { q:'R7問12', term:'サービスマーク', meaning:'商品（モノ）ではなく、輸送・金融・保険・飲食・通信などの「サービス（役務）」を提供する企業が、自社のサービスを他社のものと区別するために使用する商標のことです。日本では1992年から登録制度がスタートし、特許庁に登録することで法的に保護されます。商品に付ける「トレードマーク」の役務版と考えるとわかりやすいです。', pool:['ハウスマーク','トレードマーク','プライベートブランド'] },
+  { q:'R7問12', term:'ハウスマーク', meaning:'特定の商品やサービスではなく、「その企業全体（会社・ハウス）」を他社と区別するために使用するシンボルマーク・商標のことです。例えばトヨタの「T」マーク・ソニーの「SONY」ロゴなどが代表例です。個別の商品ブランド（トレードマーク）とは別に、企業ブランド全体を象徴するものとして使われます。', pool:['サービスマーク','トレードマーク','プライベートブランド'] },
+  { q:'R7問12', term:'トレードマーク', meaning:'特定の「商品（モノ）」を、他社の商品と区別するために使用する商標のことです。例えばコカ・コーラのロゴ・ナイキのスウッシュマーク・アップルのリンゴマークなどがこれに相当します。特許庁への商標登録により法的に保護され、無断で同一・類似の商標を使用した者への差止請求・損害賠償請求ができます。', pool:['サービスマーク','ハウスマーク','プライベートブランド'] },
+  { q:'R7問12', term:'プライベートブランド', meaning:'イオン・セブン-イレブン・コストコなどの小売業者や流通業者が、自社の名前で独自に企画・開発して販売する自社ブランドのことです。製造はメーカーに委託することが多く、PB（Private Brand）・プライベートレーベルとも呼ばれます。製造業者のブランド（ナショナルブランド）よりも割安に設定されることが多く、小売業者にとっては利幅も大きい戦略商品です。', pool:['サービスマーク','ハウスマーク','トレードマーク'] },
+  // R7問13 情報提供を求める文書
+  { q:'R7問13', term:'RFI', meaning:'Request For Information（情報提供依頼書）の略で、新しいシステムや製品の導入を検討している段階で、候補となる提供者に対して「どんな技術があるか・導入事例はあるか・費用感はどのくらいか」などの情報提供を求める文書のことです。まだ何を買うか決まっていない早い段階で「市場にどんな選択肢があるか」を調べるために使います。RFPの前段階として利用されます。', pool:['EDI','KPI','RFP'] },
+  { q:'R7問13', term:'EDI', meaning:'Electronic Data Interchange（電子データ交換）の略で、企業間の受発注・納品・請求書などの取引データを、紙や電話・FAXを使わず、決められた標準フォーマットで電子的に直接やり取りする仕組みのことです。手入力によるミスをなくし、処理のスピードアップ・コスト削減ができます。大手スーパーとメーカー間の発注システムや、金融機関間の取引などで広く活用されています。', pool:['RFI','KPI','RFP'] },
+  { q:'R7問13', term:'KPI', meaning:'Key Performance Indicator（重要業績評価指標）の略で、組織やプロジェクトが最終目標（KGI）を達成するための「途中経過を数値で測る中間指標」のことです。例えば「年間売上高1億円」を達成するための「月間商談件数50件」「成約率30%」といった測定可能な指標がこれにあたります。目標への進捗を定量的に把握でき、何がうまくいっていないかを早期に発見するために使われます。', pool:['RFI','EDI','RFP'] },
+  { q:'R7問13', term:'RFP', meaning:'Request For Proposal（提案依頼書）の略で、システムを発注しようとしている企業がITベンダー各社に対して「こういうシステムを作ってほしい。提案してください」と正式に依頼するための文書のことです。要件・スケジュール・予算・選定基準などが具体的に書かれており、RFIよりも詳細な段階で使います。各ベンダーはこれを受けて見積もりと提案書（プロポーザル）を提出します。', pool:['RFI','EDI','KPI'] },
+  // R7問14 知財情報を経営に生かす活動
+  { q:'R7問14', term:'IPランドスケープ', meaning:'自社・競合他社・市場全体の特許情報をはじめとした知的財産（IP）情報を、事業戦略・市場情報と組み合わせて分析し、その結果を経営層と共有して「これからどんな分野に投資すべきか・競合はどこに強みがあるか」という戦略立案に活かす活動のことです。単なる特許調査にとどまらず、経営判断のための情報として知財を活用するという発想が重要です。', pool:['CVC','MOT','SWOT分析'] },
+  { q:'R7問14', term:'CVC', meaning:'Corporate Venture Capital（コーポレート・ベンチャー・キャピタル）の略で、事業会社が本業との相乗効果（シナジー）を目的として、自社の資金を使ってスタートアップなどの外部企業に投資する仕組みのことです。純粋な金融リターンだけでなく「新技術の取り込み」「新事業領域への参入」「将来の買収候補の育成」といった戦略的な目的が主な動機です。', pool:['IPランドスケープ','MOT','RFI'] },
+  // R7問15 事業ごとに独立採算で運営する組織
+  { q:'R7問15', term:'カンパニー制組織', meaning:'大企業の中に「社内会社（カンパニー）」という独立採算の事業組織を設ける組織形態のことです。各カンパニーは独自の損益管理を行い、意思決定も自律的に行えるため、スピード感ある経営が可能になります。「大企業の安心感を持ちながら、スタートアップのような機動力を持つ」のがねらいです。ソニーや日立など大手企業が採用しています。本社との法律上の独立はなく、完全に独立した子会社とは異なります。', pool:['機能別組織','プロジェクト組織','マトリックス組織'] },
+  { q:'R7問15', term:'機能別組織', meaning:'企業を「製造部門・販売部門・財務部門・人事部門・開発部門」などの機能（職能）ごとに部門を分けた組織形態のことです。同じ専門知識を持つ人が一つの部門に集まるため、専門性を高めやすく効率的に業務ができます。最も一般的な組織の形です。ただし「縦割り」になりやすく、部門間の連携がとりにくいというデメリットもあります。', pool:['カンパニー制組織','プロジェクト組織','マトリックス組織'] },
+  { q:'R7問15', term:'プロジェクト組織', meaning:'特定のプロジェクト（新製品開発・システム構築・イベント運営など）を完了させるために、期間限定で様々な部門から人を集めて編成する臨時の組織形態のことです。プロジェクトが完了すれば解散します。専任のプロジェクトマネージャーが統率し、目標達成に集中できるという強みがあります。機能別組織の縦割りを超えた柔軟なチーム編成が可能です。', pool:['カンパニー制組織','機能別組織','マトリックス組織'] },
+  { q:'R7問15', term:'マトリックス組織', meaning:'「機能別（製造・販売・開発など）」と「製品別・地域別・プロジェクト別」という2つの指揮命令系統を掛け合わせた組織形態のことです。例えば「開発部門の田中さんは、開発部長（機能別）とAプロジェクトのマネージャー（プロジェクト別）の両方から指示を受ける」というイメージです。専門性と柔軟性を両立できる反面、「二人の上司」による命令の競合が起きやすいという課題もあります。', pool:['カンパニー制組織','機能別組織','プロジェクト組織'] },
+  // R7問16 不正アクセス禁止法
+  { q:'R7問16', term:'不正アクセス禁止法', meaning:'正式名称は「不正アクセス行為の禁止等に関する法律」で、他人のIDやパスワードを無断で使ってコンピュータに侵入する行為や、他人のIDとパスワードを無断で第三者に教える「フィッシング行為」などを禁じる法律のことです。インターネットバンキングへの不正ログイン・他人のSNSアカウントへの不正侵入なども対象となります。違反すると3年以下の懲役または100万円以下の罰金が科せられます。', pool:['不正アクセス','特定電子メール法','偽装請負'] },
+  { q:'R7問16', term:'不正アクセス', meaning:'他人のIDやパスワードを無断で使ったり、セキュリティの脆弱性を悪用したりして、本来アクセス権限のないコンピュータやシステムに侵入することのことです。個人情報の窃取・データの改ざん・金融詐欺など様々な犯罪の入り口となり、法律で厳しく禁止されています。パスワードを総当たりで試す「ブルートフォース攻撃」なども代表的な手段です。', pool:['不正アクセス禁止法','偽装請負','特定電子メール法'] },
+  // R7問17 業務プロセスを見える化し改善
+  { q:'R7問17', term:'プロセスマイニング', meaning:'業務システムに記録されている「操作ログ（誰が・いつ・何をしたかの記録）」をAIや分析ツールで自動的に解析し、実際の業務の流れ（プロセス）を可視化・分析して、ボトルネック（遅延箇所）や非効率な作業、ルール違反などを発見して改善につなげる手法のことです。「業務の実態を主観抜きでデータから明らかにできる」のが最大の特徴で、DX・業務改善の現場で注目されています。', pool:['BPR','テキストマイニング','クリプトマイニング'] },
+  { q:'R7問17', term:'BPR', meaning:'Business Process Reengineering（ビジネスプロセス・リエンジニアリング）の略で、「これまでのやり方を全部疑ってみて、業務プロセスを根本から白紙で見直して再設計する」ことで、コスト・品質・スピードを劇的に改善しようとする手法のことです。「今の業務の延長線上での改善」ではなく「そもそもこのやり方が正しいのか？」という抜本的な改革を目指します。1990年代にアメリカで提唱され、業務改革の基本的な考え方として定着しています。', pool:['プロセスマイニング','テキストマイニング','クリプトマイニング'] },
+  { q:'R7問17', term:'テキストマイニング', meaning:'大量のテキストデータ（口コミ・メール・SNSの投稿・アンケートの自由記述など）を自然言語処理の技術で解析し、「よく使われる言葉」「感情の傾向」「テーマのつながり」などの有用な情報やパターンを取り出す手法のことです。例えば「商品レビューのテキストを解析して、お客様がどんなことに満足・不満を感じているかを把握する」といった使い方をします。', pool:['プロセスマイニング','BPR','クリプトマイニング'] },
+  { q:'R7問17', term:'クリプトマイニング', meaning:'ビットコインなどの暗号資産（仮想通貨）において、取引の承認作業（ブロックチェーンへの記録）を行うために大量の計算処理（ハッシュ計算）を行い、その報酬として暗号資産を受け取る行為のことです。「採掘（マイニング）」とも呼ばれます。正規のマイニングは合法ですが、他人のコンピュータにマルウェアを仕込んで無断でマイニングをさせる「クリプトジャッキング」は違法です。', pool:['プロセスマイニング','BPR','テキストマイニング'] }];
+const ALL   = [...R6_50, ...R6_76, ...R7_1];
+
+const SETS = {
+  all:   { data: ALL,   badge: 'FULL SET', title: '全範囲ミックス' },
+  r6_50: { data: R6_50, badge: 'R6 問50〜75',  title: '令和6年度 問50〜75' },
+  r6_76: { data: R6_76, badge: 'R6 問76〜100', title: '令和6年度 問76〜100' },
+  r7_1:  { data: R7_1,  badge: 'R7 問1〜17',   title: '令和7年度 問1〜17' },
+};
+
+const KEYS = ['A','B','C','D'];
+let queue=[], answered=0, correct=0, wrongItems=[], history=[], currentSet='all';
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function buildOptions(item){return shuffle([item.term,...shuffle(item.pool).slice(0,3)]);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+function updateHeader(){
+  document.getElementById('hdr-correct').textContent=correct;
+  document.getElementById('hdr-answered').textContent=answered;
+  const pct=queue.length?Math.round((answered/queue.length)*100):0;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-cur').textContent=answered;
+  document.getElementById('prog-tot').textContent=queue.length;
+}
+
+function renderAll(){
+  const area=document.getElementById('quiz-area');
+  area.innerHTML=queue.map((item,idx)=>{
+    const opts=buildOptions(item);
+    return `<div class="q-card" id="card-${idx}">
+      <div class="q-meta">
+        <span class="q-num">${esc(item.q)}</span>
+        <span class="q-topic">用語4択</span>
+        <span class="q-result-badge" id="badge-${idx}"></span>
+      </div>
+      <div class="q-body">
+        <div class="q-label">問題文</div>
+        <div class="q-text">${esc(item.meaning)}</div>
+        <div class="q-ask">この説明に最も適する用語はどれか。</div>
+      </div>
+      <div class="options" id="opts-${idx}">
+        ${opts.map((o,i)=>`<button class="opt" onclick="choose(${idx},'${esc(o)}','${esc(item.term)}')" data-term="${esc(o)}"><span class="opt-key">${KEYS[i]}</span><span class="opt-text">${esc(o)}</span></button>`).join('')}
+      </div>
+      <div class="feedback" id="fb-${idx}"></div>
+    </div>`;
+  }).join('');
+}
+
+function choose(idx,chosen,correctTerm){
+  const card=document.getElementById(`card-${idx}`);
+  if(card.classList.contains('done-ok')||card.classList.contains('done-ng'))return;
+  const isOk=(chosen===correctTerm);
+  answered++;if(isOk)correct++;
+  document.querySelectorAll(`#opts-${idx} .opt`).forEach(b=>{
+    b.disabled=true;
+    const t=b.getAttribute('data-term');
+    if(t===correctTerm)b.classList.add('correct');
+    else if(t===chosen&&!isOk)b.classList.add('wrong');
+    else b.classList.add('dimmed');
+  });
+  const fb=document.getElementById(`fb-${idx}`);
+  if(isOk){
+    fb.className='feedback ok show';fb.innerHTML='<strong>✓ 正解！</strong>';
+    card.classList.add('done-ok');
+    const badge=document.getElementById(`badge-${idx}`);badge.className='q-result-badge badge-ok';badge.textContent='✓ 正解';
+  }else{
+    const item=queue[idx];wrongItems.push({term:item.term,meaning:item.meaning,chosen});
+    fb.className='feedback ng show';
+    fb.innerHTML=`<strong>✗ 不正解</strong> — 正解は「${esc(correctTerm)}」<div class="hint">${esc(item.meaning.slice(0,55))}…</div>`;
+    card.classList.add('done-ng');
+    const badge=document.getElementById(`badge-${idx}`);badge.className='q-result-badge badge-ng';badge.textContent='✗ 不正解';
+  }
+  updateHeader();
+  if(answered===queue.length)setTimeout(showResult,400);
+}
+
+function showResult(){
+  const total=queue.length,pct=Math.round((correct/total)*100);
+  const emoji=pct>=90?'🏆':pct>=70?'😊':pct>=50?'🤔':'😅';
+  const title=pct>=90?'素晴らしい！':pct>=70?'よくできました！':pct>=50?'もう少し！':'要復習';
+  document.getElementById('res-emoji').textContent=emoji;
+  document.getElementById('res-title').textContent=title;
+  document.getElementById('res-score').textContent=`${correct}／${total}`;
+  document.getElementById('res-sub').textContent=`正答率 ${pct}%`;
+  const wrongSec=document.getElementById('wrong-section');
+  const wrongList=document.getElementById('wrong-list');
+  if(wrongItems.length>0){
+    document.getElementById('retry-wrong-btn').style.display='';
+    wrongSec.classList.add('show');
+    wrongList.innerHTML=wrongItems.map(w=>`<div class="wrong-item"><div class="wi-term">✗ ${esc(w.term)}</div><div class="wi-def">${esc(w.meaning)}</div><div class="wi-your">あなたの回答: ${esc(w.chosen)}</div></div>`).join('');
+  }else{
+    document.getElementById('retry-wrong-btn').style.display='none';
+    wrongSec.classList.remove('show');
+  }
+  const now=new Date();
+  const dateStr=`${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+  history.push({date:dateStr,score:correct,total,pct,setName:SETS[currentSet].title});
+  renderHistory();
+  document.getElementById('result').classList.add('show');
+  document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderHistory(){
+  const area=document.getElementById('history-area');
+  if(!history.length){area.innerHTML='<p class="history-empty">まだ記録がありません</p>';return;}
+  area.innerHTML=`<table class="hist"><tr><th>回</th><th>範囲</th><th>正解</th><th>正答率</th><th>前回比</th></tr>${history.map((h,i)=>{
+    const cls=h.pct>=80?'chip-great':h.pct>=60?'chip-ok':'chip-low';
+    let delta='';
+    if(i>0){const d=h.pct-history[i-1].pct;delta=d>0?`<span class="delta-up">▲${d}%</span>`:d<0?`<span class="delta-down">▼${Math.abs(d)}%</span>`:`<span class="delta-eq">→</span>`;}
+    return `<tr><td>#${i+1}</td><td style="font-size:11px;color:#8b90a8">${h.setName}</td><td>${h.score}/${h.total}</td><td><span class="score-chip ${cls}">${h.pct}%</span></td><td>${delta}</td></tr>`;
+  }).join('')}</table>`;
+}
+
+function clearHistory(){history=[];renderHistory();}
+
+function startQuiz(setKey){
+  currentSet=setKey;
+  const set=SETS[setKey];
+  document.getElementById('hdr-badge').textContent=set.badge;
+  document.getElementById('hdr-title').textContent=set.title;
+  queue=shuffle([...set.data]);
+  answered=0;correct=0;wrongItems=[];
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('wrong-section').classList.remove('show');
+  updateHeader();renderAll();
+  document.getElementById('portal').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function restartQuiz(){
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('wrong-section').classList.remove('show');
+  queue=shuffle([...SETS[currentSet].data]);
+  answered=0;correct=0;wrongItems=[];
+  updateHeader();renderAll();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function retryWrong(){
+  const wt=wrongItems.map(w=>w.term);
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('wrong-section').classList.remove('show');
+  queue=shuffle(SETS[currentSet].data.filter(t=>wt.includes(t.term)));
+  answered=0;correct=0;wrongItems=[];
+  updateHeader();renderAll();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goPortal(){
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('portal').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
