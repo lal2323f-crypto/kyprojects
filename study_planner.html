@@ -22,6 +22,11 @@
     --slot-filled: #e3f0ff;
     --slot-filled-border: #4a90d9;
     --delete: #e05c5c;
+    /* 勉強結果ヒートマップ用シーケンシャル配色（青1色・淡→濃） */
+    --seq-100: #cde2fb;
+    --seq-250: #86b6ef;
+    --seq-400: #3987e5;
+    --seq-600: #184f95;
   }
 
   body {
@@ -260,22 +265,6 @@
     margin-top: 2px;
   }
 
-  /* 日別リスト */
-  .result-day-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 12px;
-    background: var(--slot-empty);
-    border-radius: 9px;
-    margin-bottom: 6px;
-    border: 1.5px solid var(--border);
-    font-size: 0.9rem;
-  }
-
-  .result-day-item .day-date { color: var(--text-sub); font-size: 0.82rem; }
-  .result-day-item .day-hours { font-weight: 700; color: var(--primary); }
-
   /* 月セレクタ */
   .month-selector {
     display: flex;
@@ -298,6 +287,152 @@
     font-size: 0.97rem;
     font-weight: 700;
     color: var(--text);
+  }
+
+  /* ── 勉強結果：ヒートマップ・カレンダー ── */
+  .cal-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+
+  .cal-legend {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    color: var(--text-sub);
+  }
+
+  .cal-legend-swatches {
+    display: flex;
+    gap: 3px;
+  }
+
+  .cal-legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .cal-toggle-btn {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--primary);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .cal-weekdays, .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .cal-weekdays { margin-bottom: 6px; }
+
+  .cal-weekday {
+    text-align: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-sub);
+  }
+
+  .cal-cell {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--slot-empty);
+    color: var(--text);
+    cursor: pointer;
+    padding: 2px;
+  }
+
+  .cal-cell:hover, .cal-cell:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+    z-index: 1;
+  }
+
+  .cal-cell.is-blank {
+    visibility: hidden;
+    pointer-events: none;
+    border: none;
+    background: none;
+  }
+
+  .cal-cell.is-today { box-shadow: 0 0 0 2px var(--accent) inset; }
+
+  .cal-cell.bucket-1 { background: var(--seq-100); border-color: var(--seq-100); color: var(--text); }
+  .cal-cell.bucket-2 { background: var(--seq-250); border-color: var(--seq-250); color: var(--text); }
+  .cal-cell.bucket-3 { background: var(--seq-400); border-color: var(--seq-400); color: var(--text); font-weight: 800; }
+  .cal-cell.bucket-4 { background: var(--seq-600); border-color: var(--seq-600); color: #ffffff; }
+
+  .cal-day {
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .cal-hours {
+    font-size: 0.6rem;
+    font-weight: 700;
+    margin-top: 1px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cal-detail {
+    min-height: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    text-align: center;
+    background: var(--slot-empty);
+    border-radius: 8px;
+    padding: 8px;
+    margin-top: 10px;
+    margin-bottom: 4px;
+  }
+
+  .result-table-wrap { display: none; }
+  .result-table-wrap.show { display: block; }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  .result-table th, .result-table td {
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .result-table th {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-sub);
+  }
+
+  .result-table td.num, .result-table th.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ── ボトムナビ ── */
@@ -413,8 +548,40 @@
           <div class="lbl">コマ数（30分×）</div>
         </div>
       </div>
-      <div class="card-title">日別の勉強時間</div>
-      <div id="result-day-list"><div class="empty-msg">この月の記録はありません</div></div>
+      <div id="result-detail-wrap">
+        <div class="cal-toolbar">
+          <div class="card-title" style="margin-bottom:0">日別の勉強時間</div>
+          <button class="cal-toggle-btn" id="result-view-toggle" onclick="toggleResultView()">表を見る</button>
+        </div>
+        <div class="cal-toolbar" id="cal-legend-row" style="margin-top:-4px">
+          <span></span>
+          <div class="cal-legend">
+            少ない
+            <div class="cal-legend-swatches">
+              <div class="cal-legend-swatch" style="background:var(--slot-empty)"></div>
+              <div class="cal-legend-swatch" style="background:var(--seq-100)"></div>
+              <div class="cal-legend-swatch" style="background:var(--seq-250)"></div>
+              <div class="cal-legend-swatch" style="background:var(--seq-400)"></div>
+              <div class="cal-legend-swatch" style="background:var(--seq-600)"></div>
+            </div>
+            多い
+          </div>
+        </div>
+        <div id="result-calendar-wrap">
+          <div class="cal-weekdays" id="cal-weekdays"></div>
+          <div class="cal-grid" id="result-calendar"></div>
+          <div class="cal-detail" id="cal-detail">日付をタップすると詳細が表示されます</div>
+        </div>
+        <div class="result-table-wrap" id="result-table-wrap">
+          <table class="result-table">
+            <thead>
+              <tr><th>日付</th><th class="num">時間</th><th class="num">コマ数</th></tr>
+            </thead>
+            <tbody id="result-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="result-empty" class="empty-msg" style="display:none">この月の記録はありません</div>
     </div>
   </div>
 
@@ -640,10 +807,27 @@ renderPlan();
 //  ③ 勉強結果
 // ─────────────────────────────────────────
 let resultViewDate = new Date();
+let resultViewMode = 'calendar'; // 'calendar' | 'table'
+const WEEKDAY_LABELS = ['日','月','火','水','木','金','土'];
 
 function changeMonth(delta) {
   resultViewDate.setMonth(resultViewDate.getMonth() + delta);
   renderResult();
+}
+
+function toggleResultView() {
+  resultViewMode = resultViewMode === 'calendar' ? 'table' : 'calendar';
+  renderResult();
+}
+
+// 当日の勉強時間を、その月の最大値に対する比率で4段階に振り分け（一色ヒートマップ）
+function bucketOf(hours, maxHours) {
+  if (!hours) return 0;
+  const ratio = hours / maxHours;
+  if (ratio <= 0.25) return 1;
+  if (ratio <= 0.5) return 2;
+  if (ratio <= 0.75) return 3;
+  return 4;
 }
 
 function renderResult() {
@@ -670,23 +854,77 @@ function renderResult() {
   document.getElementById('month-total-h').textContent = totalH;
   document.getElementById('month-total-slot').textContent = totalSlots;
 
-  const listEl = document.getElementById('result-day-list');
+  const detailWrap = document.getElementById('result-detail-wrap');
+  const emptyMsg = document.getElementById('result-empty');
   if (dates.length === 0) {
-    listEl.innerHTML = '<div class="empty-msg">この月の記録はありません</div>';
+    detailWrap.style.display = 'none';
+    emptyMsg.style.display = 'block';
     return;
   }
+  detailWrap.style.display = 'block';
+  emptyMsg.style.display = 'none';
 
-  listEl.innerHTML = dates.map(date => {
+  const maxHours = Math.max(...dates.map(d => dayMap[d] * 0.5));
+
+  // カレンダー／表の表示切替
+  const toggleBtn = document.getElementById('result-view-toggle');
+  const calWrap = document.getElementById('result-calendar-wrap');
+  const tableWrap = document.getElementById('result-table-wrap');
+  const legendRow = document.getElementById('cal-legend-row');
+  if (resultViewMode === 'table') {
+    calWrap.style.display = 'none';
+    legendRow.style.display = 'none';
+    tableWrap.classList.add('show');
+    toggleBtn.textContent = 'カレンダーを見る';
+  } else {
+    calWrap.style.display = 'block';
+    legendRow.style.display = 'flex';
+    tableWrap.classList.remove('show');
+    toggleBtn.textContent = '表を見る';
+  }
+
+  // ── カレンダーヒートマップ ──
+  document.getElementById('cal-weekdays').innerHTML =
+    WEEKDAY_LABELS.map(w => `<div class="cal-weekday">${w}</div>`).join('');
+
+  const firstWeekday = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const todayStr = toDateStr(new Date());
+
+  let cells = '';
+  for (let i = 0; i < firstWeekday; i++) {
+    cells += `<div class="cal-cell is-blank"></div>`;
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${prefix}-${String(day).padStart(2,'0')}`;
+    const slots = dayMap[dateStr] || 0;
+    const hours = slots * 0.5;
+    const bucket = bucketOf(hours, maxHours);
+    const weekday = WEEKDAY_LABELS[new Date(y, m, day).getDay()];
+    const label = `${m+1}月${day}日(${weekday})：${hours}時間（${slots}コマ）`;
+    cells += `
+      <button type="button" class="cal-cell${bucket ? ' bucket-'+bucket : ''}${dateStr===todayStr ? ' is-today' : ''}"
+        data-label="${escHtml(label)}"
+        onclick="showCalDetail(this)" onfocus="showCalDetail(this)"
+        aria-label="${escHtml(label)}">
+        <span class="cal-day">${day}</span>
+        ${hours > 0 ? `<span class="cal-hours">${hours}h</span>` : ''}
+      </button>`;
+  }
+  document.getElementById('result-calendar').innerHTML = cells;
+
+  // ── 表示（アクセシビリティ用のテーブルビュー：色に依存せず同じ値を確認できる） ──
+  document.getElementById('result-table-body').innerHTML = dates.map(date => {
     const slots = dayMap[date];
     const h = (slots * 0.5).toFixed(1);
     const d = new Date(date + 'T00:00:00');
     const label = d.toLocaleDateString('ja-JP', { month:'numeric', day:'numeric', weekday:'short' });
-    return `
-      <div class="result-day-item">
-        <div class="day-date">${label}</div>
-        <div class="day-hours">${h} 時間 <span style="font-size:0.78rem;color:var(--text-sub);font-weight:400">(${slots}コマ)</span></div>
-      </div>`;
+    return `<tr><td>${escHtml(label)}</td><td class="num">${h}</td><td class="num">${slots}</td></tr>`;
   }).join('');
+}
+
+function showCalDetail(btn) {
+  document.getElementById('cal-detail').textContent = btn.dataset.label;
 }
 </script>
 </body>
