@@ -2,7 +2,13 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#4a90d9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="勉強計画">
+<meta name="format-detection" content="telephone=no,date=no">
+<meta name="description" content="テスト・検定までの残り日数、時間割形式の勉強計画、月間の勉強結果ヒートマップをまとめた学習管理アプリ。">
 <title>勉強計画アプリ</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,11 +28,32 @@
     --slot-filled: #e3f0ff;
     --slot-filled-border: #4a90d9;
     --delete: #e05c5c;
+    --accent-text: #a15d00;
+    --shadow-sm: 0 1px 3px rgba(20,40,70,0.06);
+    --shadow-md: 0 4px 16px rgba(20,40,70,0.10);
+    --shadow-lg: 0 10px 30px rgba(20,40,70,0.16);
     /* 勉強結果ヒートマップ用シーケンシャル配色（青1色・淡→濃） */
     --seq-100: #cde2fb;
     --seq-250: #86b6ef;
     --seq-400: #3987e5;
     --seq-600: #184f95;
+  }
+
+  @keyframes tabIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shake {
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60% { transform: translateX(4px); }
+  }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
   }
 
   body {
@@ -39,29 +66,34 @@
     max-width: 480px;
     margin: 0 auto;
     position: relative;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   /* ── ヘッダー ── */
   #app-header {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: #fff;
-    padding: 14px 18px;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 14px;
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(74,144,217,0.18);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    z-index: 2;
   }
 
   /* ── コンテンツ ── */
   #content {
     flex: 1;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 16px 14px 12px;
   }
 
   .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+  .tab-panel.active { display: block; animation: tabIn 0.22s ease; }
 
   /* ── セクションカード ── */
   .card {
@@ -69,7 +101,8 @@
     border-radius: 14px;
     padding: 16px;
     margin-bottom: 14px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(20,40,70,0.04);
   }
 
   .card-title {
@@ -95,20 +128,29 @@
     font-weight: 600;
   }
 
-  .form-row input {
+  .form-row input,
+  .form-row select {
     border: 1.5px solid var(--border);
     border-radius: 8px;
     padding: 9px 12px;
     font-size: 0.95rem;
+    font-family: inherit;
     color: var(--text);
     background: var(--slot-empty);
     outline: none;
-    transition: border 0.18s;
+    transition: border 0.18s, background 0.18s;
   }
 
-  .form-row input:focus {
+  .form-row input:focus,
+  .form-row select:focus {
     border-color: var(--primary);
     background: #fff;
+  }
+
+  .form-row input.invalid,
+  .form-row select.invalid {
+    border-color: var(--delete);
+    animation: shake 0.4s;
   }
 
   .btn {
@@ -120,9 +162,10 @@
     font-size: 0.93rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.16s;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.16s, transform 0.1s, box-shadow 0.16s;
   }
-  .btn:active { background: var(--primary-dark); }
+  .btn:active { background: var(--primary-dark); transform: scale(0.97); box-shadow: none; }
 
   /* ── テストリスト ── */
   .exam-item {
@@ -134,7 +177,13 @@
     border-radius: 10px;
     margin-bottom: 8px;
     border: 1.5px solid var(--border);
+    border-left: 4px solid var(--primary);
+    transition: transform 0.1s;
   }
+  .exam-item:active { transform: scale(0.99); }
+
+  .exam-item.urgency-soon { border-left-color: var(--accent); }
+  .exam-item.urgency-urgent { border-left-color: var(--delete); }
 
   .exam-name {
     font-weight: 700;
@@ -153,8 +202,15 @@
     font-weight: 800;
     color: var(--primary);
     text-align: right;
-    min-width: 60px;
+    min-width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 3px;
   }
+
+  .exam-item.urgency-soon .exam-days { color: var(--accent-text); }
+  .exam-item.urgency-urgent .exam-days { color: var(--delete); }
 
   .exam-days span {
     display: block;
@@ -171,7 +227,10 @@
     cursor: pointer;
     padding: 4px 6px;
     margin-left: 8px;
+    border-radius: 6px;
+    transition: background 0.12s, transform 0.1s;
   }
+  .btn-delete:active { background: rgba(224,92,92,0.12); transform: scale(0.9); }
 
   /* ── 勉強計画 ── */
   .plan-date-nav {
@@ -189,7 +248,9 @@
     font-size: 1rem;
     cursor: pointer;
     color: var(--primary);
+    transition: transform 0.1s, background 0.12s;
   }
+  .plan-date-nav button:active { background: var(--slot-empty); transform: scale(0.92); }
 
   .plan-date-label {
     font-size: 0.97rem;
@@ -213,6 +274,24 @@
     text-align: right;
     flex-shrink: 0;
   }
+
+  .time-slot.is-now .time-label {
+    color: var(--delete);
+    font-weight: 800;
+    position: relative;
+  }
+  .time-slot.is-now .time-label::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--delete);
+    transform: translateY(-50%);
+  }
+  .time-slot.is-now .slot-input { border-color: var(--delete); }
 
   .slot-input {
     flex: 1;
@@ -281,7 +360,9 @@
     font-size: 1rem;
     cursor: pointer;
     color: var(--primary);
+    transition: transform 0.1s, background 0.12s;
   }
+  .month-selector button:active { background: var(--slot-empty); transform: scale(0.92); }
 
   .month-label {
     font-size: 0.97rem;
@@ -328,7 +409,9 @@
     color: var(--primary);
     cursor: pointer;
     white-space: nowrap;
+    transition: transform 0.1s, background 0.12s;
   }
+  .cal-toggle-btn:active { background: var(--slot-empty); transform: scale(0.95); }
 
   .cal-weekdays, .cal-grid {
     display: grid;
@@ -359,6 +442,7 @@
     color: var(--text);
     cursor: pointer;
     padding: 2px;
+    transition: transform 0.1s, outline-color 0.1s;
   }
 
   .cal-cell:hover, .cal-cell:focus-visible {
@@ -366,6 +450,8 @@
     outline-offset: 1px;
     z-index: 1;
   }
+
+  .cal-cell:active { transform: scale(0.93); }
 
   .cal-cell.is-blank {
     visibility: hidden;
@@ -441,6 +527,8 @@
     background: var(--surface);
     border-top: 1.5px solid var(--border);
     flex-shrink: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -2px 10px rgba(20,40,70,0.05);
   }
 
   .nav-btn {
@@ -449,30 +537,62 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px 4px 8px;
+    padding: 8px 4px 6px;
+    margin: 6px 5px;
     background: none;
     border: none;
+    border-radius: 12px;
     cursor: pointer;
-    gap: 3px;
+    gap: 2px;
     color: var(--tab-inactive);
-    transition: color 0.15s;
+    transition: color 0.15s, background 0.15s, transform 0.1s;
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.02em;
   }
 
-  .nav-btn.active { color: var(--tab-active); }
+  .nav-btn:active { transform: scale(0.94); }
+  .nav-btn.active { color: var(--tab-active); background: var(--slot-filled); }
 
   .nav-icon {
     font-size: 1.45rem;
     line-height: 1;
+    transition: transform 0.15s;
   }
+
+  .nav-btn.active .nav-icon { transform: translateY(-1px); }
 
   .empty-msg {
     text-align: center;
     color: var(--text-sub);
     font-size: 0.88rem;
     padding: 24px 0;
+  }
+
+  /* ── トースト ── */
+  #toast {
+    position: fixed;
+    left: 50%;
+    bottom: 90px;
+    transform: translate(-50%, 10px);
+    background: var(--text);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    max-width: 88%;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: var(--shadow-lg);
+    z-index: 50;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    animation: toastIn 0.2s ease;
   }
 </style>
 </head>
@@ -514,15 +634,15 @@
       <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap;">
         <div class="form-row" style="flex:1;min-width:80px;margin-bottom:0">
           <label>開始時間</label>
-          <select id="plan-start" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 6px;font-size:0.9rem;background:var(--slot-empty);color:var(--text);outline:none;"></select>
+          <select id="plan-start"></select>
         </div>
         <div class="form-row" style="flex:1;min-width:80px;margin-bottom:0">
           <label>終了時間</label>
-          <select id="plan-end" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 6px;font-size:0.9rem;background:var(--slot-empty);color:var(--text);outline:none;"></select>
+          <select id="plan-end"></select>
         </div>
         <div class="form-row" style="flex:2;min-width:120px;margin-bottom:0">
           <label>内容</label>
-          <input type="text" id="plan-content" placeholder="例：英語リスニング" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.9rem;background:var(--slot-empty);color:var(--text);outline:none;">
+          <input type="text" id="plan-content" placeholder="例：英語リスニング">
         </div>
         <button class="btn" onclick="addPlanBlock()" style="white-space:nowrap;padding:8px 14px;">追加</button>
       </div>
@@ -600,6 +720,8 @@
   </button>
 </div>
 
+<div id="toast" role="status" aria-live="polite"></div>
+
 <script>
 // ─────────────────────────────────────────
 //  データストア
@@ -639,6 +761,25 @@ function generateSlots() {
 const ALL_SLOTS = generateSlots();
 
 // ─────────────────────────────────────────
+//  トースト通知 ／ 入力エラー表示
+// ─────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function markInvalid(el) {
+  el.classList.remove('invalid');
+  void el.offsetWidth; // アニメーション再生のためリフロー
+  el.classList.add('invalid');
+  el.addEventListener('animationend', () => el.classList.remove('invalid'), { once: true });
+}
+
+// ─────────────────────────────────────────
 //  タブ切り替え
 // ─────────────────────────────────────────
 function switchTab(name, btn) {
@@ -653,14 +794,22 @@ function switchTab(name, btn) {
 //  ① 残り日数
 // ─────────────────────────────────────────
 function addExam() {
-  const name = document.getElementById('exam-name').value.trim();
-  const date = document.getElementById('exam-date').value;
-  if (!name || !date) { alert('テスト名と実施日を入力してください'); return; }
+  const nameEl = document.getElementById('exam-name');
+  const dateEl = document.getElementById('exam-date');
+  const name = nameEl.value.trim();
+  const date = dateEl.value;
+  if (!name || !date) {
+    showToast('テスト名と実施日を入力してください');
+    if (!name) markInvalid(nameEl);
+    if (!date) markInvalid(dateEl);
+    return;
+  }
   exams.push({ id: Date.now(), name, date });
   saveExams();
-  document.getElementById('exam-name').value = '';
-  document.getElementById('exam-date').value = '';
+  nameEl.value = '';
+  dateEl.value = '';
   renderExams();
+  showToast(`「${name}」を登録しました`);
 }
 
 function deleteExam(id) {
@@ -684,8 +833,9 @@ function renderExams() {
   const sorted = [...exams].sort((a,b) => a.date.localeCompare(b.date));
   el.innerHTML = sorted.map(e => {
     const d = diffDays(e.date);
+    const urgency = d <= 3 ? 'urgent' : d <= 7 ? 'soon' : 'normal';
     return `
-      <div class="exam-item">
+      <div class="exam-item urgency-${urgency}">
         <div>
           <div class="exam-name">${escHtml(e.name)}</div>
           <div class="exam-date">${e.date}</div>
@@ -697,12 +847,14 @@ function renderExams() {
       </div>`;
   }).join('');
 
-  // 残り日数表示
+  // 残り日数表示（3日以内は🔥、7日以内は⏰で注意を促す）
   el.querySelectorAll('.exam-days').forEach((el2, i) => {
     const e = sorted[i];
     const d = diffDays(e.date);
-    if (d > 0) el2.innerHTML = `${d}<span>日後</span>`;
-    else if (d === 0) el2.innerHTML = `当日<span>今日！</span>`;
+    if (d === 0) el2.innerHTML = `当日<span>今日！</span>`;
+    else if (d <= 3) el2.innerHTML = `🔥${d}<span>日後</span>`;
+    else if (d <= 7) el2.innerHTML = `⏰${d}<span>日後</span>`;
+    else el2.innerHTML = `${d}<span>日後</span>`;
   });
 }
 
@@ -737,13 +889,21 @@ function buildSelectOptions() {
 }
 
 function addPlanBlock() {
-  const startVal = document.getElementById('plan-start').value;
-  const endVal = document.getElementById('plan-end').value;
-  const content = document.getElementById('plan-content').value.trim();
-  if (!content) { alert('内容を入力してください'); return; }
+  const startEl = document.getElementById('plan-start');
+  const endEl = document.getElementById('plan-end');
+  const contentEl = document.getElementById('plan-content');
+  const startVal = startEl.value;
+  const endVal = endEl.value;
+  const content = contentEl.value.trim();
+  if (!content) { showToast('内容を入力してください'); markInvalid(contentEl); return; }
 
   // 開始 < 終了チェック
-  if (startVal >= endVal) { alert('終了時間は開始時間より後にしてください'); return; }
+  if (startVal >= endVal) {
+    showToast('終了時間は開始時間より後にしてください');
+    markInvalid(startEl);
+    markInvalid(endEl);
+    return;
+  }
 
   const dateStr = toDateStr(currentPlanDate);
   if (!plans[dateStr]) plans[dateStr] = {};
@@ -755,8 +915,9 @@ function addPlanBlock() {
     }
   });
   savePlans();
-  document.getElementById('plan-content').value = '';
+  contentEl.value = '';
   renderPlan();
+  showToast('予定を追加しました');
 }
 
 function changeDay(delta) {
@@ -769,13 +930,22 @@ function renderPlan() {
   const label = currentPlanDate.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
   document.getElementById('plan-date-label').textContent = label;
 
+  // 今日を表示している場合、現在時刻に最も近いスロットを「現在地」として強調
+  const now = new Date();
+  let nowSlot = null;
+  if (dateStr === toDateStr(now)) {
+    const roundedMin = now.getMinutes() < 30 ? '00' : '30';
+    nowSlot = `${String(now.getHours()).padStart(2,'0')}:${roundedMin}`;
+  }
+
   const dayPlan = plans[dateStr] || {};
   const container = document.getElementById('time-slots');
   container.innerHTML = ALL_SLOTS.map(slot => {
     const val = escHtml(dayPlan[slot] || '');
     const filledClass = dayPlan[slot] ? ' filled' : '';
+    const nowClass = slot === nowSlot ? ' is-now' : '';
     return `
-      <div class="time-slot">
+      <div class="time-slot${nowClass}">
         <div class="time-label">${slot}</div>
         <input class="slot-input${filledClass}" type="text"
           placeholder="予定を入力"
