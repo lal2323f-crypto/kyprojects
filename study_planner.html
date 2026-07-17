@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>勉強計画アプリ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --primary: #4a90d9;
+    --primary-dark: #2d6bb5;
+    --accent: #f5a623;
+    --text: #1a2636;
+    --text-sub: #6b7c93;
+    --border: #dce3ec;
+    --tab-active: #4a90d9;
+    --tab-inactive: #9aafc4;
+    --slot-empty: #f7f9fc;
+    --slot-filled: #e3f0ff;
+    --slot-filled-border: #4a90d9;
+    --delete: #e05c5c;
+  }
+
+  body {
+    font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* ── ヘッダー ── */
+  #app-header {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 18px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(74,144,217,0.18);
+  }
+
+  /* ── コンテンツ ── */
+  #content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 14px 12px;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── セクションカード ── */
+  .card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+
+  .card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* ── 入力フォーム ── */
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .form-row label {
+    font-size: 0.82rem;
+    color: var(--text-sub);
+    font-weight: 600;
+  }
+
+  .form-row input {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--slot-empty);
+    outline: none;
+    transition: border 0.18s;
+  }
+
+  .form-row input:focus {
+    border-color: var(--primary);
+    background: #fff;
+  }
+
+  .btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.93rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.16s;
+  }
+  .btn:active { background: var(--primary-dark); }
+
+  /* ── テストリスト ── */
+  .exam-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--slot-empty);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    border: 1.5px solid var(--border);
+  }
+
+  .exam-name {
+    font-weight: 700;
+    font-size: 0.97rem;
+    color: var(--text);
+  }
+
+  .exam-date {
+    font-size: 0.8rem;
+    color: var(--text-sub);
+    margin-top: 2px;
+  }
+
+  .exam-days {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-align: right;
+    min-width: 60px;
+  }
+
+  .exam-days span {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--text-sub);
+  }
+
+  .btn-delete {
+    background: none;
+    border: none;
+    color: var(--delete);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 6px;
+    margin-left: 8px;
+  }
+
+  /* ── 勉強計画 ── */
+  .plan-date-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .plan-date-nav button {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--primary);
+  }
+
+  .plan-date-label {
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* タイムスロット */
+  .time-slot {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 5px;
+    gap: 8px;
+  }
+
+  .time-label {
+    font-size: 0.75rem;
+    color: var(--text-sub);
+    min-width: 44px;
+    padding-top: 8px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .slot-input {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 0.88rem;
+    background: var(--slot-empty);
+    color: var(--text);
+    outline: none;
+    transition: background 0.15s, border 0.15s;
+  }
+
+  .slot-input:focus {
+    border-color: var(--primary);
+    background: #fff;
+  }
+
+  .slot-input.filled {
+    background: var(--slot-filled);
+    border-color: var(--slot-filled-border);
+    font-weight: 600;
+  }
+
+  /* ── 勉強結果 ── */
+  .result-summary {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .result-box {
+    flex: 1;
+    background: var(--slot-filled);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    border: 1.5px solid var(--slot-filled-border);
+  }
+
+  .result-box .val {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+
+  .result-box .lbl {
+    font-size: 0.75rem;
+    color: var(--text-sub);
+    margin-top: 2px;
+  }
+
+  /* 日別リスト */
+  .result-day-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--slot-empty);
+    border-radius: 9px;
+    margin-bottom: 6px;
+    border: 1.5px solid var(--border);
+    font-size: 0.9rem;
+  }
+
+  .result-day-item .day-date { color: var(--text-sub); font-size: 0.82rem; }
+  .result-day-item .day-hours { font-weight: 700; color: var(--primary); }
+
+  /* 月セレクタ */
+  .month-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .month-selector button {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--primary);
+  }
+
+  .month-label {
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* ── ボトムナビ ── */
+  #bottom-nav {
+    display: flex;
+    background: var(--surface);
+    border-top: 1.5px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 4px 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    gap: 3px;
+    color: var(--tab-inactive);
+    transition: color 0.15s;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-btn.active { color: var(--tab-active); }
+
+  .nav-icon {
+    font-size: 1.45rem;
+    line-height: 1;
+  }
+
+  .empty-msg {
+    text-align: center;
+    color: var(--text-sub);
+    font-size: 0.88rem;
+    padding: 24px 0;
+  }
+</style>
+</head>
+<body>
+
+<div id="app-header">📚 勉強計画アプリ</div>
+
+<div id="content">
+
+  <!-- ① 残り日数 -->
+  <div id="tab-days" class="tab-panel active">
+    <div class="card">
+      <div class="card-title">テスト・検定を登録</div>
+      <div class="form-row">
+        <label>テスト・検定名</label>
+        <input type="text" id="exam-name" placeholder="例：英検2級、数学中間テスト">
+      </div>
+      <div class="form-row">
+        <label>実施日</label>
+        <input type="date" id="exam-date">
+      </div>
+      <button class="btn" onclick="addExam()">登録する</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">登録済みのテスト・検定</div>
+      <div id="exam-list"><div class="empty-msg">まだ登録がありません</div></div>
+    </div>
+  </div>
+
+  <!-- 2 勉強計画 -->
+  <div id="tab-plan" class="tab-panel">
+    <div class="card">
+      <div class="plan-date-nav">
+        <button onclick="changeDay(-1)">&#65308;</button>
+        <div class="plan-date-label" id="plan-date-label"></div>
+        <button onclick="changeDay(1)">&#65310;</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap;">
+        <div class="form-row" style="flex:1;min-width:80px;margin-bottom:0">
+          <label>開始時間</label>
+          <select id="plan-start" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 6px;font-size:0.9rem;background:var(--slot-empty);color:var(--text);outline:none;"></select>
+        </div>
+        <div class="form-row" style="flex:1;min-width:80px;margin-bottom:0">
+          <label>終了時間</label>
+          <select id="plan-end" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 6px;font-size:0.9rem;background:var(--slot-empty);color:var(--text);outline:none;"></select>
+        </div>
+        <div class="form-row" style="flex:2;min-width:120px;margin-bottom:0">
+          <label>内容</label>
+          <input type="text" id="plan-content" placeholder="例：英語リスニング" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.9rem;background:var(--slot-empty);color:var(--text);outline:none;">
+        </div>
+        <button class="btn" onclick="addPlanBlock()" style="white-space:nowrap;padding:8px 14px;">追加</button>
+      </div>
+      <div id="time-slots"></div>
+    </div>
+  </div>
+
+  <!-- ③ 勉強結果 -->
+  <div id="tab-result" class="tab-panel">
+    <div class="card">
+      <div class="month-selector">
+        <button onclick="changeMonth(-1)">＜</button>
+        <div class="month-label" id="result-month-label"></div>
+        <button onclick="changeMonth(1)">＞</button>
+      </div>
+      <div class="result-summary">
+        <div class="result-box">
+          <div class="val" id="month-total-h">0</div>
+          <div class="lbl">今月の合計時間(h)</div>
+        </div>
+        <div class="result-box">
+          <div class="val" id="month-total-slot">0</div>
+          <div class="lbl">コマ数（30分×）</div>
+        </div>
+      </div>
+      <div class="card-title">日別の勉強時間</div>
+      <div id="result-day-list"><div class="empty-msg">この月の記録はありません</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ボトムナビ -->
+<div id="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('days', this)">
+    <span class="nav-icon">📅</span>残り日数
+  </button>
+  <button class="nav-btn" onclick="switchTab('plan', this)">
+    <span class="nav-icon">📝</span>勉強計画
+  </button>
+  <button class="nav-btn" onclick="switchTab('result', this)">
+    <span class="nav-icon">📊</span>勉強結果
+  </button>
+</div>
+
+<script>
+// ─────────────────────────────────────────
+//  データストア
+// ─────────────────────────────────────────
+let exams = JSON.parse(localStorage.getItem('exams') || '[]');
+let plans = JSON.parse(localStorage.getItem('plans') || '{}');
+// plans: { "YYYY-MM-DD": { "06:00": "内容", "06:30": "内容", ... } }
+
+// ─────────────────────────────────────────
+//  共通ユーティリティ
+// ─────────────────────────────────────────
+function saveExams() { localStorage.setItem('exams', JSON.stringify(exams)); }
+function savePlans() { localStorage.setItem('plans', JSON.stringify(plans)); }
+
+function toDateStr(dateObj) {
+  const y = dateObj.getFullYear();
+  const m = String(dateObj.getMonth()+1).padStart(2,'0');
+  const d = String(dateObj.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}`;
+}
+
+function diffDays(targetDateStr) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(targetDateStr); target.setHours(0,0,0,0);
+  return Math.ceil((target - today) / (1000*60*60*24));
+}
+
+// タイムスロット一覧（06:00〜23:30）
+function generateSlots() {
+  const slots = [];
+  for (let h = 6; h < 24; h++) {
+    slots.push(`${String(h).padStart(2,'0')}:00`);
+    slots.push(`${String(h).padStart(2,'0')}:30`);
+  }
+  return slots;
+}
+const ALL_SLOTS = generateSlots();
+
+// ─────────────────────────────────────────
+//  タブ切り替え
+// ─────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'result') renderResult();
+}
+
+// ─────────────────────────────────────────
+//  ① 残り日数
+// ─────────────────────────────────────────
+function addExam() {
+  const name = document.getElementById('exam-name').value.trim();
+  const date = document.getElementById('exam-date').value;
+  if (!name || !date) { alert('テスト名と実施日を入力してください'); return; }
+  exams.push({ id: Date.now(), name, date });
+  saveExams();
+  document.getElementById('exam-name').value = '';
+  document.getElementById('exam-date').value = '';
+  renderExams();
+}
+
+function deleteExam(id) {
+  exams = exams.filter(e => e.id !== id);
+  saveExams();
+  renderExams();
+}
+
+function renderExams() {
+  // 前日までは表示、翌日以降（d < 0）は自動削除
+  const before = exams.length;
+  exams = exams.filter(e => diffDays(e.date) >= 0);
+  if (exams.length !== before) saveExams();
+
+  const el = document.getElementById('exam-list');
+  if (exams.length === 0) {
+    el.innerHTML = '<div class="empty-msg">まだ登録がありません</div>';
+    return;
+  }
+  // 日付昇順ソート
+  const sorted = [...exams].sort((a,b) => a.date.localeCompare(b.date));
+  el.innerHTML = sorted.map(e => {
+    const d = diffDays(e.date);
+    return `
+      <div class="exam-item">
+        <div>
+          <div class="exam-name">${escHtml(e.name)}</div>
+          <div class="exam-date">${e.date}</div>
+        </div>
+        <div style="display:flex;align-items:center">
+          <div class="exam-days"></div>
+          <button class="btn-delete" onclick="deleteExam(${e.id})" title="削除">🗑</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  // 残り日数表示
+  el.querySelectorAll('.exam-days').forEach((el2, i) => {
+    const e = sorted[i];
+    const d = diffDays(e.date);
+    if (d > 0) el2.innerHTML = `${d}<span>日後</span>`;
+    else if (d === 0) el2.innerHTML = `当日<span>今日！</span>`;
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+renderExams();
+
+// ─────────────────────────────────────────
+//  ② 勉強計画
+// ─────────────────────────────────────────
+let currentPlanDate = new Date();
+
+// セレクトボックスにスロット選択肢を設定
+function buildSelectOptions() {
+  // 終了時間は06:30〜24:00
+  const endSlots = [];
+  for (let h = 6; h < 24; h++) {
+    endSlots.push(`${String(h).padStart(2,'0')}:30`);
+    endSlots.push(`${String(h+1).padStart(2,'0')}:00`);
+  }
+  // 重複を除いてユニークに（24:00を末尾に）
+  const uniqueEnd = [...new Set(endSlots)];
+
+  const startSel = document.getElementById('plan-start');
+  const endSel = document.getElementById('plan-end');
+  startSel.innerHTML = ALL_SLOTS.map(s => `<option value="${s}">${s}</option>`).join('');
+  endSel.innerHTML = uniqueEnd.map(s => `<option value="${s}">${s}</option>`).join('');
+  // デフォルト：開始06:00、終了06:30
+  endSel.value = '06:30';
+}
+
+function addPlanBlock() {
+  const startVal = document.getElementById('plan-start').value;
+  const endVal = document.getElementById('plan-end').value;
+  const content = document.getElementById('plan-content').value.trim();
+  if (!content) { alert('内容を入力してください'); return; }
+
+  // 開始 < 終了チェック
+  if (startVal >= endVal) { alert('終了時間は開始時間より後にしてください'); return; }
+
+  const dateStr = toDateStr(currentPlanDate);
+  if (!plans[dateStr]) plans[dateStr] = {};
+
+  // 範囲内の全スロットに内容を書き込む
+  ALL_SLOTS.forEach(slot => {
+    if (slot >= startVal && slot < endVal) {
+      plans[dateStr][slot] = content;
+    }
+  });
+  savePlans();
+  document.getElementById('plan-content').value = '';
+  renderPlan();
+}
+
+function changeDay(delta) {
+  currentPlanDate.setDate(currentPlanDate.getDate() + delta);
+  renderPlan();
+}
+
+function renderPlan() {
+  const dateStr = toDateStr(currentPlanDate);
+  const label = currentPlanDate.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+  document.getElementById('plan-date-label').textContent = label;
+
+  const dayPlan = plans[dateStr] || {};
+  const container = document.getElementById('time-slots');
+  container.innerHTML = ALL_SLOTS.map(slot => {
+    const val = escHtml(dayPlan[slot] || '');
+    const filledClass = dayPlan[slot] ? ' filled' : '';
+    return `
+      <div class="time-slot">
+        <div class="time-label">${slot}</div>
+        <input class="slot-input${filledClass}" type="text"
+          placeholder="予定を入力"
+          value="${val}"
+          data-slot="${slot}"
+          oninput="updateSlot('${dateStr}', '${slot}', this)">
+      </div>`;
+  }).join('');
+}
+
+function updateSlot(dateStr, slot, input) {
+  const val = input.value.trim();
+  if (!plans[dateStr]) plans[dateStr] = {};
+  if (val) {
+    plans[dateStr][slot] = val;
+    input.classList.add('filled');
+  } else {
+    delete plans[dateStr][slot];
+    input.classList.remove('filled');
+    if (Object.keys(plans[dateStr]).length === 0) delete plans[dateStr];
+  }
+  savePlans();
+}
+
+buildSelectOptions();
+renderPlan();
+
+// ─────────────────────────────────────────
+//  ③ 勉強結果
+// ─────────────────────────────────────────
+let resultViewDate = new Date();
+
+function changeMonth(delta) {
+  resultViewDate.setMonth(resultViewDate.getMonth() + delta);
+  renderResult();
+}
+
+function renderResult() {
+  const y = resultViewDate.getFullYear();
+  const m = resultViewDate.getMonth(); // 0-indexed
+  const mStr = String(m+1).padStart(2,'0');
+  document.getElementById('result-month-label').textContent =
+    `${y}年 ${m+1}月`;
+
+  // 当月の全日付を収集
+  const prefix = `${y}-${mStr}`;
+  const dayMap = {}; // date -> slot count
+
+  Object.entries(plans).forEach(([date, dayPlan]) => {
+    if (date.startsWith(prefix)) {
+      dayMap[date] = Object.keys(dayPlan).length;
+    }
+  });
+
+  const dates = Object.keys(dayMap).sort();
+  const totalSlots = dates.reduce((s, d) => s + dayMap[d], 0);
+  const totalH = (totalSlots * 0.5).toFixed(1);
+
+  document.getElementById('month-total-h').textContent = totalH;
+  document.getElementById('month-total-slot').textContent = totalSlots;
+
+  const listEl = document.getElementById('result-day-list');
+  if (dates.length === 0) {
+    listEl.innerHTML = '<div class="empty-msg">この月の記録はありません</div>';
+    return;
+  }
+
+  listEl.innerHTML = dates.map(date => {
+    const slots = dayMap[date];
+    const h = (slots * 0.5).toFixed(1);
+    const d = new Date(date + 'T00:00:00');
+    const label = d.toLocaleDateString('ja-JP', { month:'numeric', day:'numeric', weekday:'short' });
+    return `
+      <div class="result-day-item">
+        <div class="day-date">${label}</div>
+        <div class="day-hours">${h} 時間 <span style="font-size:0.78rem;color:var(--text-sub);font-weight:400">(${slots}コマ)</span></div>
+      </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
