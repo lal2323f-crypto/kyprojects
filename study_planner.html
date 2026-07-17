@@ -291,7 +291,8 @@
     background: var(--delete);
     transform: translateY(-50%);
   }
-  .time-slot.is-now .slot-input { border-color: var(--delete); }
+  .time-slot.is-now .slot-input,
+  .time-slot.is-now .slot-block { border-color: var(--delete); }
 
   .slot-input {
     flex: 1;
@@ -310,10 +311,63 @@
     background: #fff;
   }
 
-  .slot-input.filled {
+  /* 連続する同じ内容のコマを1つにまとめたブロック表示 */
+  .time-slot.merged .time-label {
+    white-space: normal;
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--text);
+    font-size: 0.66rem;
+  }
+
+  .slot-block {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
     background: var(--slot-filled);
-    border-color: var(--slot-filled-border);
+    border: 1.5px solid var(--slot-filled-border);
+    border-radius: 8px;
+    padding: 8px 6px 8px 10px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.12s;
+  }
+  .slot-block:active { transform: scale(0.98); }
+  .slot-block:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+  .slot-block-text {
+    font-size: 0.88rem;
     font-weight: 600;
+    color: var(--text);
+    word-break: break-word;
+  }
+
+  .slot-block-delete {
+    background: none;
+    border: none;
+    color: var(--text-sub);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    transition: background 0.12s, color 0.12s, transform 0.1s;
+  }
+  .slot-block-delete:hover { background: rgba(224,92,92,0.14); color: var(--delete); }
+  .slot-block-delete:active { transform: scale(0.85); }
+
+  .slot-block-edit {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    font-family: inherit;
+    min-width: 0;
+    padding: 0;
   }
 
   /* ── 勉強結果 ── */
@@ -760,6 +814,12 @@ function generateSlots() {
 }
 const ALL_SLOTS = generateSlots();
 
+// あるスロットの終了時刻（次のスロットの開始時刻。最後は24:00）
+function slotEndLabel(slot) {
+  const idx = ALL_SLOTS.indexOf(slot);
+  return idx === ALL_SLOTS.length - 1 ? '24:00' : ALL_SLOTS[idx + 1];
+}
+
 // ─────────────────────────────────────────
 //  トースト通知 ／ 入力エラー表示
 // ─────────────────────────────────────────
@@ -940,18 +1000,51 @@ function renderPlan() {
 
   const dayPlan = plans[dateStr] || {};
   const container = document.getElementById('time-slots');
-  container.innerHTML = ALL_SLOTS.map(slot => {
-    const val = escHtml(dayPlan[slot] || '');
-    const filledClass = dayPlan[slot] ? ' filled' : '';
-    const nowClass = slot === nowSlot ? ' is-now' : '';
+
+  // 連続して内容が同じスロットは1つのブロックにまとめる（空きスロットはまとめない）
+  const segments = [];
+  ALL_SLOTS.forEach(slot => {
+    const content = dayPlan[slot] || '';
+    const last = segments[segments.length - 1];
+    if (content && last && last.content === content) {
+      last.slots.push(slot);
+    } else {
+      segments.push({ content, slots: [slot] });
+    }
+  });
+
+  container.innerHTML = segments.map(seg => {
+    const startSlot = seg.slots[0];
+    const nowClass = seg.slots.includes(nowSlot) ? ' is-now' : '';
+    const slotsCsv = seg.slots.join(',');
+
+    if (!seg.content) {
+      return `
+        <div class="time-slot${nowClass}">
+          <div class="time-label">${startSlot}</div>
+          <input class="slot-input" type="text"
+            placeholder="予定を入力"
+            value=""
+            data-slot="${startSlot}"
+            oninput="updateSlot('${dateStr}', '${startSlot}', this)"
+            onblur="renderPlan()"
+            onkeydown="if(event.key==='Enter') this.blur()">
+        </div>`;
+    }
+
+    const rangeLabel = seg.slots.length > 1
+      ? `${startSlot}〜${slotEndLabel(seg.slots[seg.slots.length - 1])}`
+      : startSlot;
     return `
-      <div class="time-slot${nowClass}">
-        <div class="time-label">${slot}</div>
-        <input class="slot-input${filledClass}" type="text"
-          placeholder="予定を入力"
-          value="${val}"
-          data-slot="${slot}"
-          oninput="updateSlot('${dateStr}', '${slot}', this)">
+      <div class="time-slot merged${nowClass}">
+        <div class="time-label">${rangeLabel}</div>
+        <div class="slot-block" tabindex="0" role="button"
+          onclick="editSegment('${dateStr}', '${slotsCsv}', this)"
+          onkeydown="if(event.key==='Enter'){editSegment('${dateStr}', '${slotsCsv}', this)}">
+          <span class="slot-block-text">${escHtml(seg.content)}</span>
+          <button type="button" class="slot-block-delete" title="削除"
+            onclick="event.stopPropagation(); clearSegment('${dateStr}', '${slotsCsv}')">✕</button>
+        </div>
       </div>`;
   }).join('');
 }
@@ -961,13 +1054,52 @@ function updateSlot(dateStr, slot, input) {
   if (!plans[dateStr]) plans[dateStr] = {};
   if (val) {
     plans[dateStr][slot] = val;
-    input.classList.add('filled');
   } else {
     delete plans[dateStr][slot];
-    input.classList.remove('filled');
     if (Object.keys(plans[dateStr]).length === 0) delete plans[dateStr];
   }
   savePlans();
+}
+
+// まとめられたブロックをタップ→インライン編集欄に切り替え
+function editSegment(dateStr, slotsCsv, blockEl) {
+  if (blockEl.querySelector('.slot-block-edit')) return; // 編集中は二重起動しない
+  const slots = slotsCsv.split(',');
+  const current = (plans[dateStr] && plans[dateStr][slots[0]]) || '';
+  const textEl = blockEl.querySelector('.slot-block-text');
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'slot-block-edit';
+  input.value = current;
+  textEl.replaceWith(input);
+  input.focus();
+  input.select();
+
+  const commit = () => {
+    const val = input.value.trim();
+    if (!plans[dateStr]) plans[dateStr] = {};
+    slots.forEach(slot => {
+      if (val) plans[dateStr][slot] = val;
+      else delete plans[dateStr][slot];
+    });
+    if (plans[dateStr] && Object.keys(plans[dateStr]).length === 0) delete plans[dateStr];
+    savePlans();
+    renderPlan();
+  };
+  input.addEventListener('blur', commit, { once: true });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') input.blur();
+  });
+  input.addEventListener('click', (e) => e.stopPropagation());
+}
+
+function clearSegment(dateStr, slotsCsv) {
+  if (!plans[dateStr]) return;
+  slotsCsv.split(',').forEach(slot => delete plans[dateStr][slot]);
+  if (Object.keys(plans[dateStr]).length === 0) delete plans[dateStr];
+  savePlans();
+  renderPlan();
+  showToast('予定を削除しました');
 }
 
 buildSelectOptions();
