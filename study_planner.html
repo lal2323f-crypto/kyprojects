@@ -260,10 +260,22 @@
     transition: border 0.18s, background 0.18s;
   }
 
+  /* ネイティブのスピナー/矢印を独自アイコンに置き換え、テキストが隠れないようにする */
+  .form-row select {
+    -webkit-appearance: none;
+    appearance: none;
+    min-width: 0;
+    padding-right: 26px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a39cc0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 13px;
+  }
+
   .form-row input:focus,
   .form-row select:focus {
     border-color: var(--primary);
-    background: var(--surface-2);
+    background-color: var(--surface-2);
     box-shadow: 0 0 0 3px rgba(168,85,247,0.18);
   }
 
@@ -655,13 +667,52 @@
     font-size: 0.82rem;
     font-weight: 600;
     color: var(--text);
-    text-align: center;
     background: var(--slot-empty);
-    border-radius: 8px;
-    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
     margin-top: 10px;
     margin-bottom: 4px;
   }
+
+  .cal-detail-empty {
+    text-align: center;
+    color: var(--text-sub);
+    font-weight: 400;
+  }
+
+  .cal-detail-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .cal-detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 5px 0;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+  .cal-detail-row:first-child { border-top: none; }
+
+  .cal-detail-name {
+    color: var(--text-sub);
+    font-weight: 600;
+    word-break: break-word;
+  }
+
+  .cal-detail-mins {
+    color: var(--primary-soft);
+    font-weight: 700;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #badge-detail { text-align: center; }
 
   .result-table-wrap { display: none; }
   .result-table-wrap.show { display: block; }
@@ -849,8 +900,8 @@
           <div class="lbl">今月の合計時間(h)</div>
         </div>
         <div class="result-box">
-          <div class="val" id="month-total-slot">0</div>
-          <div class="lbl">コマ数（30分×）</div>
+          <div class="val" id="month-total-days">0</div>
+          <div class="lbl">学習日数</div>
         </div>
       </div>
       <div id="result-detail-wrap">
@@ -875,12 +926,12 @@
         <div id="result-calendar-wrap">
           <div class="cal-weekdays" id="cal-weekdays"></div>
           <div class="cal-grid" id="result-calendar"></div>
-          <div class="cal-detail" id="cal-detail">日付をタップすると詳細が表示されます</div>
+          <div class="cal-detail" id="cal-detail"><div class="cal-detail-empty">日付をタップすると内訳が表示されます</div></div>
         </div>
         <div class="result-table-wrap" id="result-table-wrap">
           <table class="result-table">
             <thead>
-              <tr><th>日付</th><th class="num">時間</th><th class="num">コマ数</th></tr>
+              <tr><th>日付</th><th class="num">時間</th><th>内訳</th></tr>
             </thead>
             <tbody id="result-table-body"></tbody>
           </table>
@@ -930,8 +981,35 @@
 //  データストア
 // ─────────────────────────────────────────
 let exams = JSON.parse(localStorage.getItem('exams') || '[]');
-let plans = JSON.parse(localStorage.getItem('plans') || '{}');
-// plans: { "YYYY-MM-DD": { "06:00": "内容", "06:30": "内容", ... } }
+let plans = migratePlans(JSON.parse(localStorage.getItem('plans') || '{}'));
+// plans: { "YYYY-MM-DD": [ { id, start:"06:05", end:"06:45", content:"英語" }, ... ] }
+
+// 旧形式（30分刻みのスロットMap）が残っていた場合、ブロック配列に変換する
+function migratePlans(rawPlans) {
+  let changed = false;
+  const migrated = {};
+  Object.entries(rawPlans).forEach(([date, val]) => {
+    if (Array.isArray(val)) {
+      migrated[date] = val;
+      return;
+    }
+    changed = true;
+    const slots = Object.keys(val).sort();
+    const blocks = [];
+    slots.forEach(slot => {
+      const content = val[slot];
+      const last = blocks[blocks.length - 1];
+      if (last && last.content === content && last.end === slot) {
+        last.end = addMinutesToTime(slot, 30);
+      } else {
+        blocks.push({ id: genId(), start: slot, end: addMinutesToTime(slot, 30), content });
+      }
+    });
+    migrated[date] = blocks;
+  });
+  if (changed) localStorage.setItem('plans', JSON.stringify(migrated));
+  return migrated;
+}
 
 // ─────────────────────────────────────────
 //  共通ユーティリティ
@@ -955,22 +1033,45 @@ function diffDays(targetDateStr) {
   return Math.ceil((target - today) / (1000*60*60*24));
 }
 
-// タイムスロット一覧（06:00〜23:30）
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+function toMinutes(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function addMinutesToTime(hhmm, addMin) {
+  const total = toMinutes(hhmm) + addMin;
+  const h = Math.floor(total / 60), m = total % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+// 分数を「1時間30分」のような読みやすい表記に変換
+function formatMinutes(min) {
+  const h = Math.floor(min / 60), m = min % 60;
+  if (h && m) return `${h}時間${m}分`;
+  if (h) return `${h}時間`;
+  return `${m}分`;
+}
+
+// カレンダーの小さいセルに収まる短い表記（例: 1.5h／45m）
+function shortDuration(min) {
+  const h = min / 60;
+  return h >= 1 ? `${Math.round(h * 10) / 10}h` : `${min}m`;
+}
+
+// タイムスロット一覧（06:00〜23:55、5分刻み）
 function generateSlots() {
   const slots = [];
   for (let h = 6; h < 24; h++) {
-    slots.push(`${String(h).padStart(2,'0')}:00`);
-    slots.push(`${String(h).padStart(2,'0')}:30`);
+    for (let m = 0; m < 60; m += 5) {
+      slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+    }
   }
   return slots;
 }
-const ALL_SLOTS = generateSlots();
-
-// あるスロットの終了時刻（次のスロットの開始時刻。最後は24:00）
-function slotEndLabel(slot) {
-  const idx = ALL_SLOTS.indexOf(slot);
-  return idx === ALL_SLOTS.length - 1 ? '24:00' : ALL_SLOTS[idx + 1];
-}
+const ALL_SLOTS = generateSlots(); // 06:00 〜 23:55（5分刻み・開始時間の選択肢）
+const END_SLOTS = ALL_SLOTS.slice(1).concat(['24:00']); // 06:05 〜 24:00（終了時間の選択肢）
 
 // ─────────────────────────────────────────
 //  トースト通知 ／ 入力エラー表示
@@ -1081,21 +1182,12 @@ renderExams();
 // ─────────────────────────────────────────
 let currentPlanDate = new Date();
 
-// セレクトボックスにスロット選択肢を設定
+// セレクトボックスにスロット選択肢を設定（5分刻み）
 function buildSelectOptions() {
-  // 終了時間は06:30〜24:00
-  const endSlots = [];
-  for (let h = 6; h < 24; h++) {
-    endSlots.push(`${String(h).padStart(2,'0')}:30`);
-    endSlots.push(`${String(h+1).padStart(2,'0')}:00`);
-  }
-  // 重複を除いてユニークに（24:00を末尾に）
-  const uniqueEnd = [...new Set(endSlots)];
-
   const startSel = document.getElementById('plan-start');
   const endSel = document.getElementById('plan-end');
   startSel.innerHTML = ALL_SLOTS.map(s => `<option value="${s}">${s}</option>`).join('');
-  endSel.innerHTML = uniqueEnd.map(s => `<option value="${s}">${s}</option>`).join('');
+  endSel.innerHTML = END_SLOTS.map(s => `<option value="${s}">${s}</option>`).join('');
   // デフォルト：開始06:00、終了06:30
   endSel.value = '06:30';
 }
@@ -1118,14 +1210,19 @@ function addPlanBlock() {
   }
 
   const dateStr = toDateStr(currentPlanDate);
-  if (!plans[dateStr]) plans[dateStr] = {};
+  const existing = plans[dateStr] || [];
 
-  // 範囲内の全スロットに内容を書き込む
-  ALL_SLOTS.forEach(slot => {
-    if (slot >= startVal && slot < endVal) {
-      plans[dateStr][slot] = content;
-    }
+  // 時間が重なる既存ブロックは、新しいブロックの範囲を避けて分割・縮小する
+  const trimmed = [];
+  existing.forEach(b => {
+    if (b.end <= startVal || b.start >= endVal) { trimmed.push(b); return; }
+    if (b.start < startVal) trimmed.push({ id: genId(), start: b.start, end: startVal, content: b.content });
+    if (b.end > endVal) trimmed.push({ id: genId(), start: endVal, end: b.end, content: b.content });
   });
+  trimmed.push({ id: genId(), start: startVal, end: endVal, content });
+  trimmed.sort((a, b) => a.start.localeCompare(b.start));
+  plans[dateStr] = trimmed;
+
   savePlans();
   contentEl.value = '';
   renderPlan();
@@ -1142,80 +1239,62 @@ function renderPlan() {
   const label = currentPlanDate.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
   document.getElementById('plan-date-label').textContent = label;
 
-  // 今日を表示している場合、現在時刻に最も近いスロットを「現在地」として強調
+  // 今日を表示している場合、現在時刻を含むブロックを「現在地」として強調
   const now = new Date();
-  let nowSlot = null;
-  if (dateStr === toDateStr(now)) {
-    const roundedMin = now.getMinutes() < 30 ? '00' : '30';
-    nowSlot = `${String(now.getHours()).padStart(2,'0')}:${roundedMin}`;
-  }
+  const isToday = dateStr === toDateStr(now);
+  const nowHHMM = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
-  const dayPlan = plans[dateStr] || {};
+  const dayBlocks = (plans[dateStr] || []).slice().sort((a, b) => a.start.localeCompare(b.start));
   const container = document.getElementById('time-slots');
 
-  // 予定があるコマだけを対象に、連続して内容が同じものを1つのブロックにまとめる
-  const segments = [];
-  let lastSlotIndex = -2;
-  ALL_SLOTS.forEach((slot, idx) => {
-    const content = dayPlan[slot] || '';
-    if (!content) return;
-    const last = segments[segments.length - 1];
-    if (last && last.content === content && idx === lastSlotIndex + 1) {
-      last.slots.push(slot);
-    } else {
-      segments.push({ content, slots: [slot] });
-    }
-    lastSlotIndex = idx;
-  });
-
-  if (segments.length === 0) {
+  if (dayBlocks.length === 0) {
     container.innerHTML = '<div class="empty-msg">この日の予定はまだありません</div>';
     return;
   }
 
-  container.innerHTML = segments.map(seg => {
-    const startSlot = seg.slots[0];
-    const nowClass = seg.slots.includes(nowSlot) ? ' is-now' : '';
-    const slotsCsv = seg.slots.join(',');
-    const rangeLabel = `${startSlot}〜${slotEndLabel(seg.slots[seg.slots.length - 1])}`;
+  container.innerHTML = dayBlocks.map(b => {
+    const nowClass = (isToday && b.start <= nowHHMM && nowHHMM < b.end) ? ' is-now' : '';
     return `
       <div class="time-slot merged${nowClass}">
         <div class="slot-block" tabindex="0" role="button"
-          onclick="editSegment('${dateStr}', '${slotsCsv}', this)"
-          onkeydown="if(event.key==='Enter'){editSegment('${dateStr}', '${slotsCsv}', this)}">
+          onclick="editBlock('${dateStr}', '${b.id}', this)"
+          onkeydown="if(event.key==='Enter'){editBlock('${dateStr}', '${b.id}', this)}">
           <div class="slot-block-main">
-            <div class="slot-block-title">${escHtml(seg.content)}</div>
-            <div class="slot-block-time">${rangeLabel}</div>
+            <div class="slot-block-title">${escHtml(b.content)}</div>
+            <div class="slot-block-time">${b.start}〜${b.end}</div>
           </div>
           <button type="button" class="slot-block-delete" title="削除"
-            onclick="event.stopPropagation(); clearSegment('${dateStr}', '${slotsCsv}')">✕</button>
+            onclick="event.stopPropagation(); clearBlock('${dateStr}', '${b.id}')">✕</button>
         </div>
       </div>`;
   }).join('');
 }
 
-// まとめられたブロックをタップ→インライン編集欄に切り替え
-function editSegment(dateStr, slotsCsv, blockEl) {
+// ブロックをタップ→インライン編集欄に切り替え
+function editBlock(dateStr, id, blockEl) {
   if (blockEl.querySelector('.slot-block-edit')) return; // 編集中は二重起動しない
-  const slots = slotsCsv.split(',');
-  const current = (plans[dateStr] && plans[dateStr][slots[0]]) || '';
+  const block = (plans[dateStr] || []).find(b => b.id === id);
+  if (!block) return;
   const textEl = blockEl.querySelector('.slot-block-title');
   const input = document.createElement('input');
   input.type = 'text';
   input.className = 'slot-block-edit';
-  input.value = current;
+  input.value = block.content;
   textEl.replaceWith(input);
   input.focus();
   input.select();
 
   const commit = () => {
     const val = input.value.trim();
-    if (!plans[dateStr]) plans[dateStr] = {};
-    slots.forEach(slot => {
-      if (val) plans[dateStr][slot] = val;
-      else delete plans[dateStr][slot];
-    });
-    if (plans[dateStr] && Object.keys(plans[dateStr]).length === 0) delete plans[dateStr];
+    const list = plans[dateStr] || [];
+    const idx = list.findIndex(b => b.id === id);
+    if (idx === -1) return;
+    if (val) {
+      list[idx].content = val;
+    } else {
+      list.splice(idx, 1);
+      if (list.length === 0) delete plans[dateStr];
+    }
     savePlans();
     renderPlan();
   };
@@ -1226,10 +1305,11 @@ function editSegment(dateStr, slotsCsv, blockEl) {
   input.addEventListener('click', (e) => e.stopPropagation());
 }
 
-function clearSegment(dateStr, slotsCsv) {
-  if (!plans[dateStr]) return;
-  slotsCsv.split(',').forEach(slot => delete plans[dateStr][slot]);
-  if (Object.keys(plans[dateStr]).length === 0) delete plans[dateStr];
+function clearBlock(dateStr, id) {
+  const list = plans[dateStr];
+  if (!list) return;
+  plans[dateStr] = list.filter(b => b.id !== id);
+  if (plans[dateStr].length === 0) delete plans[dateStr];
   savePlans();
   renderPlan();
   showToast('予定を削除しました');
@@ -1265,6 +1345,17 @@ function bucketOf(hours, maxHours) {
   return 4;
 }
 
+// 指定日のブロックを内容ごとに集計した内訳（時間が長い順）
+function dayBreakdown(dateStr) {
+  const blocks = plans[dateStr] || [];
+  const byContent = {};
+  blocks.forEach(b => {
+    const min = toMinutes(b.end) - toMinutes(b.start);
+    byContent[b.content] = (byContent[b.content] || 0) + min;
+  });
+  return Object.entries(byContent).sort((a, b) => b[1] - a[1]);
+}
+
 function renderResult() {
   const y = resultViewDate.getFullYear();
   const m = resultViewDate.getMonth(); // 0-indexed
@@ -1272,22 +1363,21 @@ function renderResult() {
   document.getElementById('result-month-label').textContent =
     `${y}年 ${m+1}月`;
 
-  // 当月の全日付を収集
+  // 当月の全日付を収集（日付 → 合計勉強分数）
   const prefix = `${y}-${mStr}`;
-  const dayMap = {}; // date -> slot count
+  const dayMap = {};
 
-  Object.entries(plans).forEach(([date, dayPlan]) => {
-    if (date.startsWith(prefix)) {
-      dayMap[date] = Object.keys(dayPlan).length;
+  Object.entries(plans).forEach(([date, blocks]) => {
+    if (date.startsWith(prefix) && Array.isArray(blocks) && blocks.length > 0) {
+      dayMap[date] = blocks.reduce((s, b) => s + (toMinutes(b.end) - toMinutes(b.start)), 0);
     }
   });
 
   const dates = Object.keys(dayMap).sort();
-  const totalSlots = dates.reduce((s, d) => s + dayMap[d], 0);
-  const totalH = (totalSlots * 0.5).toFixed(1);
+  const totalMinutesMonth = dates.reduce((s, d) => s + dayMap[d], 0);
 
-  document.getElementById('month-total-h').textContent = totalH;
-  document.getElementById('month-total-slot').textContent = totalSlots;
+  document.getElementById('month-total-h').textContent = (totalMinutesMonth / 60).toFixed(1);
+  document.getElementById('month-total-days').textContent = dates.length;
 
   const detailWrap = document.getElementById('result-detail-wrap');
   const emptyMsg = document.getElementById('result-empty');
@@ -1299,7 +1389,7 @@ function renderResult() {
   detailWrap.style.display = 'block';
   emptyMsg.style.display = 'none';
 
-  const maxHours = Math.max(...dates.map(d => dayMap[d] * 0.5));
+  const maxHours = Math.max(...dates.map(d => dayMap[d] / 60));
 
   // カレンダー／表の表示切替
   const toggleBtn = document.getElementById('result-view-toggle');
@@ -1332,34 +1422,45 @@ function renderResult() {
   }
   for (let day = 1; day <= daysInMonth; day++) {
     const dateStr = `${prefix}-${String(day).padStart(2,'0')}`;
-    const slots = dayMap[dateStr] || 0;
-    const hours = slots * 0.5;
-    const bucket = bucketOf(hours, maxHours);
+    const minutes = dayMap[dateStr] || 0;
+    const bucket = bucketOf(minutes / 60, maxHours);
     const weekday = WEEKDAY_LABELS[new Date(y, m, day).getDay()];
-    const label = `${m+1}月${day}日(${weekday})：${hours}時間（${slots}コマ）`;
+    const dayLabel = `${m+1}月${day}日(${weekday})`;
     cells += `
       <button type="button" class="cal-cell${bucket ? ' bucket-'+bucket : ''}${dateStr===todayStr ? ' is-today' : ''}"
-        data-label="${escHtml(label)}"
-        onclick="showCalDetail(this)" onfocus="showCalDetail(this)"
-        aria-label="${escHtml(label)}">
+        onclick="showCalDetail('${dateStr}', '${escHtml(dayLabel)}')" onfocus="showCalDetail('${dateStr}', '${escHtml(dayLabel)}')"
+        aria-label="${escHtml(dayLabel)}：${minutes > 0 ? escHtml(formatMinutes(minutes)) : '記録なし'}">
         <span class="cal-day">${day}</span>
-        ${hours > 0 ? `<span class="cal-hours">${hours}h</span>` : ''}
+        ${minutes > 0 ? `<span class="cal-hours">${shortDuration(minutes)}</span>` : ''}
       </button>`;
   }
   document.getElementById('result-calendar').innerHTML = cells;
 
-  // ── 表示（アクセシビリティ用のテーブルビュー：色に依存せず同じ値を確認できる） ──
+  // ── 表（アクセシビリティ用のテーブルビュー：色に依存せず日別の時間と内訳を確認できる） ──
   document.getElementById('result-table-body').innerHTML = dates.map(date => {
-    const slots = dayMap[date];
-    const h = (slots * 0.5).toFixed(1);
+    const breakdown = dayBreakdown(date).map(([content, min]) => `${content} ${formatMinutes(min)}`).join('、');
     const d = new Date(date + 'T00:00:00');
     const label = d.toLocaleDateString('ja-JP', { month:'numeric', day:'numeric', weekday:'short' });
-    return `<tr><td>${escHtml(label)}</td><td class="num">${h}</td><td class="num">${slots}</td></tr>`;
+    return `<tr><td>${escHtml(label)}</td><td class="num">${escHtml(formatMinutes(dayMap[date]))}</td><td>${escHtml(breakdown)}</td></tr>`;
   }).join('');
 }
 
-function showCalDetail(btn) {
-  document.getElementById('cal-detail').textContent = btn.dataset.label;
+function showCalDetail(dateStr, dayLabel) {
+  const el = document.getElementById('cal-detail');
+  const breakdown = dayBreakdown(dateStr);
+  if (breakdown.length === 0) {
+    el.innerHTML = `<div class="cal-detail-title">${escHtml(dayLabel)}</div><div class="cal-detail-empty">記録なし</div>`;
+    return;
+  }
+  const totalMin = breakdown.reduce((s, [, min]) => s + min, 0);
+  const rows = breakdown.map(([content, min]) => `
+    <div class="cal-detail-row">
+      <span class="cal-detail-name">${escHtml(content)}</span>
+      <span class="cal-detail-mins">${escHtml(formatMinutes(min))}</span>
+    </div>`).join('');
+  el.innerHTML = `
+    <div class="cal-detail-title">${escHtml(dayLabel)}・合計 ${escHtml(formatMinutes(totalMin))}</div>
+    <div class="cal-detail-breakdown">${rows}</div>`;
 }
 
 // ─────────────────────────────────────────
@@ -1368,7 +1469,7 @@ function showCalDetail(btn) {
 
 // 記録がある日付（コマが1つ以上ある日）の一覧
 function datesWithRecords() {
-  return Object.keys(plans).filter(d => Object.keys(plans[d]).length > 0);
+  return Object.keys(plans).filter(d => Array.isArray(plans[d]) && plans[d].length > 0);
 }
 
 // 現在の連続日数（今日分がまだ無い場合は昨日から数える）と、過去最長の連続日数
@@ -1403,20 +1504,21 @@ function computeStreaks() {
 // 累計時間や特徴的な勉強パターンの集計
 function computeStudyStats() {
   const dates = datesWithRecords();
-  let totalSlots = 0;
+  let totalMinutes = 0;
   let perfectDay = false;
   let earlyBird = false;
   let nightOwl = false;
   dates.forEach(d => {
-    const slots = Object.keys(plans[d]);
-    totalSlots += slots.length;
-    if (slots.length >= 16) perfectDay = true;
-    slots.forEach(s => {
-      if (s < '07:00') earlyBird = true;
-      if (s >= '22:00') nightOwl = true;
+    let dayMinutes = 0;
+    plans[d].forEach(b => {
+      dayMinutes += toMinutes(b.end) - toMinutes(b.start);
+      if (b.start < '07:00') earlyBird = true;
+      if (b.end > '22:00') nightOwl = true;
     });
+    totalMinutes += dayMinutes;
+    if (dayMinutes >= 480) perfectDay = true; // 8時間以上
   });
-  return { totalHours: totalSlots * 0.5, daysStudied: dates.length, perfectDay, earlyBird, nightOwl };
+  return { totalHours: totalMinutes / 60, daysStudied: dates.length, perfectDay, earlyBird, nightOwl };
 }
 
 const BADGES = [
