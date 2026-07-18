@@ -146,7 +146,15 @@
     letter-spacing: 0.04em;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 9px;
+  }
+
+  .header-title-main {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
   }
 
   .header-badge {
@@ -161,6 +169,22 @@
     background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.3), transparent 60%), rgba(168,85,247,0.18);
     box-shadow: 0 0 14px rgba(168,85,247,0.55), inset 0 0 6px rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .streak-chip {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    background: rgba(251,191,36,0.16);
+    border: 1px solid rgba(251,191,36,0.4);
+    color: var(--accent);
+    padding: 3px 10px 3px 8px;
+    border-radius: 999px;
+    box-shadow: 0 0 12px rgba(251,191,36,0.3);
+    flex-shrink: 0;
   }
 
   /* ── コンテンツ ── */
@@ -497,6 +521,40 @@
     margin-top: 2px;
   }
 
+  /* ── 実績バッジ ── */
+  .badge-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .badge-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    border-radius: 12px;
+    cursor: pointer;
+    background: var(--slot-empty);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    transition: transform 0.1s, box-shadow 0.15s;
+  }
+  .badge-cell:active { transform: scale(0.92); }
+
+  .badge-cell.earned {
+    background: linear-gradient(160deg, rgba(168,85,247,0.28), rgba(192,132,252,0.10));
+    border-color: var(--primary);
+    box-shadow: 0 0 14px rgba(168,85,247,0.4);
+  }
+
+  .badge-cell.locked {
+    opacity: 0.32;
+    filter: grayscale(1);
+  }
+
   /* 月セレクタ */
   .month-selector {
     display: flex;
@@ -762,7 +820,10 @@
 
 <div id="app-header">
   <div class="header-eyebrow">STUDY · PLANNER</div>
-  <div class="header-title"><span class="header-badge">📚</span>勉強計画アプリ</div>
+  <div class="header-title">
+    <span class="header-title-main"><span class="header-badge">📚</span>勉強計画アプリ</span>
+    <span class="streak-chip" id="streak-chip" style="display:none">🔥<span id="streak-count">0</span></span>
+  </div>
 </div>
 
 <div id="content">
@@ -868,6 +929,24 @@
       </div>
       <div id="result-empty" class="empty-msg" style="display:none">この月の記録はありません</div>
     </div>
+
+    <div class="card">
+      <div class="card-title">連続記録</div>
+      <div class="result-summary">
+        <div class="result-box">
+          <div class="val" id="streak-current-val">0</div>
+          <div class="lbl">現在の連続日数</div>
+        </div>
+        <div class="result-box">
+          <div class="val" id="streak-best-val">0</div>
+          <div class="lbl">自己ベスト</div>
+        </div>
+      </div>
+      <div class="card-title">実績バッジ</div>
+      <div class="badge-grid" id="badge-grid"></div>
+      <div class="cal-detail" id="badge-detail">バッジをタップすると詳細が表示されます</div>
+    </div>
+
   </div>
 
 </div>
@@ -899,7 +978,10 @@ let plans = JSON.parse(localStorage.getItem('plans') || '{}');
 //  共通ユーティリティ
 // ─────────────────────────────────────────
 function saveExams() { localStorage.setItem('exams', JSON.stringify(exams)); }
-function savePlans() { localStorage.setItem('plans', JSON.stringify(plans)); }
+function savePlans() {
+  localStorage.setItem('plans', JSON.stringify(plans));
+  renderBadges();
+}
 
 function toDateStr(dateObj) {
   const y = dateObj.getFullYear();
@@ -1339,6 +1421,128 @@ function renderResult() {
 function showCalDetail(btn) {
   document.getElementById('cal-detail').textContent = btn.dataset.label;
 }
+
+// ─────────────────────────────────────────
+//  連続記録（ストリーク）／ 実績バッジ
+// ─────────────────────────────────────────
+
+// 記録がある日付（コマが1つ以上ある日）の一覧
+function datesWithRecords() {
+  return Object.keys(plans).filter(d => Object.keys(plans[d]).length > 0);
+}
+
+// 現在の連続日数（今日分がまだ無い場合は昨日から数える）と、過去最長の連続日数
+function computeStreaks() {
+  const recorded = new Set(datesWithRecords());
+
+  let current = 0;
+  const cursor = new Date();
+  if (!recorded.has(toDateStr(cursor))) cursor.setDate(cursor.getDate() - 1);
+  while (recorded.has(toDateStr(cursor))) {
+    current++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  const sorted = [...recorded].sort();
+  let longest = 0, run = 0, prevDate = null;
+  sorted.forEach(d => {
+    if (prevDate) {
+      const diff = Math.round((new Date(d) - new Date(prevDate)) / 86400000);
+      run = diff === 1 ? run + 1 : 1;
+    } else {
+      run = 1;
+    }
+    longest = Math.max(longest, run);
+    prevDate = d;
+  });
+  longest = Math.max(longest, current);
+
+  return { current, longest };
+}
+
+// 累計時間や特徴的な勉強パターンの集計
+function computeStudyStats() {
+  const dates = datesWithRecords();
+  let totalSlots = 0;
+  let perfectDay = false;
+  let earlyBird = false;
+  let nightOwl = false;
+  dates.forEach(d => {
+    const slots = Object.keys(plans[d]);
+    totalSlots += slots.length;
+    if (slots.length >= 16) perfectDay = true;
+    slots.forEach(s => {
+      if (s < '07:00') earlyBird = true;
+      if (s >= '22:00') nightOwl = true;
+    });
+  });
+  return { totalHours: totalSlots * 0.5, daysStudied: dates.length, perfectDay, earlyBird, nightOwl };
+}
+
+const BADGES = [
+  { id:'streak3',    icon:'🔥', name:'3日連続',      desc:'3日連続で勉強を記録した', check: s => s.streak.longest >= 3 },
+  { id:'streak7',    icon:'🔥', name:'1週間連続',    desc:'7日連続で勉強を記録した', check: s => s.streak.longest >= 7 },
+  { id:'streak14',   icon:'⚡', name:'2週間連続',    desc:'14日連続で勉強を記録した', check: s => s.streak.longest >= 14 },
+  { id:'streak30',   icon:'🏆', name:'1ヶ月連続',    desc:'30日連続で勉強を記録した', check: s => s.streak.longest >= 30 },
+  { id:'hours10',    icon:'📖', name:'累計10時間',   desc:'合計10時間の勉強を記録した', check: s => s.stats.totalHours >= 10 },
+  { id:'hours50',    icon:'📚', name:'累計50時間',   desc:'合計50時間の勉強を記録した', check: s => s.stats.totalHours >= 50 },
+  { id:'hours100',   icon:'🎓', name:'累計100時間',  desc:'合計100時間の勉強を記録した', check: s => s.stats.totalHours >= 100 },
+  { id:'perfectday', icon:'💯', name:'パーフェクトデイ', desc:'1日8時間以上の勉強を記録した', check: s => s.stats.perfectDay },
+  { id:'earlybird',  icon:'🌅', name:'早朝の勉強家', desc:'朝7時より前に勉強を記録した', check: s => s.stats.earlyBird },
+  { id:'nightowl',   icon:'🌙', name:'夜型の勉強家', desc:'夜22時以降に勉強を記録した', check: s => s.stats.nightOwl },
+];
+
+// 一度解除したバッジは、後で記録を編集・削除しても失われないよう保持する
+let earnedBadgeIds = new Set(JSON.parse(localStorage.getItem('earnedBadges') || '[]'));
+
+function renderBadges() {
+  const streak = computeStreaks();
+  const stats = computeStudyStats();
+  const state = { streak, stats };
+
+  let newlyEarned = false;
+  BADGES.forEach(b => {
+    if (!earnedBadgeIds.has(b.id) && b.check(state)) {
+      earnedBadgeIds.add(b.id);
+      newlyEarned = true;
+    }
+  });
+  if (newlyEarned) localStorage.setItem('earnedBadges', JSON.stringify([...earnedBadgeIds]));
+
+  const streakChip = document.getElementById('streak-chip');
+  const streakCount = document.getElementById('streak-count');
+  if (streak.current > 0) {
+    streakChip.style.display = 'flex';
+    streakCount.textContent = streak.current;
+  } else {
+    streakChip.style.display = 'none';
+  }
+
+  const currentEl = document.getElementById('streak-current-val');
+  const bestEl = document.getElementById('streak-best-val');
+  if (currentEl) currentEl.textContent = streak.current;
+  if (bestEl) bestEl.textContent = streak.longest;
+
+  const gridEl = document.getElementById('badge-grid');
+  if (gridEl) {
+    gridEl.innerHTML = BADGES.map(b => {
+      const earned = earnedBadgeIds.has(b.id);
+      return `
+        <button type="button" class="badge-cell ${earned ? 'earned' : 'locked'}"
+          onclick="showBadgeDetail('${b.id}')" title="${escHtml(b.name)}">${b.icon}</button>`;
+    }).join('');
+  }
+}
+
+function showBadgeDetail(id) {
+  const b = BADGES.find(x => x.id === id);
+  if (!b) return;
+  const earned = earnedBadgeIds.has(id);
+  const el = document.getElementById('badge-detail');
+  el.textContent = (earned ? '🔓 ' : '🔒 ') + b.name + '：' + b.desc;
+}
+
+renderBadges();
 </script>
 </body>
 </html>
