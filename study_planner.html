@@ -386,51 +386,8 @@
     gap: 8px;
   }
 
-  .time-label {
-    font-size: 0.75rem;
-    color: var(--text-sub);
-    min-width: 44px;
-    padding-top: 8px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  .time-slot.is-now .time-label {
-    color: var(--delete);
-    font-weight: 800;
-    position: relative;
-  }
-  .time-slot.is-now .time-label::before {
-    content: '';
-    position: absolute;
-    left: -8px;
-    top: 50%;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--delete);
-    transform: translateY(-50%);
-  }
-  .time-slot.is-now .slot-input { border-color: var(--delete); }
   .time-slot.is-now .slot-block { border-left-color: var(--delete); }
-
-  .slot-input {
-    flex: 1;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 10px;
-    font-size: 0.88rem;
-    background: var(--slot-empty);
-    color: var(--text);
-    outline: none;
-    transition: background 0.15s, border 0.15s;
-  }
-
-  .slot-input:focus {
-    border-color: var(--primary);
-    background: var(--surface-2);
-    box-shadow: 0 0 0 3px rgba(168,85,247,0.18);
-  }
+  .time-slot.is-now .slot-block-time { color: var(--delete); font-weight: 700; }
 
   /* 連続する同じ内容のコマを1つのカードにまとめた表示（残り日数のカードと同じ見た目） */
   .slot-block {
@@ -1196,37 +1153,30 @@ function renderPlan() {
   const dayPlan = plans[dateStr] || {};
   const container = document.getElementById('time-slots');
 
-  // 連続して内容が同じスロットは1つのブロックにまとめる（空きスロットはまとめない）
+  // 予定があるコマだけを対象に、連続して内容が同じものを1つのブロックにまとめる
   const segments = [];
-  ALL_SLOTS.forEach(slot => {
+  let lastSlotIndex = -2;
+  ALL_SLOTS.forEach((slot, idx) => {
     const content = dayPlan[slot] || '';
+    if (!content) return;
     const last = segments[segments.length - 1];
-    if (content && last && last.content === content) {
+    if (last && last.content === content && idx === lastSlotIndex + 1) {
       last.slots.push(slot);
     } else {
       segments.push({ content, slots: [slot] });
     }
+    lastSlotIndex = idx;
   });
+
+  if (segments.length === 0) {
+    container.innerHTML = '<div class="empty-msg">この日の予定はまだありません</div>';
+    return;
+  }
 
   container.innerHTML = segments.map(seg => {
     const startSlot = seg.slots[0];
     const nowClass = seg.slots.includes(nowSlot) ? ' is-now' : '';
     const slotsCsv = seg.slots.join(',');
-
-    if (!seg.content) {
-      return `
-        <div class="time-slot${nowClass}">
-          <div class="time-label">${startSlot}</div>
-          <input class="slot-input" type="text"
-            placeholder="予定を入力"
-            value=""
-            data-slot="${startSlot}"
-            oninput="updateSlot('${dateStr}', '${startSlot}', this)"
-            onblur="renderPlan()"
-            onkeydown="if(event.key==='Enter') this.blur()">
-        </div>`;
-    }
-
     const rangeLabel = `${startSlot}〜${slotEndLabel(seg.slots[seg.slots.length - 1])}`;
     return `
       <div class="time-slot merged${nowClass}">
@@ -1242,18 +1192,6 @@ function renderPlan() {
         </div>
       </div>`;
   }).join('');
-}
-
-function updateSlot(dateStr, slot, input) {
-  const val = input.value.trim();
-  if (!plans[dateStr]) plans[dateStr] = {};
-  if (val) {
-    plans[dateStr][slot] = val;
-  } else {
-    delete plans[dateStr][slot];
-    if (Object.keys(plans[dateStr]).length === 0) delete plans[dateStr];
-  }
-  savePlans();
 }
 
 // まとめられたブロックをタップ→インライン編集欄に切り替え
