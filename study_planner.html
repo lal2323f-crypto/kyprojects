@@ -411,8 +411,8 @@
     background: var(--delete);
     transform: translateY(-50%);
   }
-  .time-slot.is-now .slot-input,
-  .time-slot.is-now .slot-block { border-color: var(--delete); }
+  .time-slot.is-now .slot-input { border-color: var(--delete); }
+  .time-slot.is-now .slot-block { border-left-color: var(--delete); }
 
   .slot-input {
     flex: 1;
@@ -432,15 +432,7 @@
     box-shadow: 0 0 0 3px rgba(168,85,247,0.18);
   }
 
-  /* 連続する同じ内容のコマを1つにまとめたブロック表示 */
-  .time-slot.merged .time-label {
-    white-space: normal;
-    line-height: 1.2;
-    font-weight: 700;
-    color: var(--text);
-    font-size: 0.66rem;
-  }
-
+  /* 連続する同じ内容のコマを1つのカードにまとめた表示（残り日数のカードと同じ見た目） */
   .slot-block {
     flex: 1;
     display: flex;
@@ -448,30 +440,40 @@
     justify-content: space-between;
     gap: 8px;
     background: var(--slot-filled);
-    border: 1.5px solid var(--slot-filled-border);
-    border-radius: 8px;
-    padding: 8px 6px 8px 10px;
+    border: 1.5px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 10px;
+    padding: 12px 10px 12px 14px;
     cursor: pointer;
-    box-shadow: 0 0 14px rgba(168,85,247,0.18);
+    box-shadow: 0 0 14px rgba(168,85,247,0.15);
     transition: transform 0.1s, background 0.12s;
   }
   .slot-block:active { transform: scale(0.98); }
   .slot-block:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 
-  .slot-block-text {
-    font-size: 0.88rem;
-    font-weight: 600;
+  .slot-block-main { min-width: 0; }
+
+  .slot-block-title {
+    font-size: 0.97rem;
+    font-weight: 700;
     color: var(--text);
     word-break: break-word;
+  }
+
+  .slot-block-time {
+    font-size: 0.8rem;
+    color: var(--text-sub);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
   }
 
   .slot-block-delete {
     background: none;
     border: none;
     color: var(--text-sub);
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     cursor: pointer;
-    padding: 3px 6px;
+    padding: 4px 7px;
     border-radius: 6px;
     flex-shrink: 0;
     transition: background 0.12s, color 0.12s, transform 0.1s;
@@ -484,8 +486,8 @@
     border: none;
     outline: none;
     background: transparent;
-    font-size: 0.88rem;
-    font-weight: 600;
+    font-size: 0.97rem;
+    font-weight: 700;
     color: var(--text);
     font-family: inherit;
     min-width: 0;
@@ -1225,16 +1227,16 @@ function renderPlan() {
         </div>`;
     }
 
-    const rangeLabel = seg.slots.length > 1
-      ? `${startSlot}〜${slotEndLabel(seg.slots[seg.slots.length - 1])}`
-      : startSlot;
+    const rangeLabel = `${startSlot}〜${slotEndLabel(seg.slots[seg.slots.length - 1])}`;
     return `
       <div class="time-slot merged${nowClass}">
-        <div class="time-label">${rangeLabel}</div>
         <div class="slot-block" tabindex="0" role="button"
           onclick="editSegment('${dateStr}', '${slotsCsv}', this)"
           onkeydown="if(event.key==='Enter'){editSegment('${dateStr}', '${slotsCsv}', this)}">
-          <span class="slot-block-text">${escHtml(seg.content)}</span>
+          <div class="slot-block-main">
+            <div class="slot-block-title">${escHtml(seg.content)}</div>
+            <div class="slot-block-time">${rangeLabel}</div>
+          </div>
           <button type="button" class="slot-block-delete" title="削除"
             onclick="event.stopPropagation(); clearSegment('${dateStr}', '${slotsCsv}')">✕</button>
         </div>
@@ -1259,7 +1261,7 @@ function editSegment(dateStr, slotsCsv, blockEl) {
   if (blockEl.querySelector('.slot-block-edit')) return; // 編集中は二重起動しない
   const slots = slotsCsv.split(',');
   const current = (plans[dateStr] && plans[dateStr][slots[0]]) || '';
-  const textEl = blockEl.querySelector('.slot-block-text');
+  const textEl = blockEl.querySelector('.slot-block-title');
   const input = document.createElement('input');
   input.type = 'text';
   input.className = 'slot-block-edit';
