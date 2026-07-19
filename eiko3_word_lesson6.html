@@ -1011,10 +1011,10 @@ function showCelebration(score,total,les,part,wrongOnly){
   bwrap.style.bottom='42%';
   var b1=mk('button','cel-main-btn');
   b1.textContent='もう一度挑戦する 🎉';
-  b1.onclick=function(){stop();$app.innerHTML='';renderQuiz(les,part,wrongOnly,wrongOnly?QS.currentSet:null);window.scrollTo(0,0);};
+  b1.onclick=function(){stop();ov.remove();$app.innerHTML='';renderQuiz(les,part,wrongOnly,wrongOnly?QS.currentSet:null);window.scrollTo(0,0);};
   var b2=mk('button','cel-sec-btn');
-  b2.textContent='結果を閉じる';
-  b2.onclick=function(){stop();ov.remove();};
+  b2.textContent='戻る';
+  b2.onclick=function(){stop();ov.remove();go('lesson',les);};
   bwrap.appendChild(b1);bwrap.appendChild(b2);
   ov.appendChild(bwrap);
   // tap anywhere to dismiss (except buttons)
