@@ -77,6 +77,18 @@ html,body{min-height:100vh;font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP
 }
 .lt-back-btn:hover{border-color:#d4a843;color:#d4a843}
 
+.lt-theme-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:transparent;
+  border:1px solid rgba(212,168,67,.38);
+  border-radius:20px;
+  color:rgba(212,168,67,.85);
+  padding:6px 14px;font-size:13px;
+  cursor:pointer;font-family:inherit;
+  margin-bottom:16px;float:right;clear:right;
+}
+.lt-theme-btn:hover{border-color:#d4a843;color:#d4a843}
+
 .lt-hd-inner{clear:both;padding-bottom:0}
 .lt-ey{
   font-size:11px;letter-spacing:.1em;
@@ -127,6 +139,16 @@ html,body{min-height:100vh;font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP
 .lc-ttl{font-size:17px;font-weight:700;color:#d4a843;margin-bottom:5px;line-height:1.3}
 .lc-desc{font-size:12.5px;color:rgba(255,255,255,.42);line-height:1.5}
 .lc-arr{font-size:22px;color:rgba(212,168,67,.5);flex:0 0 auto}
+
+/* ── theme picker cards ── */
+.theme-card.selected{
+  border-color:#d4a843;
+  box-shadow:0 4px 24px rgba(0,0,0,.55),0 0 22px rgba(212,168,67,.18);
+}
+.theme-card .theme-check{font-size:13px;font-weight:700;letter-spacing:.02em;color:#d4a843}
+.theme-card.locked{opacity:.4;cursor:default}
+.theme-card.locked:hover{border-color:rgba(212,168,67,.28);box-shadow:0 2px 14px rgba(0,0,0,.5)}
+.theme-card.locked .lc-arr{font-size:18px}
 
 /* ════════════════════════════════════════
    QUIZ SCREEN – Disney starfield theme
@@ -501,6 +523,16 @@ var LESSONS = [
 ];
 
 /* ════════════════════════════════════════
+   THEMES（着せ替え）
+   ════════════════════════════════════════ */
+var THEMES = [
+  {id:'disney', name:'ディズニー', desc:'夜空にきらめく星と黄金の城。現在のデザインです。'}
+  /* ── 例: 新テーマ追加時
+  ,{id:'xxx', name:'テーマ名', desc:'説明文'}
+  ── */
+];
+
+/* ════════════════════════════════════════
    UTILS
    ════════════════════════════════════════ */
 var KANA = ["ア","イ","ウ","エ"];
@@ -521,6 +553,8 @@ function fmtDate(d){return (d.getMonth()+1)+'/'+d.getDate();}
 function loadHist(key){try{var r=localStorage.getItem(key);return r?JSON.parse(r):[];}catch(e){return [];}}
 function saveHist(key,rec){try{var h=loadHist(key);h.push(rec);localStorage.setItem(key,JSON.stringify(h));}catch(e){}}
 function clearHist(key){try{localStorage.removeItem(key);}catch(e){}}
+function getTheme(){try{return localStorage.getItem('TQ_theme')||'disney';}catch(e){return 'disney';}}
+function setTheme(id){try{localStorage.setItem('TQ_theme',id);}catch(e){}}
 
 /* ════════════════════════════════════════
    APP ROUTER
@@ -532,6 +566,7 @@ function go(view, a, b){
   if(view==='hub')    renderHub();
   if(view==='lesson') renderLesson(a);
   if(view==='quiz')   renderQuiz(a, b, false);
+  if(view==='theme')  renderThemes();
   window.scrollTo(0,0);
 }
 
@@ -611,6 +646,10 @@ function renderHub(){
 
   /* header */
   var hd=mk('div','lt-hd');
+  var tb=mk('button','lt-theme-btn');
+  tb.innerHTML='🎨 着せ替え';
+  tb.onclick=function(){go('theme');};
+  hd.appendChild(tb);
   var inner=mk('div','lt-hd-inner');
   var ey=mk('div','lt-ey');ey.textContent='英語コミュニケーションⅢ';
   var ttl=mk('div','lt-ttl');ttl.textContent='単語テスト';
@@ -676,6 +715,67 @@ function renderLesson(les){
   });
   pg.appendChild(bd);
   $app.appendChild(pg);
+}
+
+/* ════════════════════════════════════════
+   THEME PICKER VIEW（着せ替え）
+   ════════════════════════════════════════ */
+function renderThemes(){
+  var pg=mk('div','lt');
+
+  /* header */
+  var hd=mk('div','lt-hd');
+  var bk=mk('button','lt-back-btn');
+  bk.innerHTML='‹ もどる';
+  bk.onclick=function(){go('hub');};
+  hd.appendChild(bk);
+  var inner=mk('div','lt-hd-inner');
+  var ey=mk('div','lt-ey');ey.textContent='英語コミュニケーションⅢ';
+  var ttl=mk('div','lt-ttl');ttl.textContent='着せ替え';
+  var deco=mk('div','lt-deco');deco.textContent='✦　✦　✦';
+  inner.appendChild(ey);inner.appendChild(ttl);inner.appendChild(deco);
+  hd.appendChild(inner);
+  var ct=mk('div');ct.innerHTML=castleSVG();
+  while(ct.firstChild) hd.appendChild(ct.firstChild);
+  pg.appendChild(hd);
+
+  /* body */
+  var bd=mk('div','lt-body');
+  var lbl=mk('div','lt-lbl');lbl.textContent='使用するテーマを選んでください';
+  bd.appendChild(lbl);
+
+  var current=getTheme();
+  THEMES.forEach(function(th){
+    bd.appendChild(mkThemeCard(th, th.id===current));
+  });
+
+  /* 今後追加されるテーマ用のスペース確保（プレースホルダー） */
+  var soon=mk('div','lcard theme-card locked');
+  var soonBody=mk('div','lc-body');
+  var soonEy=mk('div','lc-ey');soonEy.textContent='テーマ';
+  var soonTtl=mk('div','lc-ttl');soonTtl.textContent='近日公開';
+  var soonDesc=mk('div','lc-desc');soonDesc.textContent='新しいテーマを準備中です';
+  soonBody.appendChild(soonEy);soonBody.appendChild(soonTtl);soonBody.appendChild(soonDesc);
+  var soonArr=mk('div','lc-arr');soonArr.textContent='🔒';
+  soon.appendChild(soonBody);soon.appendChild(soonArr);
+  bd.appendChild(soon);
+
+  pg.appendChild(bd);
+  $app.appendChild(pg);
+}
+
+function mkThemeCard(theme, selected){
+  var c=mk('button','lcard theme-card'+(selected?' selected':''));
+  var bd=mk('div','lc-body');
+  var ey=mk('div','lc-ey');ey.textContent='テーマ';
+  var ttl=mk('div','lc-ttl');ttl.textContent=theme.name;
+  var ds=mk('div','lc-desc');ds.textContent=theme.desc;
+  bd.appendChild(ey);bd.appendChild(ttl);bd.appendChild(ds);
+  var st=mk('div','lc-arr'+(selected?' theme-check':''));
+  st.textContent=selected?'✓ 使用中':'選択';
+  c.appendChild(bd);c.appendChild(st);
+  c.onclick=function(){setTheme(theme.id);go('theme');};
+  return c;
 }
 
 /* ════════════════════════════════════════
