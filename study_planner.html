@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a14">
+<meta name="theme-color" content="#3a7bc8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="勉強計画">
@@ -14,36 +14,35 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    color-scheme: dark;
-    --bg: #0a0a14;
-    --surface: #15151f;
-    --surface-2: #20203a;
-    --primary: #a855f7;
-    --primary-soft: #c084fc;
-    --primary-btn-a: #9333ea;
-    --primary-btn-b: #7c3aed;
-    --primary-dark: #7c3aed;
-    --accent: #fbbf24;
-    --text: #f2f0fa;
-    --text-sub: #a39cc0;
-    --border: rgba(255,255,255,0.10);
-    --tab-active: #c084fc;
-    --tab-inactive: #6b6486;
-    --slot-empty: #1c1c2c;
-    --slot-filled: rgba(168,85,247,0.16);
-    --slot-filled-border: #a855f7;
-    --delete: #fb7185;
-    --delete-rgb: 251,113,133;
-    --accent-text: #fbbf24;
-    --ink-dark: #1a1030;
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03) inset;
-    --shadow-md: 0 10px 30px rgba(0,0,0,0.55), 0 0 24px rgba(168,85,247,0.12);
-    --shadow-lg: 0 20px 50px rgba(0,0,0,0.6), 0 0 40px rgba(168,85,247,0.20);
-    /* 勉強結果ヒートマップ用シーケンシャル配色（紫1色・暗→明、ダーク面用に反転） */
-    --seq-100: #241f38;
-    --seq-250: #3f2f6b;
-    --seq-400: #7c3aed;
-    --seq-600: #c084fc;
+    color-scheme: light;
+    --bg: #eaf4fd;
+    --surface: #fffdf8;
+    --surface-2: #fff6e0;
+    --primary: #2f6fb0;
+    --primary-soft: #1d4b7a;
+    --primary-btn-a: #3a7bc8;
+    --primary-btn-b: #1f4e80;
+    --primary-dark: #1f4e80;
+    --accent: #eab308;
+    --text: #22303f;
+    --text-sub: #566878;
+    --border: #dde8f2;
+    --tab-active: #1d4b7a;
+    --tab-inactive: #9db1c4;
+    --slot-empty: #f3f9fe;
+    --slot-filled: #e4f0fc;
+    --slot-filled-border: #2f6fb0;
+    --delete: #c2413d;
+    --delete-rgb: 194,65,61;
+    --accent-text: #7a5608;
+    --shadow-sm: 0 1px 3px rgba(31,78,128,0.08);
+    --shadow-md: 0 8px 24px rgba(31,78,128,0.12);
+    --shadow-lg: 0 16px 40px rgba(31,78,128,0.18);
+    /* 勉強結果ヒートマップ用シーケンシャル配色（青1色・淡→濃） */
+    --seq-100: #cde2fb;
+    --seq-250: #86b6ef;
+    --seq-400: #3987e5;
+    --seq-600: #184f95;
   }
 
   @keyframes tabIn {
@@ -78,7 +77,7 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* 星空の背景（固定・スクロールに追従しない） */
+  /* 妖精の粉（パステルの光の粒）を散りばめた背景（固定・スクロールに追従しない） */
   body::before {
     content: '';
     position: absolute;
@@ -88,22 +87,22 @@
     background-repeat: repeat-y;
     background-size: 100% 620px;
     background-image:
-      radial-gradient(1.4px 1.4px at 8% 10%, rgba(255,255,255,0.85), transparent 100%),
-      radial-gradient(1px 1px at 22% 34%, rgba(255,255,255,0.6), transparent 100%),
-      radial-gradient(1.6px 1.6px at 33% 6%, rgba(255,255,255,0.55), transparent 100%),
-      radial-gradient(1px 1px at 47% 52%, rgba(255,255,255,0.75), transparent 100%),
-      radial-gradient(1.6px 1.6px at 61% 20%, rgba(255,255,255,0.5), transparent 100%),
-      radial-gradient(1px 1px at 73% 64%, rgba(255,255,255,0.65), transparent 100%),
-      radial-gradient(1.6px 1.6px at 86% 14%, rgba(255,255,255,0.55), transparent 100%),
-      radial-gradient(1px 1px at 93% 46%, rgba(255,255,255,0.75), transparent 100%),
-      radial-gradient(1.6px 1.6px at 15% 76%, rgba(255,255,255,0.5), transparent 100%),
-      radial-gradient(1px 1px at 41% 86%, rgba(255,255,255,0.6), transparent 100%),
-      radial-gradient(1.6px 1.6px at 57% 94%, rgba(255,255,255,0.5), transparent 100%),
-      radial-gradient(1px 1px at 79% 90%, rgba(255,255,255,0.65), transparent 100%),
-      radial-gradient(2px 2px at 27% 24%, rgba(255,255,255,0.4), transparent 100%),
-      radial-gradient(2px 2px at 68% 40%, rgba(255,255,255,0.4), transparent 100%);
+      radial-gradient(1.6px 1.6px at 8% 10%, rgba(234,179,8,0.65), transparent 100%),
+      radial-gradient(1.2px 1.2px at 22% 34%, rgba(255,255,255,0.9), transparent 100%),
+      radial-gradient(1.8px 1.8px at 33% 6%, rgba(234,179,8,0.55), transparent 100%),
+      radial-gradient(1.2px 1.2px at 47% 52%, rgba(255,255,255,0.85), transparent 100%),
+      radial-gradient(1.8px 1.8px at 61% 20%, rgba(234,179,8,0.5), transparent 100%),
+      radial-gradient(1.2px 1.2px at 73% 64%, rgba(255,255,255,0.8), transparent 100%),
+      radial-gradient(1.8px 1.8px at 86% 14%, rgba(234,179,8,0.55), transparent 100%),
+      radial-gradient(1.2px 1.2px at 93% 46%, rgba(255,255,255,0.85), transparent 100%),
+      radial-gradient(1.8px 1.8px at 15% 76%, rgba(234,179,8,0.5), transparent 100%),
+      radial-gradient(1.2px 1.2px at 41% 86%, rgba(255,255,255,0.8), transparent 100%),
+      radial-gradient(1.8px 1.8px at 57% 94%, rgba(234,179,8,0.5), transparent 100%),
+      radial-gradient(1.2px 1.2px at 79% 90%, rgba(255,255,255,0.8), transparent 100%),
+      radial-gradient(2.2px 2.2px at 27% 24%, rgba(234,179,8,0.4), transparent 100%),
+      radial-gradient(2.2px 2.2px at 68% 40%, rgba(234,179,8,0.4), transparent 100%);
   }
-  /* 紫のグロー光源 */
+  /* 夕空のような淡いグロー光源 */
   body::after {
     content: '';
     position: absolute;
@@ -111,18 +110,16 @@
     z-index: 0;
     pointer-events: none;
     background:
-      radial-gradient(360px 300px at 15% -4%, rgba(168,85,247,0.30), transparent 70%),
-      radial-gradient(300px 280px at 95% 14%, rgba(99,102,241,0.18), transparent 70%),
-      radial-gradient(280px 260px at 10% 78%, rgba(192,132,252,0.10), transparent 70%);
+      radial-gradient(380px 320px at 15% -4%, rgba(58,123,200,0.18), transparent 70%),
+      radial-gradient(320px 280px at 95% 10%, rgba(244,194,198,0.30), transparent 70%),
+      radial-gradient(300px 260px at 10% 80%, rgba(234,179,8,0.10), transparent 70%);
   }
 
-  /* ── ヘッダー ── */
+  /* ── ヘッダー（シンデレラ城の屋根を思わせる青とゴールドの縁取り） ── */
   #app-header {
-    background: linear-gradient(135deg, rgba(168,85,247,0.22) 0%, rgba(124,58,237,0.10) 100%);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    color: var(--text);
+    background: linear-gradient(135deg, #3a7bc8 0%, #1f4e80 100%);
+    border-bottom: 3px solid var(--accent);
+    color: #fff;
     padding: calc(12px + env(safe-area-inset-top, 0px)) 18px 12px;
     flex-shrink: 0;
     display: flex;
@@ -130,13 +127,14 @@
     gap: 3px;
     position: relative;
     z-index: 2;
+    box-shadow: var(--shadow-md);
   }
 
   .header-eyebrow {
     font-size: 0.6rem;
     letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: var(--text-sub);
+    color: rgba(255,255,255,0.75);
     font-weight: 700;
   }
 
@@ -144,6 +142,7 @@
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 0.04em;
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -166,9 +165,9 @@
     border-radius: 50%;
     font-size: 0.95rem;
     flex-shrink: 0;
-    background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.3), transparent 60%), rgba(168,85,247,0.18);
-    box-shadow: 0 0 14px rgba(168,85,247,0.55), inset 0 0 6px rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.5), transparent 60%), rgba(255,255,255,0.14);
+    box-shadow: 0 0 14px rgba(234,179,8,0.7), inset 0 0 6px rgba(255,255,255,0.3);
+    border: 1px solid rgba(255,255,255,0.4);
   }
 
   .streak-chip {
@@ -178,12 +177,12 @@
     font-size: 0.85rem;
     font-weight: 800;
     letter-spacing: 0;
-    background: rgba(251,191,36,0.16);
-    border: 1px solid rgba(251,191,36,0.4);
-    color: var(--accent);
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(234,179,8,0.6);
+    color: var(--accent-text);
     padding: 3px 10px 3px 8px;
     border-radius: 999px;
-    box-shadow: 0 0 12px rgba(251,191,36,0.3);
+    box-shadow: 0 0 12px rgba(234,179,8,0.35);
     flex-shrink: 0;
   }
 
@@ -207,7 +206,7 @@
     padding: 16px;
     margin-bottom: 14px;
     box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(255,255,255,0.07);
+    border: 1px solid var(--border);
   }
 
   .card-title {
@@ -262,7 +261,7 @@
   .form-row input:focus {
     border-color: var(--primary);
     background-color: var(--surface-2);
-    box-shadow: 0 0 0 3px rgba(168,85,247,0.18);
+    box-shadow: 0 0 0 3px rgba(47,111,176,0.18);
   }
 
   .form-row input.invalid {
@@ -279,7 +278,7 @@
     font-size: 0.93rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(147,51,234,0.35);
+    box-shadow: 0 4px 20px rgba(31,78,128,0.30);
     transition: filter 0.16s, transform 0.1s, box-shadow 0.16s;
   }
   .btn:active { filter: brightness(0.88); transform: scale(0.97); box-shadow: none; }
@@ -399,7 +398,7 @@
     border-radius: 10px;
     padding: 12px 10px 12px 14px;
     cursor: pointer;
-    box-shadow: 0 0 14px rgba(168,85,247,0.15);
+    box-shadow: 0 0 14px rgba(47,111,176,0.15);
     transition: transform 0.1s, background 0.12s;
   }
   .slot-block:active { transform: scale(0.98); }
@@ -468,7 +467,7 @@
     font-size: 1.6rem;
     font-weight: 800;
     color: var(--primary-soft);
-    text-shadow: 0 0 18px rgba(168,85,247,0.5);
+    text-shadow: 0 0 18px rgba(47,111,176,0.35);
   }
 
   .result-box .lbl {
@@ -501,9 +500,9 @@
   .badge-cell:active { transform: scale(0.92); }
 
   .badge-cell.earned {
-    background: linear-gradient(160deg, rgba(168,85,247,0.28), rgba(192,132,252,0.10));
-    border-color: var(--primary);
-    box-shadow: 0 0 14px rgba(168,85,247,0.4);
+    background: linear-gradient(160deg, rgba(234,179,8,0.28), rgba(255,215,110,0.12));
+    border-color: var(--accent);
+    box-shadow: 0 0 14px rgba(234,179,8,0.45);
   }
 
   .badge-cell.locked {
@@ -563,7 +562,7 @@
     width: 12px;
     height: 12px;
     border-radius: 3px;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(0,0,0,0.12);
   }
 
   .cal-toggle-btn {
@@ -632,7 +631,7 @@
   .cal-cell.bucket-1 { background: var(--seq-100); border-color: var(--seq-100); color: var(--text); }
   .cal-cell.bucket-2 { background: var(--seq-250); border-color: var(--seq-250); color: var(--text); }
   .cal-cell.bucket-3 { background: var(--seq-400); border-color: var(--seq-400); color: var(--text); font-weight: 800; }
-  .cal-cell.bucket-4 { background: var(--seq-600); border-color: var(--seq-600); color: var(--ink-dark); box-shadow: 0 0 12px rgba(192,132,252,0.5); }
+  .cal-cell.bucket-4 { background: var(--seq-600); border-color: var(--seq-600); color: #ffffff; box-shadow: 0 0 12px rgba(24,79,149,0.4); }
 
   .cal-day {
     font-size: 0.7rem;
@@ -730,13 +729,13 @@
   /* ── ボトムナビ ── */
   #bottom-nav {
     display: flex;
-    background: rgba(21,21,31,0.88);
+    background: rgba(255,253,248,0.92);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid var(--border);
     flex-shrink: 0;
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    box-shadow: 0 -8px 24px rgba(0,0,0,0.35);
+    box-shadow: 0 -8px 24px rgba(31,78,128,0.10);
     position: relative;
     z-index: 1;
   }
@@ -765,7 +764,7 @@
   .nav-btn.active {
     color: var(--tab-active);
     background: var(--slot-filled);
-    box-shadow: 0 0 16px rgba(168,85,247,0.35), inset 0 0 0 1px rgba(168,85,247,0.3);
+    box-shadow: 0 0 16px rgba(47,111,176,0.25), inset 0 0 0 1px rgba(47,111,176,0.3);
   }
 
   .nav-icon {
@@ -790,7 +789,7 @@
     bottom: 90px;
     transform: translate(-50%, 10px);
     background: var(--surface-2);
-    border: 1px solid rgba(255,255,255,0.12);
+    border: 1px solid var(--border);
     color: var(--text);
     padding: 10px 18px;
     border-radius: 10px;
@@ -816,7 +815,7 @@
 <div id="app-header">
   <div class="header-eyebrow">STUDY · PLANNER</div>
   <div class="header-title">
-    <span class="header-title-main"><span class="header-badge">📚</span>勉強計画アプリ</span>
+    <span class="header-title-main"><span class="header-badge">🏰</span>勉強計画アプリ</span>
     <span class="streak-chip" id="streak-chip" style="display:none">🔥<span id="streak-count">0</span></span>
   </div>
 </div>
@@ -955,7 +954,7 @@
     <span class="nav-icon">📝</span>勉強計画
   </button>
   <button class="nav-btn" onclick="switchTab('result', this)">
-    <span class="nav-icon">📊</span>勉強結果
+    <span class="nav-icon">🏆</span>勉強結果
   </button>
 </div>
 
