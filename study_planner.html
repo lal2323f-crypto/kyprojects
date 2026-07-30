@@ -128,7 +128,36 @@
     position: relative;
     z-index: 2;
     box-shadow: var(--shadow-md);
+    overflow: hidden;
   }
+
+  /* おとぎ話のお城のシルエット（実在の城の意匠は模倣せず、汎用的な塔の並びとして表現） */
+  .castle-silhouette {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 46px;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.25; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+
+  .sparkle {
+    position: absolute;
+    font-size: 0.7rem;
+    pointer-events: none;
+    z-index: -1;
+    animation: twinkle 2.6s ease-in-out infinite;
+  }
+  .sparkle-1 { top: 14px; right: 64px; animation-delay: 0s; }
+  .sparkle-2 { top: 38px; right: 30%; font-size: 0.55rem; animation-delay: 0.9s; }
+  .sparkle-3 { top: 8px; left: 44%; font-size: 0.6rem; animation-delay: 1.7s; }
 
   .header-eyebrow {
     font-size: 0.6rem;
@@ -813,7 +842,25 @@
 <body>
 
 <div id="app-header">
-  <div class="header-eyebrow">STUDY · PLANNER</div>
+  <svg class="castle-silhouette" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true">
+    <rect x="0" y="72" width="400" height="28" fill="rgba(255,255,255,0.22)"/>
+    <rect x="18" y="55" width="20" height="45" fill="rgba(255,255,255,0.22)"/>
+    <polygon points="13,55 43,55 28,33" fill="rgba(255,255,255,0.22)"/>
+    <rect x="88" y="38" width="26" height="62" fill="rgba(255,255,255,0.22)"/>
+    <polygon points="82,38 120,38 101,12" fill="rgba(255,255,255,0.22)"/>
+    <rect x="178" y="20" width="32" height="80" fill="rgba(255,255,255,0.28)"/>
+    <polygon points="172,20 218,20 195,-8" fill="rgba(255,255,255,0.28)"/>
+    <rect x="192" y="-16" width="4" height="12" fill="rgba(255,255,255,0.28)"/>
+    <polygon points="196,-16 208,-11 196,-6" fill="rgba(255,255,255,0.28)"/>
+    <rect x="286" y="38" width="26" height="62" fill="rgba(255,255,255,0.22)"/>
+    <polygon points="280,38 318,38 299,12" fill="rgba(255,255,255,0.22)"/>
+    <rect x="362" y="55" width="20" height="45" fill="rgba(255,255,255,0.22)"/>
+    <polygon points="357,55 387,55 372,33" fill="rgba(255,255,255,0.22)"/>
+  </svg>
+  <span class="sparkle sparkle-1" aria-hidden="true">✨</span>
+  <span class="sparkle sparkle-2" aria-hidden="true">✨</span>
+  <span class="sparkle sparkle-3" aria-hidden="true">⭐</span>
+  <div class="header-eyebrow">✨ STUDY · PLANNER ✨</div>
   <div class="header-title">
     <span class="header-title-main"><span class="header-badge">🏰</span>勉強計画アプリ</span>
     <span class="streak-chip" id="streak-chip" style="display:none">🔥<span id="streak-count">0</span></span>
