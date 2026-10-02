@@ -473,6 +473,8 @@ shion:['……今、空見てる?','夢に、{me}が出てきた','なんでも�
 /* 友達グループ(人間関係) */
 const GROUPS=[['hayate','hikaru','leo'],['makoto','yu','natsuki'],['haru','daiki','rio'],['kanade','shiori','mizuki'],['sota','kaede','koharu'],['saku','shion'],['reika','yume','rio'],['koharu','hiyori']];
 CHARS.forEach(c=>{Object.assign(c,LINES[c.id]);c.lv=LV[c.id];c.diff=DIFF[c.lv];c.story=STORY[c.id];c.msg=MSG[c.id]});
+/* 並び順:男子→女子 */
+CHARS.sort((a,b)=>(a.g==='m'?0:1)-(b.g==='m'?0:1));
 
 
 const N={
