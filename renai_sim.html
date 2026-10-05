@@ -679,14 +679,47 @@ function plan(){
    ${A("train('gym')",'ジムで鍛える','体力アップ')}
    ${A("train('beauty')",'美容室と服選び',`ルックスアップ(${yen(5000)})`,S.money<5000)}
    ${A("train('play')",'友達と遊ぶ',`話術アップ(${yen(2000)})`,S.money<2000)}
-   ${A("train('baito')",'バイトする','お金を稼ぐ')}
+   ${A("train('baito')",'バイトする',(S.baitoStreak||0)>=2?'疲れ気味。次は失敗しそう……':'お金を稼ぐ(何が起きるかはお楽しみ)')}
   </div>
   ${lover?`<div class="grp">ほかの人と会う <span class="hint">バレたら修羅場</span></div><div class="acts">${A('cheatMenu()','こっそり他の人と会う・告白する',sides().length?`${mata()}中。バレる危険:${susLabel()}`:'浮気・二股。バレたら修羅場')}</div>`:''}`,true);
+}
+/* ---------- バイト(人生ゲーム風) ---------- */
+const BAITO_OK=[ /* [重み, 出来事, 金額] */
+ [30,'いつも通り、まじめにシフトをこなした。',()=>rnd(7,10)*1000],
+ [8,'お皿を割ってしまい、減給された……。',()=>1000],
+ [6,'寝坊して遅刻。店長にこってり絞られた。',()=>3000],
+ [6,'お客さんが少なくて、早上がりになった。',()=>4000],
+ [6,'レジの計算が合わず、少しだけ弁償した。',()=>2000],
+ [8,'急な欠員の穴埋めで、店長にとても感謝された。',()=>12000],
+ [7,'繁忙期で大忙し!残業代がたっぷり出た。',()=>14000],
+ [5,'常連さんに気に入られて、こっそりお小遣いをもらった。',()=>15000],
+ [5,'仕事ぶりが認められて、バイトリーダーに昇格した!',()=>10000],
+ [3,'新メニューのアイデアが採用されて、特別ボーナス!',()=>20000],
+ [2,'店の福引きで特賞が当たった!',()=>30000]
+];
+const BAITO_NG=[ /* 3回連続以降 */
+ [4,'モチベーションがなくなり、ミスしまくり……。',5000],
+ [3,'疲れ果てて、お皿を大量に割ってしまった。弁償だ……。',8000],
+ [3,'寝不足で大遅刻。罰金を取られた……。',3000],
+ [3,'ぼーっとして注文ミスを連発。お店に迷惑をかけた……。',4000]
+];
+function wpick(a){let t=a.reduce((x,e)=>x+e[0],0),r=Math.random()*t;for(const e of a){if((r-=e[0])<0)return e}return a[a.length-1]}
+function baito(){
+  S.baitoStreak=(S.baitoStreak||0)+1;S.didBaito=true;
+  S.stats['体力']=clamp(S.stats['体力']+1,0,100);
+  if(S.baitoStreak>=3){
+    const [,t,amt]=wpick(BAITO_NG);const loss=Math.min(amt,S.money);S.money-=loss;rc('earned',-loss);
+    log(`バイト${S.baitoStreak}連続:${t.replace(/。.*$/,'')}(-${yen(loss)})`);
+    return `<p>${t}</p>${loss?`<p class="big hand" style="color:var(--bad)">-${yen(loss)}</p>`:'<p class="big hand" style="color:var(--bad)">お給料なし</p>'}${loss<amt?(loss?'<p>所持金がすっからかんになった……。</p>':'<p>払えるお金がなかったので、今回はお給料なしで許してもらえた。</p>'):''}<p class="hintbox">バイト${S.baitoStreak}回連続。働きすぎてやる気が出ない……。一度ほかのことをして気分を変えよう。</p>`;
+  }
+  const [,t,f]=wpick(BAITO_OK);const earn=f();S.money+=earn;rc('earned',earn);
+  log(`バイト:${t.replace(/。.*$/,'')}(+${yen(earn)})`);
+  return `<p>${t}</p><p class="big hand">${yen(earn)} 稼いだ!</p>${S.baitoStreak===2?'<p class="hintbox">バイト2回連続。次も続けると、疲れてミスしそう……。</p>':''}`;
 }
 function train(k){
   const c=ch(S.target),st=S.st[c.id];const T={study:['図書館で勉強','学力',rnd(4,7),0,NN('study')],gym:['ジムで鍛える','体力',rnd(4,7),0,NN('gym')],beauty:['美容室と服選び','ルックス',rnd(5,8),5000,NN('beauty')],play:['友達と遊ぶ','話術',rnd(4,7),2000,NN('play')],baito:['バイトする',null,0,0,'']}[k];
   let html;
-  if(k==='baito'){const earn=rnd(8,12)*1000;S.money+=earn;rc('earned',earn);S.stats['体力']=clamp(S.stats['体力']+1,0,100);html=`<p>${NN('baito')}</p><p class="big hand">${yen(earn)} 稼いだ!</p>`;log(`バイトで${yen(earn)}稼いだ。`)}
+  if(k==='baito'){html=baito()}
   else{S.money-=T[3];S.stats[T[1]]=clamp(S.stats[T[1]]+T[2],0,100);html=`<p>${T[4]}</p><div style="max-width:420px">${sbar(T[1],S.stats[T[1]],T[2])}</div>`;log(`${T[0]}(${T[1]}+${T[2]})`)}
   const loss=S.partner===c.id?2:1;st.aff=Math.max(0,st.aff-loss);S.skipped=true;
   html+=`<p style="color:var(--ink-soft)">${fmt(NN(S.partner===c.id?'missLover':'miss'),c)}</p>`;
@@ -1033,6 +1066,7 @@ function act(i){
   <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
 function next(){
+  if(!S.didBaito)S.baitoStreak=0;S.didBaito=false;
   rc('turns');if(S.partner)rc('loverTurns');
   S.half++;if(S.half>1){S.half=0;S.month++;if(S.month>11){S.month=0;S.grade++;}}
   CHARS.forEach(c=>{if(S.st[c.id].awk>0)S.st[c.id].awk--});
