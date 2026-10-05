@@ -135,6 +135,17 @@ details summary{cursor:pointer;font-weight:700}
 .stamp{position:absolute;top:-14px;right:18px;background:var(--marker);color:#fff;padding:2px 12px;transform:rotate(3deg);font-size:1rem}
 .big{font-size:2rem;margin:6px 0 10px;line-height:1.3}
 @media (prefers-reduced-motion:no-preference){ .page.enter{animation:pop .25s ease-out} @keyframes pop{from{transform:translateY(6px);opacity:.3}to{transform:none;opacity:1}} }
+/* ---------- 卒業の振り返り ---------- */
+.recap{margin-top:18px;border-top:2px dashed var(--line);padding-top:16px}
+.recap h3{font-size:1.4rem;margin:0 0 10px}
+.badge{display:inline-block;background:var(--marker);color:#fff;padding:4px 16px;border-radius:999px;font-size:1.2rem;transform:rotate(-2deg);margin:4px 0 6px}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}
+.rcell{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
+.rcell .rk{font-size:.8rem;color:var(--ink-soft)}
+.rcell .rv{font-size:1.5rem;font-weight:700;line-height:1.3}
+.rcell .rs{font-size:.75rem;color:var(--ink-soft)}
+.rlovers{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}
+.rlovers span{display:flex;align-items:center;gap:6px;font-size:.9rem}
 /* ---------- タイトル画面 ---------- */
 .title-screen{text-align:center;padding:36px 22px 32px}
 .title-screen .tt-sub{color:var(--ink-soft);margin:0 0 4px;font-size:1rem}
@@ -552,6 +563,9 @@ function sbar(k,v,d){return `<div class="sbar"><span class="sk">${k}</span><div 
 function status(id){const st=S.st[id];if(S.partner===id)return'恋人';if(taken(id))return'ライバルと交際中';let b=st.aff<20?'顔見知り':st.aff<45?'友達':st.aff<70?'仲良し':'いい感じ';if(st.awk>0)b='気まずい';return st.ex?'元恋人・'+b:b}
 function ava(c,sm){return `<img class="ava${sm?' sm':''}" src="${IMG[c.id]}" alt="${esc(c.name)}の顔">`}
 function log(t){S.log.unshift(`[${gradeLabel()} ${MONTHS[S.month]}] ${t}`);S.log=S.log.slice(0,80)}
+/* 振り返り用の記録 */
+function rc(k,n){if(!S.rec)S.rec={};S.rec[k]=(S.rec[k]||0)+(n===undefined?1:n)}
+function addLover(id){if(!S.rec)S.rec={};const l=S.rec.lovers=S.rec.lovers||[];if(!l.includes(id))l.push(id)}
 function sbonus(k){return k?clamp(Math.round((S.stats[k]-35)/15),-2,4):0}
 
 /* ---------- 確認ダイアログ(ページ内) ---------- */
@@ -585,7 +599,7 @@ function side(){
     <div class="row">${lover?`<button class="btn small ghost" onclick="breakUp()">別れを切り出す</button>`:`<button class="btn small" onclick="confess()">告白する</button>`}<button class="btn small ghost" onclick="toPick()">相手を変える</button></div>
     ${!lover&&!can?`<p style="font-size:.8rem;color:var(--ink-soft);margin:8px 0 0">${taken(t.id)?`今は${esc(rv(t).name)}と付き合っている。告白しても望みは薄い。`:st.awk>0?'今は気まずい。告白しても成功しにくそう。':'今告白しても成功は難しそう。好感度40を超えてからが勝負。'}</p>`:''}</div>`;}
   h+=`<div class="note"><h3 class="hand">みんなとの関係</h3><ul class="plist">${pool().map(c=>`<li class="${S.target===c.id?'cur':''}">${ava(c,1)}<div style="flex:1;min-width:0">${esc(c.first)} <span style="font-size:.75rem;color:var(--ink-soft)">${status(c.id)}</span>${meter(S.st[c.id].aff)}</div></li>`).join('')}</ul></div>`;
-  h+=`<div class="note"><details><summary>これまでの出来事</summary><ol class="log">${S.log.map(l=>`<li>${esc(l)}</li>`).join('')||'<li>まだ何も起きていない</li>'}</ol></details><div class="row"><button class="btn small ghost" onclick="resetGame()">はじめからやり直す</button></div></div>`;
+  h+=`<div class="note"><details><summary>これまでの出来事</summary><ol class="log">${S.log.map(l=>`<li>${esc(l)}</li>`).join('')||'<li>まだ何も起きていない</li>'}</ol></details><div class="row">${S.gradRec?`<button class="btn small ghost" onclick="showRecap()">卒業の振り返り</button>`:''}<button class="btn small ghost" onclick="resetGame()">はじめからやり直す</button></div></div>`;
   return h;
 }
 
@@ -604,7 +618,7 @@ function autoPref(){const g=document.querySelector('input[name=gd]:checked').val
 function start(){
   const name=document.getElementById('nm').value.trim();
   if(!name){document.getElementById('err').textContent='名前を入力してください。';return}
-  S={name,gender:document.querySelector('input[name=gd]:checked').value,pref:document.querySelector('input[name=pf]:checked').value,grade:+document.getElementById('gr').value,month:0,half:0,target:null,partner:null,st:{},rv:{},log:[],seen:{},gradDone:false,last:null,tturns:0,skipped:false,money:10000,stats:{},sus:0,pc:null,story:{},hints:{}};
+  S={name,gender:document.querySelector('input[name=gd]:checked').value,pref:document.querySelector('input[name=pf]:checked').value,grade:+document.getElementById('gr').value,month:0,half:0,target:null,partner:null,st:{},rv:{},log:[],seen:{},gradDone:false,last:null,tturns:0,skipped:false,money:10000,stats:{},sus:0,pc:null,story:{},hints:{},rec:{startGrade:+document.getElementById('gr').value}};
   STATS.forEach(k=>S.stats[k]=rnd(15,30));
   CHARS.forEach(c=>S.st[c.id]={aff:rnd(8,18),awk:0,ex:false});
   log(`${S.name}の大学生活が始まった。`);save();toPick();
@@ -617,7 +631,7 @@ function toPick(){
 function choose(id){
   if(S.partner&&S.partner!==id){
     return ask(`今は${esc(ch(S.partner).first)}と付き合っています。別れて${esc(ch(id).first)}を狙いますか?`,'別れて狙う',()=>{
-      const p=ch(S.partner);S.st[p.id].ex=true;S.st[p.id].aff=Math.max(0,S.st[p.id].aff-25);S.st[p.id].awk=3;log(`${p.first}と別れた。`);ripple(p,-5,`${p.first}を振った`);S.partner=null;setTarget(id)});
+      const p=ch(S.partner);rc('breakup');S.st[p.id].ex=true;S.st[p.id].aff=Math.max(0,S.st[p.id].aff-25);S.st[p.id].awk=3;log(`${p.first}と別れた。`);ripple(p,-5,`${p.first}を振った`);S.partner=null;setTarget(id)});
   }
   setTarget(id);
 }
@@ -653,7 +667,7 @@ function plan(){
 function train(k){
   const c=ch(S.target),st=S.st[c.id];const T={study:['図書館で勉強','学力',rnd(4,7),0,NN('study')],gym:['ジムで鍛える','体力',rnd(4,7),0,NN('gym')],beauty:['美容室と服選び','ルックス',rnd(5,8),5000,NN('beauty')],play:['友達と遊ぶ','話術',rnd(4,7),2000,NN('play')],baito:['バイトする',null,0,0,'']}[k];
   let html;
-  if(k==='baito'){const earn=rnd(8,12)*1000;S.money+=earn;S.stats['体力']=clamp(S.stats['体力']+1,0,100);html=`<p>${NN('baito')}</p><p class="big hand">${yen(earn)} 稼いだ!</p>`;log(`バイトで${yen(earn)}稼いだ。`)}
+  if(k==='baito'){const earn=rnd(8,12)*1000;S.money+=earn;rc('earned',earn);S.stats['体力']=clamp(S.stats['体力']+1,0,100);html=`<p>${NN('baito')}</p><p class="big hand">${yen(earn)} 稼いだ!</p>`;log(`バイトで${yen(earn)}稼いだ。`)}
   else{S.money-=T[3];S.stats[T[1]]=clamp(S.stats[T[1]]+T[2],0,100);html=`<p>${T[4]}</p><div style="max-width:420px">${sbar(T[1],S.stats[T[1]],T[2])}</div>`;log(`${T[0]}(${T[1]}+${T[2]})`)}
   const loss=S.partner===c.id?2:1;st.aff=Math.max(0,st.aff-loss);S.skipped=true;
   html+=`<p style="color:var(--ink-soft)">${fmt(NN(S.partner===c.id?'missLover':'miss'),c)}</p>`;
@@ -666,7 +680,7 @@ function giftMenu(){
   <div class="row"><button class="btn ghost" onclick="plan()">やめる</button></div>`,true);
 }
 function give(id){
-  const c=ch(S.target),st=S.st[c.id],it=ITEMS.find(i=>i.id===id),r=rv(c);S.money-=it.price;
+  const c=ch(S.target),st=S.st[c.id],it=ITEMS.find(i=>i.id===id),r=rv(c);S.money-=it.price;rc('gifts');
   let d,kind,msg;
   if(it.price>=6000&&st.aff<30&&S.partner!==c.id){d=-6;kind='bad';msg=NN('giftHeavy')}
   else if(it.id===c.fav){d=14+Math.round(it.price/3000);kind='good';msg=NN('giftFav')}
@@ -686,9 +700,9 @@ function dateMenu(){
 function invite(id){
   const c=ch(S.target),st=S.st[c.id],s=SPOTS.find(x=>x.id===id),r=rv(c),lover=S.partner===c.id;
   let p=lover?1:clamp((st.aff-20)/40+(S.stats['ルックス']-40)/200-(st.awk>0?.3:0),.1,.95);
-  if(Math.random()>p){st.aff=Math.max(0,st.aff-3);log(`${c.first}をデートに誘ったが断られた。`);save();
+  if(Math.random()>p){rc('dateNg');st.aff=Math.max(0,st.aff-3);log(`${c.first}をデートに誘ったが断られた。`);save();
     return show(`<h2 class="hand">デートのお誘い</h2><p>${esc(c.first)}を${s.name}に誘ってみた。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,'refuse'),c)}</div></div><p>${fmt(NN('refuseAfter'),c)}</p><div style="max-width:420px">${meter(st.aff,1,-3)}</div><div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true)}
-  S.money-=s.price;
+  S.money-=s.price;rc('dates');
   let d=5+(s.k===c.spot?9:0)+sbonus('話術')+rnd(-3,3)+(lover?3:0);
   if(s.price>=8000&&st.aff<50&&!lover)d-=5;
   const kind=d>=10?'good':d>=0?'meh':'bad';d=gain(c,d);const b=st.aff;st.aff=clamp(st.aff+d,0,100);
@@ -747,7 +761,7 @@ function cheatAct(i){
   d=gain(o,d);const b=so.aff;so.aff=clamp(so.aff+d,0,100);let kind=d>=8?'good':d>=0?'meh':'bad';let quote=L(o,kind);
   if(!so.knows&&Math.random()<.2){so.knows=true;so.aff=Math.max(0,so.aff-10);kind='bad';quote=NN('foundOut');extra=fmt3('{o}は、あなたに恋人がいることを知ってしまった。',p,o)}
   S.sus=clamp(S.sus+rnd(15,25)+(x.tag==='bold'?8:0)-(x.tag==='quiet'?5:0)+(friendsOf(p.id).includes(o)?10:0),0,100);d=d;
-  sp.aff=Math.max(0,sp.aff-2);S.skipped=true;S.lastCheat=o.id;S.cheatedNow=true;S.tturns++;
+  sp.aff=Math.max(0,sp.aff-2);rc('cheat');S.skipped=true;S.lastCheat=o.id;S.cheatedNow=true;S.tturns++;
   log(`${p.first}に内緒で${o.first}と会った(${cur.title})。`);save();
   show(`<span class="stamp hand">浮気</span><h2 class="hand">${esc(cur.title)}</h2><p>あなたは「${fmt3(x.label,p,o)}」を選んだ。</p>
   <div class="speaker">${ava(o)}<div class="quote hand">${fmt(quote,o)}</div></div>${extra?`<p>${extra}</p>`:''}
@@ -768,11 +782,12 @@ function caught(){
   <div class="choices">${opts.map(([k,l],i)=>`<button class="choice" onclick="caughtAct('${k}')" ${i===0?'autofocus':''}>${l}</button>`).join('')}</div>`,true);
 }
 function caughtAct(k){
-  const p=ch(S.partner),o=ch(S.lastCheat),sp=S.st[p.id];let quote,res,broke=false;const rp=ripple(p,-6,'浮気がバレた');
+  const p=ch(S.partner),o=ch(S.lastCheat),sp=S.st[p.id];let quote,res,broke=false;rc('caught');const rp=ripple(p,-6,'浮気がバレた');
   if(k==='sorry'){sp.aff=Math.max(0,sp.aff-20);if(Math.random()<clamp(sp.aff/100+.25,.1,.9)){quote=NN('forgive');res='なんとか許してもらえた。でも、信頼を取り戻すには時間がかかりそうだ。';S.sus=0;sp.awk=2;log(`浮気がバレたが、${p.first}は許してくれた。`)}else{quote=NN('noForgive');res='許してはもらえなかった。';broke=true}}
   else if(k==='excuse'){if(Math.random()<.45){sp.aff=Math.max(0,sp.aff-5);S.sus=Math.max(0,S.sus-30);quote='「……そっか。ならいいんだけど」';res='なんとかごまかせた。……胸の奥に、罪悪感が残る。';log('浮気を言い訳でごまかした。')}else{sp.aff=Math.max(0,sp.aff-30);if(Math.random()<.6){quote=NN('noForgive');res='見え透いた言い訳は、火に油を注いだだけだった。';broke=true}else{quote='「……しばらく一人にして」';res=`${esc(p.first)}は黙り込んでしまった。関係はぎりぎりのところでつながっている。`;S.sus=20;sp.awk=3;log('浮気の言い訳が通じず、関係がぎくしゃくした。')}}}
   else if(k==='open'){sp.aff=Math.max(0,sp.aff-35);if(Math.random()<.8){quote=NN('noForgive');res='開き直った態度に、すべてが終わった。';broke=true}else{quote='「……信じられない。でも、嫌いになれない自分がもっと嫌」';res='かろうじて別れずに済んだが、関係は冷え切っている。';S.sus=25;sp.awk=3}}
   else{quote='「……そう。わかった」';res='自分から別れを切り出した。';broke=true}
+  if(broke)rc(k==='end'?'breakup':'dumped');
   if(broke)cheatBreak(p,k==='end'?`浮気がバレて、自分から${p.first}に別れを告げた。`:`浮気がバレて、${p.first}に振られた。`);
   save();
   show(`<span class="stamp hand">修羅場</span><h2 class="hand">${broke?'終わり':'話し合い'}</h2>
@@ -806,10 +821,10 @@ function pcReveal(q){
 }
 function pcForgive(){const p=ch(S.partner),sp=S.st[p.id];const q=NN('pcThanks');S.pc=null;sp.aff=clamp(sp.aff+8,0,100);log(`${p.first}の浮気を許した。`);save();
   show(`<h2 class="hand">許した</h2><div class="speaker">${ava(p)}<div class="quote hand">${fmt(q,p)}</div></div><p>傷は残るけれど、もう一度やり直すことにした。</p><div style="max-width:420px">${meter(sp.aff,1,8)}</div><div class="row"><button class="btn" onclick="plan()" autofocus>次へ</button></div>`,true)}
-function pcBreak(){const p=ch(S.partner),sp=S.st[p.id];S.partner=null;sp.ex=true;sp.awk=3;sp.aff=Math.max(0,sp.aff-20);S.pc=null;S.sus=0;log(`浮気した${p.first}と別れた。`);save();
+function pcBreak(){const p=ch(S.partner),sp=S.st[p.id];rc('breakup');S.partner=null;sp.ex=true;sp.awk=3;sp.aff=Math.max(0,sp.aff-20);S.pc=null;S.sus=0;log(`浮気した${p.first}と別れた。`);save();
   show(`<h2 class="hand">別れた</h2><p>${esc(p.first)}に別れを告げた。裏切られた痛みは、しばらく消えそうにない。</p><div class="row"><button class="btn" onclick="plan()" autofocus>${esc(p.first)}を狙い続ける</button><button class="btn ghost" onclick="toPick()">ほかの人を選ぶ</button></div>`,true)}
 function pcGuilt(){return pcReveal(NN('guilt'))}
-function pcLeave(){const p=ch(S.partner),sp=S.st[p.id];const q=NN('leave');const nm=S.pc.name;S.partner=null;sp.ex=true;sp.awk=3;sp.aff=Math.max(0,sp.aff-15);S.pc=null;S.sus=0;log(`${p.first}が${nm}のもとへ去っていった。`);save();
+function pcLeave(){const p=ch(S.partner),sp=S.st[p.id];rc('dumped');rc('betrayed');const q=NN('leave');const nm=S.pc.name;S.partner=null;sp.ex=true;sp.awk=3;sp.aff=Math.max(0,sp.aff-15);S.pc=null;S.sus=0;log(`${p.first}が${nm}のもとへ去っていった。`);save();
   show(`<span class="stamp hand">事件</span><h2 class="hand">去っていった</h2><div class="speaker">${ava(p)}<div class="quote hand">${fmt(q,p).replace('{x}',esc(nm))}</div></div><p class="big hand">${esc(p.first)}にフラれた……</p><p>気づかないふりをしている間に、${esc(p.first)}の心は${esc(nm)}へ移っていた。</p><div class="row"><button class="btn" onclick="plan()" autofocus>${esc(p.first)}を狙い続ける</button><button class="btn ghost" onclick="toPick()">ほかの人を選ぶ</button></div>`,true)}
 
 /* ---------- 人間関係 ---------- */
@@ -943,6 +958,7 @@ function act(i){
   <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
 function next(){
+  rc('turns');if(S.partner)rc('loverTurns');
   S.half++;if(S.half>1){S.half=0;S.month++;if(S.month>11){S.month=0;S.grade++;}}
   CHARS.forEach(c=>{if(S.st[c.id].awk>0)S.st[c.id].awk--});
   const skipped=S.skipped;S.skipped=false;S.hintUsed=false;
@@ -984,6 +1000,7 @@ function next(){
 function rivalAppear(){const c=ch(S.target),r=rv(c);
   show(`<span class="stamp hand">ライバル出現</span><h2 class="hand">ライバル出現!</h2><p>${esc(r.name)}も、${esc(c.first)}のことが気になっているらしい。</p><div style="max-width:420px">${rmeter(r)}</div><p>接近度が100になると、先に${esc(c.first)}と付き合われてしまう。${esc(c.first)}と過ごして好反応を引き出せば引き離せるが、自分磨きの日は差を詰められる。</p><div class="row"><button class="btn" onclick="plan()" autofocus>次へ</button></div>`,true)}
 function rivalWon(c,r,wasLover){
+  rc('stolen');if(wasLover)rc('dumped');
   show(`<span class="stamp hand">事件</span><h2 class="hand">${wasLover?'奪われた……':'先を越された……'}</h2><p>${wasLover?`${esc(c.first)}から「ごめん、ほかに好きな人ができた」と告げられた。相手は${esc(r.name)}だった。`:`${esc(c.first)}が${esc(r.name)}と付き合い始めたらしい。キャンパス中の噂になっている。`}</p>
   <p>しばらくは告白もデートもできない。でも、二人が別れる可能性もある。待つか、別の人に目を向けるか。</p>
   <div class="row"><button class="btn" onclick="plan()" autofocus>${esc(c.first)}を待つ</button><button class="btn ghost" onclick="toPick()">相手を変える</button></div>`,true)}
@@ -998,7 +1015,7 @@ function doConfess(){
   let p=(st.aff-45)/50;if(st.ex)p-=.2;p+=c.diff||0;p+=(S.stats[c.want]-40)/150;if(st.awk>0)p-=.15;if((S.story[c.id]||0)>=4)p+=.1;
   if(wasTaken)p=p*.3;else if(r)p-=r.prog/400;
   p=clamp(p,.03,.92);
-  const ok=Math.random()<p;const affAt=st.aff;const tier=affAt<45?'noLow':affAt<70?'noMid':'noHigh';
+  const ok=Math.random()<p;rc('conf');if(ok){rc('confOk');addLover(c.id)}else rc('confNg');const affAt=st.aff;const tier=affAt<45?'noLow':affAt<70?'noMid':'noHigh';
   if(ok){S.partner=c.id;st.aff=Math.min(100,st.aff+10);st.ex=false;st.awk=0;
     if(wasTaken){log(`${c.first}は${r.name}と別れ、自分を選んでくれた!`);S.rv[c.id]=null}else if(r)r.prog=15;
     log(`${c.first}に告白して、付き合うことになった!`)}
@@ -1017,7 +1034,7 @@ function confessed(){
   <div class="choices"><button class="choice" onclick="answer(true)" autofocus>「うん、よろしくお願いします」</button><button class="choice" onclick="answer(false)">「ごめん、今は付き合えない」</button></div>`,true);
 }
 function answer(yes){
-  const c=ch(S.target),st=S.st[c.id],r=rv(c);
+  const c=ch(S.target),st=S.st[c.id],r=rv(c);rc('confessedBy');if(yes)addLover(c.id);
   if(yes){S.partner=c.id;st.aff=Math.min(100,st.aff+8);st.ex=false;if(r)r.prog=15;log(`${c.first}から告白され、付き合うことになった!`)}
   let rp='';if(!yes){st.aff=Math.max(0,st.aff-12);st.awk=2;log(`${c.first}からの告白を断った。`);rp=ripple(c,-5,`${c.first}の告白を断った`)}
   save();
@@ -1025,7 +1042,7 @@ function answer(yes){
   <div class="row"><button class="btn" onclick="plan()" autofocus>次へ</button></div>`,true);
 }
 function dumped(){
-  const c=ch(S.target),st=S.st[c.id];S.pc=null;S.sus=0;
+  const c=ch(S.target),st=S.st[c.id];rc('dumped');S.pc=null;S.sus=0;
   S.partner=null;st.ex=true;st.aff=Math.max(0,st.aff-10);st.awk=3;log(`${c.first}に別れを告げられた。`);save();
   show(`<span class="stamp hand">事件</span><h2 class="hand">話があるの</h2><p>${esc(c.first)}から「ちょっと話せる?」と連絡があった。いつもと様子が違う。</p>
   <div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,'bye'),c)}</div></div>
@@ -1036,18 +1053,85 @@ function breakUp(){
   const c=ch(S.partner);ask(`${esc(c.first)}と別れますか?`,'別れる',doBreakUp);
 }
 function doBreakUp(){
-  const c=ch(S.partner);
+  const c=ch(S.partner);rc('breakup');
   S.st[c.id].ex=true;S.st[c.id].aff=Math.max(0,S.st[c.id].aff-25);S.st[c.id].awk=3;S.partner=null;log(`自分から${c.first}に別れを告げた。`);const rp=ripple(c,-5,`${c.first}を振った`);save();
   show(`<h2 class="hand">別れ</h2><p>${esc(c.first)}に別れを告げた。${esc(c.first)}は、しばらく何も言わなかった。</p>${rp}
   <div class="row"><button class="btn" onclick="toPick()" autofocus>次の相手を選ぶ</button><button class="btn ghost" onclick="plan()">このまま続ける</button></div>`,true);
 }
 function graduation(){
   const p=S.partner?ch(S.partner):null;
+  S.gradRec=recapData();save();
   show(`<span class="stamp hand">卒業</span><h2 class="hand">卒業式</h2>
   <p>4年間の大学生活が終わった。桜の舞うキャンパスで、${esc(S.name)}は角帽を空に投げた。</p>
   ${p?`<div class="speaker">${ava(p)}<div class="quote hand">「卒業しても、ずっと一緒にいようね」</div></div><p class="big hand">${esc(p.first)}と一緒に卒業!</p>`:`<p class="big hand">恋人はいないまま卒業……</p><p>でも、出会いはまだまだこれから。</p>`}
+  ${recapHtml(S.gradRec)}
   <p>ここからは卒業後の日々が続きます。</p>
   <div class="row"><button class="btn" onclick="plan()" autofocus>卒業後も続ける</button><button class="btn ghost" onclick="resetGame()">はじめからやり直す</button></div>`,true);
+}
+/* ---------- 大学生活の振り返り ---------- */
+function recapData(){
+  const r=S.rec||{},n=k=>r[k]||0;
+  const p=S.partner?ch(S.partner):null;
+  const best=pool().slice().sort((a,b)=>S.st[b.id].aff-S.st[a.id].aff)[0];
+  const storyAll=CHARS.reduce((t,c)=>t+(S.story[c.id]||0),0);
+  return {partner:p?p.id:null,paff:p?Math.round(S.st[p.id].aff):0,pstory:p?(S.story[p.id]||0):0,
+    lovers:(r.lovers||[]).slice(),turns:n('turns'),loverTurns:n('loverTurns'),
+    conf:n('conf'),confOk:n('confOk'),confNg:n('confNg'),confessedBy:n('confessedBy'),
+    dumped:n('dumped'),breakup:n('breakup'),cheat:n('cheat'),caught:n('caught'),betrayed:n('betrayed'),stolen:n('stolen'),
+    dates:n('dates'),dateNg:n('dateNg'),gifts:n('gifts'),earned:n('earned'),
+    storyAll,storyFull:CHARS.filter(c=>(S.story[c.id]||0)>=4).length,
+    best:best?best.id:null,bestAff:best?Math.round(S.st[best.id].aff):0,stats:Object.assign({},S.stats),money:S.money};
+}
+function recapTitle(d){
+  const rej=d.confNg+d.dumped;
+  if(d.partner&&d.paff>=90&&d.pstory>=4&&!d.cheat)return['運命の二人','恋人との絆は、もう誰にも切れない。'];
+  if(d.cheat>=3&&!d.caught)return['完全犯罪','何度も浮気して、一度もバレなかった……。'];
+  if(d.cheat>=3)return['キャンパスの小悪魔','スリルと修羅場に満ちた4年間だった。'];
+  if(d.partner&&d.lovers.length===1&&!d.cheat)return['一途な恋人','最初に結ばれた人と、最後まで。'];
+  if(d.lovers.length>=3)return['恋多き旅人','たくさんの恋を経験した4年間。'];
+  if(rej>=4)return['七転び八起き','何度振られても、前を向き続けた。'];
+  if(!d.lovers.length&&!d.conf)return['見守り専門','想いは胸に秘めたまま、卒業の日を迎えた。'];
+  if(!d.lovers.length)return['あきらめない心','実らなかった恋も、きっと大切な思い出。'];
+  if(d.partner)return['青春謳歌','恋も勉強も楽しんだ、充実の4年間。'];
+  return['自由な旅人','恋を知って、またひとりで歩き出す。'];
+}
+function recapHtml(d){
+  if(!d)return'';
+  const p=d.partner?ch(d.partner):null,[tt,ts]=recapTitle(d);
+  const mon=t=>t>=2?`約${Math.round(t/2)}か月`:t?'半月':'0か月';
+  const cell=(k,v,sub)=>`<div class="rcell"><div class="rk">${k}</div><div class="rv">${v}</div>${sub?`<div class="rs">${sub}</div>`:''}</div>`;
+  const best=d.best?ch(d.best):null;
+  return `<section class="recap"><h3 class="hand">大学生活の振り返り</h3>
+  <div>あなたの称号</div><div class="badge hand">${tt}</div><p>${ts}</p>
+  <div class="grp">卒業時の恋人</div>
+  ${p?`<div class="who">${ava(p,1)}<div><b>${esc(p.name)}</b><div class="rs" style="font-size:.85rem">ひみつストーリー ${d.pstory}/4${d.pstory>=4?'(コンプリート!)':''}</div></div></div><div style="max-width:420px;margin-top:8px">${meter(d.paff,1)}</div>`:'<p>恋人なし</p>'}
+  <div class="grp">恋のデータ</div>
+  <div class="rgrid">
+   ${cell('付き合った人',d.lovers.length+'人')}
+   ${cell('恋人がいた期間',mon(d.loverTurns),`大学生活 ${mon(d.turns)}のうち`)}
+   ${cell('告白した',d.conf+'回',`成功 ${d.confOk}・失敗 ${d.confNg}`)}
+   ${cell('告白された',d.confessedBy+'回')}
+   ${cell('振られた',(d.confNg+d.dumped)+'回',`告白で ${d.confNg}・別れを告げられて ${d.dumped}`)}
+   ${cell('自分から別れた',d.breakup+'回')}
+   ${cell('浮気した',d.cheat+'回',d.cheat?`バレた ${d.caught}回`:'一度もしなかった')}
+   ${cell('浮気された',d.betrayed+'回')}
+   ${cell('ライバルに先を越された',d.stolen+'回')}
+  </div>
+  ${d.lovers.length?`<div class="rk" style="font-size:.85rem;color:var(--ink-soft)">付き合った人</div><div class="rlovers">${d.lovers.map(id=>`<span>${ava(ch(id),1)}${esc(ch(id).first)}</span>`).join('')}</div>`:''}
+  <div class="grp">思い出のデータ</div>
+  <div class="rgrid">
+   ${cell('デート',d.dates+'回',d.dateNg?`断られた ${d.dateNg}回`:'')}
+   ${cell('プレゼント',d.gifts+'回')}
+   ${cell('バイト収入',yen(d.earned),`卒業時の所持金 ${yen(d.money)}`)}
+   ${cell('見たひみつストーリー',d.storyAll+'話',`4話すべて見た人 ${d.storyFull}人`)}
+   ${best?cell('いちばん仲良し',esc(best.first),`好感度 ${d.bestAff}`):''}
+  </div>
+  <div class="grp">卒業時の能力</div>
+  <div style="max-width:420px">${STATS.map(k=>sbar(k,d.stats[k]||0)).join('')}</div>
+  </section>`;
+}
+function showRecap(){
+  show(`<h2 class="hand">卒業アルバム</h2>${recapHtml(S.gradRec)}<div class="row"><button class="btn" onclick="plan()" autofocus>戻る</button></div>`,true);
 }
 function resetGame(){ask('セーブを消して、はじめからやり直しますか?','はじめから',()=>{try{localStorage.removeItem(KEY)}catch(e){}setup()})}
 
@@ -1055,7 +1139,7 @@ function resetGame(){ask('セーブを消して、はじめからやり直しま
 function resume(){
   const saved=load();
   if(!saved||!saved.name)return setup();
-  S=saved;if(S.sus==null)S.sus=0;if(S.pc===undefined)S.pc=null;S.story=S.story||{};S.hints=S.hints||{};CHARS.forEach(c=>{if(!S.st[c.id])S.st[c.id]={aff:rnd(8,18),awk:0,ex:false}});
+  S=saved;if(S.sus==null)S.sus=0;if(S.pc===undefined)S.pc=null;S.story=S.story||{};S.hints=S.hints||{};S.rec=S.rec||{};CHARS.forEach(c=>{if(!S.st[c.id])S.st[c.id]={aff:rnd(8,18),awk:0,ex:false}});
   S.target?plan():toPick();
 }
 function titleScreen(){
