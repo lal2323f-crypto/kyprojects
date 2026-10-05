@@ -577,6 +577,10 @@ function mata(){return ['','','二股','三股','四股','五股'][sides().lengt
 function susM(){const p=S.partner?ch(S.partner):null;return p?SUSM[p.lv]||1:1}
 function susUp(n){S.sus=clamp(S.sus+Math.round(n*susM()),0,100)}
 function sideNames(){return sides().map(id=>esc(ch(id).first)).join('・')}
+/* 重視する能力:ちひろに何回か聞くとわかる */
+const WANT_NEED=3;
+function wantKnown(id){return !!(S.wantKnown&&S.wantKnown[id])}
+function wantLabel(c){return wantKnown(c.id)?c.want:`???<span style="font-size:.75rem">(ちひろに聞くとわかる ${Math.min(WANT_NEED-1,(S.wantAsk&&S.wantAsk[c.id])||0)}/${WANT_NEED})</span>`}
 /* 振り返り用の記録 */
 function rc(k,n){if(!S.rec)S.rec={};S.rec[k]=(S.rec[k]||0)+(n===undefined?1:n)}
 function addLover(id){if(!S.rec)S.rec={};const l=S.rec.lovers=S.rec.lovers||[];if(!l.includes(id))l.push(id)}
@@ -607,7 +611,7 @@ function side(){
   let h=`<div class="note"><h3 class="hand">あなた:${esc(S.name)}</h3><div class="money">所持金 <b>${yen(S.money)}</b></div>${STATS.map(k=>sbar(k,S.stats[k])).join('')}</div>`;
   if(t){const st=S.st[t.id];const lover=S.partner===t.id;const r=rv(t);const can=st.aff>=40&&st.awk===0&&!taken(t.id);
     h+=`<div class="note"><h3 class="hand">狙っている相手</h3><div class="who">${ava(t,1)}<div><div><b>${esc(t.name)}</b></div><span class="status${lover?' lover':''}">${status(t.id)}</span></div></div>
-    <div style="margin-top:10px">${meter(st.aff,1)}</div><div class="legend">縦線は告白の目安ライン(40)・重視する能力:${t.want}</div><div class="legend">難易度 ${stars(t.lv)} ・ ひみつ ${S.story[t.id]||0}/4</div>
+    <div style="margin-top:10px">${meter(st.aff,1)}</div><div class="legend">縦線は告白の目安ライン(40)・重視する能力:${wantLabel(t)}</div><div class="legend">難易度 ${stars(t.lv)} ・ ひみつ ${S.story[t.id]||0}/4</div>
     ${lover&&sides().length?`<div class="legend" style="color:var(--bad)">${sideNames()}とも付き合っている(${mata()}中)</div>`:''}${lover&&S.sus>0?`<div class="legend" style="color:var(--bad)">浮気がバレる危険:${susLabel()}</div>`:''}${lover&&S.pc?`<div class="legend">最近、${esc(t.first)}の様子が少しおかしい……</div>`:''}
     ${r?`<div style="margin-top:10px">${rmeter(r)}</div><div class="legend">${r.taken>0?`${esc(t.first)}は今${esc(r.name)}と付き合っている。`:'100になると先に付き合われてしまう。'}</div>`:''}
     <div class="row">${lover?`<button class="btn small ghost" onclick="breakUp()">別れを切り出す</button>`:`<button class="btn small" onclick="confess()">告白する</button>`}<button class="btn small ghost" onclick="toPick()">相手を変える</button></div>
@@ -639,7 +643,7 @@ function start(){
 }
 function toPick(){
   show(`<h2 class="hand">誰を狙う?</h2><p>気になる相手を選んでください。性格によって、喜ぶ行動・好きなプレゼント・好きなデート先・重視する能力が違います。あとから相手を変えることもできます。</p>
-  <div class="cards">${pool().map(c=>`<button class="cand" onclick="choose('${c.id}')"><img class="pic" src="${IMG[c.id]}" alt="${esc(c.name)}"><span class="type">${esc(c.type)}</span><div class="nm">${esc(c.name)}</div><div class="dp">${esc(c.dept)}</div><div class="ds">${esc(c.desc)}</div><div class="dp" style="margin-top:6px">難易度 ${stars(c.lv)}</div><div class="dp">重視する能力:${c.want}</div>${friendsOf(c.id).length?`<div class="dp">仲良し:${friendsOf(c.id).map(f=>esc(f.first)).join('・')}</div>`:''}<div style="margin-top:8px">${meter(S.st[c.id].aff)}</div><span class="status" style="margin-top:6px">${status(c.id)}</span></button>`).join('')}</div>
+  <div class="cards">${pool().map(c=>`<button class="cand" onclick="choose('${c.id}')"><img class="pic" src="${IMG[c.id]}" alt="${esc(c.name)}"><span class="type">${esc(c.type)}</span><div class="nm">${esc(c.name)}</div><div class="dp">${esc(c.dept)}</div><div class="ds">${esc(c.desc)}</div><div class="dp" style="margin-top:6px">難易度 ${stars(c.lv)}</div><div class="dp">重視する能力:${wantLabel(c)}</div>${friendsOf(c.id).length?`<div class="dp">仲良し:${friendsOf(c.id).map(f=>esc(f.first)).join('・')}</div>`:''}<div style="margin-top:8px">${meter(S.st[c.id].aff)}</div><span class="status" style="margin-top:6px">${status(c.id)}</span></button>`).join('')}</div>
   ${S.target?`<div class="row"><button class="btn ghost" onclick="plan()">今の相手のまま続ける</button></div>`:''}`,false);
 }
 function choose(id){
@@ -917,7 +921,7 @@ Object.assign(N,{
 function advisor(){
   const c=ch(S.target);
   show(`<h2 class="hand">親友のちひろに相談</h2><div class="speaker"><div class="ava chihiro hand" aria-hidden="true">ち</div><div class="quote hand">「${esc(S.name)}、また恋の悩み?いいよ、聞いてあげる」</div></div>
-  <p>${fmt('ちひろは顔が広くて、{t}のこともいろいろ知っているらしい。ジュースをおごると、もっと詳しく教えてくれる。相談しても時間は進まない(1日1回)。',c)}</p>
+  <p>${fmt('ちひろは顔が広くて、{t}のこともいろいろ知っているらしい。ジュースをおごると、もっと詳しく教えてくれる。何回か聞くと、{t}が重視する能力もわかる(おごると2回分)。相談しても時間は進まない(1日1回)。',c)}</p>
   <div class="acts">${`<button class="act" onclick="consult(0)" autofocus><b>ふつうに相談する</b><span>ざっくりしたヒント</span></button><button class="act" onclick="consult(1)" ${S.money<500?'disabled':''}><b>ジュースをおごって相談</b><span>具体的なヒント(${yen(500)})</span></button>`}</div>
   <div class="row"><button class="btn ghost" onclick="plan()">やめる</button></div>`,true);
 }
@@ -928,16 +932,21 @@ function consult(paid){
   if(S.partner===c.id&&S.pc&&(paid||Math.random()<.5)){const acc=Math.random()<.8;ctx=(S.pc.truth===acc)?`「正直……${c.first}、最近ちょっと怪しいと思う。気をつけて」`:`「考えすぎだって。${c.first}はそんな人じゃないよ」`}
   else if(S.partner===c.id&&S.sus>=40)ctx=`「ねえ、最近こそこそしてない?${c.first}、勘づき始めてるよ」`;
   else if(r&&!r.taken&&r.prog>=60)ctx=`「急いだほうがいいよ。${r.name}、本気で${c.first}を狙ってるから」`;
-  const P=[['like',()=>`「${c.first}はね、${TAGWORD[pick(c.likes)]}がうれしいみたいだよ」`],['dislike',()=>`「${c.first}、${TAGWORD[pick(c.dislikes)]}はちょっと苦手らしいよ」`],['want',()=>`「${c.first}が重視してるのは${c.want}だって。鍛えておくと告白で有利かも」`]];
+  const P=[['like',()=>`「${c.first}はね、${TAGWORD[pick(c.likes)]}がうれしいみたいだよ」`],['dislike',()=>`「${c.first}、${TAGWORD[pick(c.dislikes)]}はちょっと苦手らしいよ」`],];
   if((S.story[c.id]||0)<4)P.push(['story',()=>`「${c.first}、もう少し仲良くなったら、大事な話をしてくれるかもよ」`]);
   if(friendsOf(c.id).length)P.push(['friend',()=>`「${c.first}は${friendsOf(c.id).map(f=>f.first).join('や')}と仲いいから、そっちにも嫌われないようにね」`]);
   if(paid)P.push(['fav',()=>`「ここだけの話、${c.first}は『${ITEMS.find(i=>i.id===c.fav).name}』をもらうとすごく喜ぶって」`],['dis',()=>`「『${ITEMS.find(i=>i.id===c.dis).name}』だけはやめときな。${c.first}の苦手なやつだから」`],['spot',()=>`「デートなら、${SPOTWORD[c.spot]}が好きらしいよ」`]);
   let pool2=P.filter(p=>!used.includes(p[0]));if(!pool2.length){S.hints[c.id]=[];pool2=P}
   const h=paid?pick(pool2.filter(p=>['fav','dis','spot'].includes(p[0])).concat(pool2).slice(0,Math.max(1,pool2.length))):pick(pool2);
   S.hints[c.id]=[...(S.hints[c.id]||[]),h[0]];
+  if(!S.wantAsk)S.wantAsk={};if(!S.wantKnown)S.wantKnown={};let wantNote='';
+  if(!S.wantKnown[c.id]){S.wantAsk[c.id]=(S.wantAsk[c.id]||0)+(paid?2:1);
+    if(S.wantAsk[c.id]>=WANT_NEED){S.wantKnown[c.id]=true;log(`${c.first}が重視する能力は「${c.want}」だとわかった。`);
+      wantNote=`<p class="hintbox">「それとね、ずっと調べてたんだけど……${esc(c.first)}が重視してるのは<b>${c.want}</b>だって!鍛えておくと告白で有利になるよ」</p><p class="ripple up">${esc(c.first)}が重視する能力がわかった!</p>`}
+    else wantNote=`<p style="font-size:.85rem;color:var(--ink-soft)">「${esc(c.first)}が何を重視してるかは、まだ調べ中。また聞いてね」(重視する能力の手がかり ${S.wantAsk[c.id]}/${WANT_NEED})</p>`}
   log(`ちひろに${c.first}のことを相談した。`);save();
   show(`<h2 class="hand">ちひろのアドバイス</h2><div class="speaker"><div class="ava chihiro hand" aria-hidden="true">ち</div><div class="quote hand">${esc(NN(paid?'chihiroPaid':'chihiroFree'))}</div></div>
-  <p class="hintbox">${esc(h[1]())}</p>${ctx?`<p class="hintbox">${esc(ctx)}</p>`:''}
+  <p class="hintbox">${esc(h[1]())}</p>${ctx?`<p class="hintbox">${esc(ctx)}</p>`:''}${wantNote}
   <div class="row"><button class="btn" onclick="plan()" autofocus>予定に戻る</button></div>`,true);
 }
 /* ---------- キャラ別ストーリー ---------- */
