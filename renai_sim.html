@@ -38,9 +38,12 @@ body{
 }
 .hand{font-family:"Yomogi","Zen Maru Gothic","Hiragino Maru Gothic ProN",cursive}
 .wrap{max-width:1040px;margin:0 auto;padding:20px 16px 48px}
-header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-20px -16px 18px;padding:10px 16px;flex-wrap:nowrap;position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:2px solid var(--line)}
+.date{white-space:nowrap;flex:none}
 .logo{font-size:1.6rem;margin:0;line-height:1.2}
 .logo small{display:block;font-size:.85rem;color:var(--ink-soft);font-family:"Zen Maru Gothic",sans-serif}
+.logo{min-width:0}
+@media (max-width:600px){.logo{font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.logo small{font-size:.72rem}.date{font-size:1rem;padding:4px 10px}}
 .date{background:var(--note);color:var(--ink);padding:6px 14px;transform:rotate(-2deg);font-size:1.15rem;box-shadow:2px 3px 0 var(--line)}
 .layout{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start}
 @media (max-width:780px){.layout{grid-template-columns:1fr}}
@@ -560,7 +563,7 @@ return `<div class="meter${big?' big':''}" role="meter" aria-valuemin="0" aria-v
 ${big?'<div class="ticks"><span style="left:20%">友達</span><span style="left:45%">仲良し</span><span style="left:70%">いい感じ</span></div>':''}</div>`}
 function rmeter(r){return `<div class="meter rival"><div class="mtop"><span>${esc(r.name)}の接近度 <b>${Math.round(r.prog)}</b>/100</span></div><div class="bar"><div class="fill" style="width:${r.prog}%"></div></div></div>`}
 function sbar(k,v,d){return `<div class="sbar"><span class="sk">${k}</span><div class="bar"><div class="fill" style="width:${v}%"></div></div><span class="sv">${v}${d?`<span class="delta up"> +${d}</span>`:''}</span></div>`}
-function status(id){const st=S.st[id];if(S.partner===id)return'恋人';if(taken(id))return'ライバルと交際中';let b=st.aff<20?'顔見知り':st.aff<45?'友達':st.aff<70?'仲良し':'いい感じ';if(st.awk>0)b='気まずい';return st.ex?'元恋人・'+b:b}
+function status(id){const st=S.st[id];if(S.partner===id)return'恋人';if(S.side===id)return'秘密の恋人';if(taken(id))return'ライバルと交際中';let b=st.aff<20?'顔見知り':st.aff<45?'友達':st.aff<70?'仲良し':'いい感じ';if(st.awk>0)b='気まずい';return st.ex?'元恋人・'+b:b}
 function ava(c,sm){return `<img class="ava${sm?' sm':''}" src="${IMG[c.id]}" alt="${esc(c.name)}の顔">`}
 function log(t){S.log.unshift(`[${gradeLabel()} ${MONTHS[S.month]}] ${t}`);S.log=S.log.slice(0,80)}
 /* 振り返り用の記録 */
@@ -594,7 +597,7 @@ function side(){
   if(t){const st=S.st[t.id];const lover=S.partner===t.id;const r=rv(t);const can=st.aff>=40&&st.awk===0&&!taken(t.id);
     h+=`<div class="note"><h3 class="hand">狙っている相手</h3><div class="who">${ava(t,1)}<div><div><b>${esc(t.name)}</b></div><span class="status${lover?' lover':''}">${status(t.id)}</span></div></div>
     <div style="margin-top:10px">${meter(st.aff,1)}</div><div class="legend">縦線は告白の目安ライン(40)・重視する能力:${t.want}</div><div class="legend">難易度 ${stars(t.lv)} ・ ひみつ ${S.story[t.id]||0}/4</div>
-    ${lover&&S.sus>0?`<div class="legend" style="color:var(--bad)">浮気がバレる危険:${susLabel()}</div>`:''}${lover&&S.pc?`<div class="legend">最近、${esc(t.first)}の様子が少しおかしい……</div>`:''}
+    ${lover&&S.side?`<div class="legend" style="color:var(--bad)">${esc(ch(S.side).first)}と二股中</div>`:''}${lover&&S.sus>0?`<div class="legend" style="color:var(--bad)">浮気がバレる危険:${susLabel()}</div>`:''}${lover&&S.pc?`<div class="legend">最近、${esc(t.first)}の様子が少しおかしい……</div>`:''}
     ${r?`<div style="margin-top:10px">${rmeter(r)}</div><div class="legend">${r.taken>0?`${esc(t.first)}は今${esc(r.name)}と付き合っている。`:'100になると先に付き合われてしまう。'}</div>`:''}
     <div class="row">${lover?`<button class="btn small ghost" onclick="breakUp()">別れを切り出す</button>`:`<button class="btn small" onclick="confess()">告白する</button>`}<button class="btn small ghost" onclick="toPick()">相手を変える</button></div>
     ${!lover&&!can?`<p style="font-size:.8rem;color:var(--ink-soft);margin:8px 0 0">${taken(t.id)?`今は${esc(rv(t).name)}と付き合っている。告白しても望みは薄い。`:st.awk>0?'今は気まずい。告白しても成功しにくそう。':'今告白しても成功は難しそう。好感度40を超えてからが勝負。'}</p>`:''}</div>`;}
@@ -642,6 +645,7 @@ function setTarget(id){
 
 /* ---------- 今日の予定 ---------- */
 function plan(){
+  if(!S.partner&&S.side)return sidePromote();
   const c=ch(S.target),st=S.st[c.id],lover=S.partner===c.id;
   const canDate=(lover||st.aff>=35)&&!taken(c.id);
   const A=(fn,title,sub,dis)=>`<button class="act" onclick="${fn}" ${dis?'disabled':''}><b>${title}</b><span>${sub}</span></button>`;
@@ -662,7 +666,7 @@ function plan(){
    ${A("train('play')",'友達と遊ぶ',`話術アップ(${yen(2000)})`,S.money<2000)}
    ${A("train('baito')",'バイトする','お金を稼ぐ')}
   </div>
-  ${lover?`<div class="grp">ほかの人と会う <span class="hint">バレたら修羅場</span></div><div class="acts">${A('cheatMenu()','こっそり他の人と会う','浮気。会うほどバレる危険が上がる')}</div>`:''}`,true);
+  ${lover?`<div class="grp">ほかの人と会う <span class="hint">バレたら修羅場</span></div><div class="acts">${A('cheatMenu()','こっそり他の人と会う・告白する',S.side?`${esc(ch(S.side).first)}と二股中。バレる危険:${susLabel()}`:'浮気・二股。バレたら修羅場')}</div>`:''}`,true);
 }
 function train(k){
   const c=ch(S.target),st=S.st[c.id];const T={study:['図書館で勉強','学力',rnd(4,7),0,NN('study')],gym:['ジムで鍛える','体力',rnd(4,7),0,NN('gym')],beauty:['美容室と服選び','ルックス',rnd(5,8),5000,NN('beauty')],play:['友達と遊ぶ','話術',rnd(4,7),2000,NN('play')],baito:['バイトする',null,0,0,'']}[k];
@@ -739,11 +743,50 @@ Object.assign(N,{
 });
 function fmt3(str,p,o){return fmt(str.replace(/\{t\}/g,'\u0001').replace(/\{o\}/g,'{t}'),o).replace(/\u0001/g,esc(p.first))}
 function susLabel(){return S.sus<30?'低い':S.sus<60?'やや高い':'かなり高い'}
-function cheatMenu(){
-  const p=ch(S.partner);const list=pool().filter(c=>c.id!==S.partner&&!taken(c.id));
-  show(`<span class="stamp hand">浮気</span><h2 class="hand">こっそり誰と会う?</h2><p>${esc(p.first)}には内緒で、ほかの人と会います。会うほどバレる危険が高まり、バレると修羅場になります。</p>
-  <div class="acts">${list.map(c=>`<button class="act" onclick="cheatGo('${c.id}')"><span style="display:flex;gap:10px;align-items:center">${ava(c,1)}<b style="color:var(--ink)">${esc(c.first)}</b></span>${meter(S.st[c.id].aff)}</button>`).join('')}</div>
+function cheatMenu(mode){
+  const p=ch(S.partner);const list=pool().filter(c=>c.id!==S.partner&&!taken(c.id));const conf=mode==='conf';
+  const tab=(m,l)=>`<input type="radio" name="cm" id="cm_${m}" ${(m==='conf')===conf?'checked':''} onchange="cheatMenu('${m}')"><label for="cm_${m}">${l}</label>`;
+  show(`<span class="stamp hand">${conf?'二股':'浮気'}</span><h2 class="hand">${conf?'こっそり誰に告白する?':'こっそり誰と会う?'}</h2>
+  <div class="seg" role="radiogroup" style="margin:6px 0 12px">${tab('meet','こっそり会う')}${tab('conf','こっそり告白する')}</div>
+  ${conf?`<p>${esc(p.first)}と付き合ったまま、ほかの人に告白します。成功すると二股になり、バレる危険が一気に上がります。二股を続けるかぎり、危険は毎日少しずつ上がり続けます。</p>
+  ${S.side?`<p class="hintbox">今は${esc(ch(S.side).first)}と二股中。これ以上は告白できない。</p>`:`<div class="acts">${list.map(c=>`<button class="act" onclick="cheatConfess('${c.id}')"><span style="display:flex;gap:10px;align-items:center">${ava(c,1)}<b style="color:var(--ink)">${esc(c.first)}に告白</b></span>${meter(S.st[c.id].aff)}<span>${S.st[c.id].awk>0?'今は気まずい':S.st[c.id].aff<40?'好感度40未満。成功は難しい':'成功するかも'}</span></button>`).join('')}</div>`}`
+  :`<p>${esc(p.first)}には内緒で、ほかの人と会います。会うほどバレる危険が高まり、バレると修羅場になります。</p>
+  <div class="acts">${list.map(c=>`<button class="act" onclick="cheatGo('${c.id}')"><span style="display:flex;gap:10px;align-items:center">${ava(c,1)}<b style="color:var(--ink)">${esc(c.first)}</b>${S.side===c.id?'<span class="status lover" style="margin:0">秘密の恋人</span>':''}</span>${meter(S.st[c.id].aff)}</button>`).join('')}</div>`}
+  <p style="margin-top:12px">${esc(p.first)}にバレる危険:<b>${susLabel()}</b></p>
   <div class="row"><button class="btn ghost" onclick="plan()">やめる</button></div>`,true);
+}
+/* ---------- 二股 ---------- */
+function cheatConfess(id){
+  const p=ch(S.partner),o=ch(id);
+  ask(`${esc(p.first)}と付き合ったまま、${esc(o.first)}に告白しますか?<br>成功すると二股になり、${esc(p.first)}にバレる危険が一気に上がります。`,'告白する',()=>doCheatConfess(id));
+}
+function doCheatConfess(id){
+  const p=ch(S.partner),o=ch(id),so=S.st[o.id];
+  let pr=(so.aff-45)/50+(o.diff||0)+(S.stats[o.want]-40)/150;if(so.ex)pr-=.2;if(so.awk>0)pr-=.15;if((S.story[o.id]||0)>=4)pr+=.1;if(so.knows)pr-=.1;
+  pr=clamp(pr,.03,.85);const ok=Math.random()<pr;const fr=friendsOf(p.id).includes(o);
+  rc('conf');S.lastCheat=o.id;S.cheatedNow=true;S.skipped=true;S.tturns++;
+  const tier=so.aff<45?'noLow':so.aff<70?'noMid':'noHigh';
+  if(ok){rc('confOk');rc('twoTiming');addLover(o.id);S.side=o.id;so.aff=Math.min(100,so.aff+8);so.ex=false;so.awk=0;
+    S.sus=clamp(S.sus+rnd(30,40)+(fr?15:0),0,100);log(`${p.first}と付き合ったまま、${o.first}に告白して付き合うことになった(二股)。`)}
+  else{rc('confNg');so.aff=Math.max(0,so.aff-15);so.awk=3;S.sus=clamp(S.sus+rnd(10,20)+(fr?15:0),0,100);log(`${p.first}に内緒で${o.first}に告白したが、振られた。`)}
+  save();
+  show(`<span class="stamp hand">二股</span><h2 class="hand">ひみつの告白</h2><p>${fmt3('{t}には内緒で、{o}を呼び出した。',p,o)}</p>
+  <div class="speaker">${ava(o)}<div class="quote hand">${fmt(ok?L(o,'yes'):L(o,tier),o)}</div></div>
+  <p class="big hand">${ok?`${esc(o.first)}とも付き合うことになった!`:'振られてしまった……'}</p>
+  <p>${ok?`${esc(p.first)}と${esc(o.first)}、二人との秘密の日々が始まる。二股を続けるかぎり、バレる危険は毎日少しずつ上がっていく。`:`${esc(o.first)}から話が広まるかもしれない……。`}</p>
+  <p>${esc(p.first)}にバレる危険:<b>${susLabel()}</b>${fr?`<br><span class="ripple down">${esc(o.first)}は${esc(p.first)}の友達。噂が伝わりやすい……</span>`:''}</p>
+  <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
+}
+function sidePromote(){
+  const o=ch(S.side);S.partner=o.id;S.side=null;S.target=o.id;S.tturns=0;S.sus=0;S.pc=null;log(`${o.first}と正式に付き合うことになった。`);save();
+  show(`<h2 class="hand">正式な恋人に</h2><div class="speaker">${ava(o)}<div class="quote hand">${fmt(L(o,'good'),o)}</div></div><p>秘密の恋人だった${esc(o.first)}と、これからは堂々と付き合える。</p>
+  <div class="row"><button class="btn" onclick="plan()" autofocus>次へ</button></div>`,true);
+}
+function sideLeft(){
+  const o=ch(S.side),so=S.st[o.id];S.side=null;so.ex=true;so.awk=3;so.aff=Math.max(0,so.aff-10);rc('dumped');log(`秘密の恋人だった${o.first}に別れを告げられた。`);save();
+  show(`<span class="stamp hand">事件</span><h2 class="hand">秘密の終わり</h2><div class="speaker">${ava(o)}<div class="quote hand">${fmt(L(o,'bye'),o)}</div></div>
+  <p class="big hand">${esc(o.first)}に振られた……</p><p>二番目でいることに、${esc(o.first)}は疲れてしまったようだ。</p>
+  <div class="row"><button class="btn" onclick="plan()" autofocus>次へ</button></div>`,true);
 }
 function cheatGo(id){
   const p=ch(S.partner),o=ch(id);S.cheatWith=id;cur=freshScene('ch',CHEATS);cur.order=[...cur.ch].sort(()=>Math.random()-.5);save();
@@ -788,12 +831,18 @@ function caughtAct(k){
   else if(k==='open'){sp.aff=Math.max(0,sp.aff-35);if(Math.random()<.8){quote=NN('noForgive');res='開き直った態度に、すべてが終わった。';broke=true}else{quote='「……信じられない。でも、嫌いになれない自分がもっと嫌」';res='かろうじて別れずに済んだが、関係は冷え切っている。';S.sus=25;sp.awk=3}}
   else{quote='「……そう。わかった」';res='自分から別れを切り出した。';broke=true}
   if(broke)rc(k==='end'?'breakup':'dumped');
+  let sideNote='',sideNext=false;
   if(broke)cheatBreak(p,k==='end'?`浮気がバレて、自分から${p.first}に別れを告げた。`:`浮気がバレて、${p.first}に振られた。`);
+  if(S.side){const sd=ch(S.side),ss=S.st[sd.id];
+    if(Math.random()<.5){S.side=null;ss.ex=true;ss.awk=3;ss.aff=Math.max(0,ss.aff-20);rc('dumped');log(`二股が${sd.first}にもバレて、振られた。`);sideNote=`二股は${esc(sd.first)}にも知れ渡り、${esc(sd.first)}にも振られてしまった……`}
+    else if(broke){sideNote=`残ったのは、秘密の恋人だった${esc(sd.first)}だけだ。`;sideNext=true}
+    else if(k==='sorry'){S.side=null;ss.ex=true;ss.awk=2;ss.aff=Math.max(0,ss.aff-10);rc('breakup');log(`二股をやめ、${sd.first}とは別れた。`);sideNote=`けじめとして、${esc(sd.first)}とは別れることにした。`}}
   save();
   show(`<span class="stamp hand">修羅場</span><h2 class="hand">${broke?'終わり':'話し合い'}</h2>
   <div class="speaker">${ava(p)}<div class="quote hand">${fmt3(quote,p,o)}</div></div><p>${res}</p>${rp}
   ${broke?`<p class="big hand">${esc(p.first)}と別れた……</p><p style="color:var(--ink-soft);font-size:.9rem">浮気の噂が広まり、周りからの印象も少し下がった。</p>`:`<div style="max-width:420px">${meter(sp.aff,1)}</div>`}
-  <div class="row">${broke?`<button class="btn" onclick="setTarget('${o.id}')" autofocus>${esc(o.first)}を狙う</button><button class="btn ghost" onclick="plan()">${esc(p.first)}を狙い続ける</button><button class="btn ghost" onclick="toPick()">ほかの人を選ぶ</button>`:`<button class="btn" onclick="plan()" autofocus>次へ</button>`}</div>`,true);
+  ${sideNote?`<p>${sideNote}</p>`:''}
+  <div class="row">${sideNext?`<button class="btn" onclick="plan()" autofocus>次へ</button>`:broke?`<button class="btn" onclick="setTarget('${o.id}')" autofocus>${esc(o.first)}を狙う</button><button class="btn ghost" onclick="plan()">${esc(p.first)}を狙い続ける</button><button class="btn ghost" onclick="toPick()">ほかの人を選ぶ</button>`:`<button class="btn" onclick="plan()" autofocus>次へ</button>`}</div>`,true);
 }
 /* 相手の浮気 */
 function pcEvent(){
@@ -982,7 +1031,8 @@ function next(){
   if(!S.partner){S.pc=null;S.sus=0}
   const cheatedNow=S.cheatedNow;S.cheatedNow=false;
   if(S.partner===c.id){
-    if(S.sus>0){if(Math.random()<S.sus/140){save();return caught()}if(!cheatedNow)S.sus=Math.max(0,S.sus-6)}
+    if(S.side){const ss=S.st[S.side];ss.aff=Math.max(0,ss.aff-1);if(!S.sus)S.sus=10;if(ss.aff<30&&Math.random()<.3){save();return sideLeft()}}
+    if(S.sus>0){if(Math.random()<S.sus/140){save();return caught()}if(S.side)S.sus=clamp(S.sus+4,0,100);else if(!cheatedNow)S.sus=Math.max(0,S.sus-6)}
     if(S.pc){S.pc.t++;
       if(S.pc.truth){if(S.pc.t>=2&&Math.random()<.12+.06*(S.pc.stage||0)+.04*S.pc.t)return pcLeave();if(Math.random()<.15)return pcGuilt();if(Math.random()<.25){save();return pcEvent()}}
       else if(S.pc.t>=3)S.pc=null;
@@ -1067,6 +1117,7 @@ function graduation(){
   ${recapHtml(S.gradRec)}
   <p>ここからは卒業後の日々が続きます。</p>
   <div class="row"><button class="btn" onclick="plan()" autofocus>卒業後も続ける</button><button class="btn ghost" onclick="resetGame()">はじめからやり直す</button></div>`,true);
+  document.getElementById('date').textContent='大学4年・3月 卒業式';
 }
 /* ---------- 大学生活の振り返り ---------- */
 function recapData(){
@@ -1077,7 +1128,7 @@ function recapData(){
   return {partner:p?p.id:null,paff:p?Math.round(S.st[p.id].aff):0,pstory:p?(S.story[p.id]||0):0,
     lovers:(r.lovers||[]).slice(),turns:n('turns'),loverTurns:n('loverTurns'),
     conf:n('conf'),confOk:n('confOk'),confNg:n('confNg'),confessedBy:n('confessedBy'),
-    dumped:n('dumped'),breakup:n('breakup'),cheat:n('cheat'),caught:n('caught'),betrayed:n('betrayed'),stolen:n('stolen'),
+    dumped:n('dumped'),twoTiming:n('twoTiming'),breakup:n('breakup'),cheat:n('cheat'),caught:n('caught'),betrayed:n('betrayed'),stolen:n('stolen'),
     dates:n('dates'),dateNg:n('dateNg'),gifts:n('gifts'),earned:n('earned'),
     storyAll,storyFull:CHARS.filter(c=>(S.story[c.id]||0)>=4).length,
     best:best?best.id:null,bestAff:best?Math.round(S.st[best.id].aff):0,stats:Object.assign({},S.stats),money:S.money};
@@ -1086,6 +1137,7 @@ function recapTitle(d){
   const rej=d.confNg+d.dumped;
   if(d.partner&&d.paff>=90&&d.pstory>=4&&!d.cheat)return['運命の二人','恋人との絆は、もう誰にも切れない。'];
   if(d.cheat>=3&&!d.caught)return['完全犯罪','何度も浮気して、一度もバレなかった……。'];
+  if(d.twoTiming)return['禁断の二股','二人を同時に愛した、危うい4年間。'];
   if(d.cheat>=3)return['キャンパスの小悪魔','スリルと修羅場に満ちた4年間だった。'];
   if(d.partner&&d.lovers.length===1&&!d.cheat)return['一途な恋人','最初に結ばれた人と、最後まで。'];
   if(d.lovers.length>=3)return['恋多き旅人','たくさんの恋を経験した4年間。'];
@@ -1114,6 +1166,7 @@ function recapHtml(d){
    ${cell('振られた',(d.confNg+d.dumped)+'回',`告白で ${d.confNg}・別れを告げられて ${d.dumped}`)}
    ${cell('自分から別れた',d.breakup+'回')}
    ${cell('浮気した',d.cheat+'回',d.cheat?`バレた ${d.caught}回`:'一度もしなかった')}
+   ${cell('二股',(d.twoTiming||0)+'回')}
    ${cell('浮気された',d.betrayed+'回')}
    ${cell('ライバルに先を越された',d.stolen+'回')}
   </div>
