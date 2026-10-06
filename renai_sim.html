@@ -882,7 +882,7 @@ function setTarget(id){
 
 /* ---------- 今日の予定 ---------- */
 function plan(){
-  if(S){S.mood=null;S.follow=null}
+  if(S){S.mood=null;S.follow=null;S.leak=null}
   if(!S.partner&&sides().length)return sidePromote();
   const c=ch(S.target),st=S.st[c.id],lover=S.partner===c.id;
   const canDate=(lover||st.aff>=35)&&!taken(c.id);
@@ -1060,14 +1060,14 @@ function doCheatConfess(id){social();
   if(ok){rc('confOk');rc('twoTiming');addLover(o.id);sides().push(o.id);so.aff=Math.min(100,so.aff+8);so.ex=false;so.awk=0;
     S.rec.maxMata=Math.max(S.rec.maxMata||0,sides().length+1);
     susUp(rnd(30,40)+5*(sides().length-1)+(fr?15:0));log(`${p.first}と付き合ったまま、${o.first}に告白して付き合うことになった(${mata()})。`)}
-  else{rc('confNg');so.aff=Math.max(0,so.aff-15);so.awk=3;susUp(rnd(10,20)+(fr?15:0));log(`${p.first}に内緒で${o.first}に告白したが、振られた。`)}
+  else{rc('confNg');so.aff=Math.max(0,so.aff-15);so.awk=3;susUp(rnd(10,20)+(fr?15:0));log(`${p.first}に内緒で${o.first}に告白したが、振られた。`);S.leak=o.id}
   save();
   show(`<span class="stamp hand">${ok?mata():'告白'}</span><h2 class="hand">ひみつの告白</h2><p>${fmt3('{t}には内緒で、{o}を呼び出した。',p,o)}</p>
   <div class="speaker">${ava(o)}<div class="quote hand">${fmt(ok?L(o,'yes'):L(o,tier),o)}</div></div>
   <p class="big hand">${ok?`${esc(o.first)}とも付き合うことになった!`:'振られてしまった……'}</p>
-  <p>${ok?`これで${mata()}。${esc(p.first)}に内緒の日々が続く。付き合う人数が多いほど、バレる危険は毎日どんどん上がっていく。`:`${esc(o.first)}から話が広まるかもしれない……。`}</p>
+  <p>${ok?`これで${mata()}。${esc(p.first)}に内緒の日々が続く。付き合う人数が多いほど、バレる危険は毎日どんどん上がっていく。`:`……${esc(o.first)}の口から、この話が広まってしまうかもしれない。`}</p>
   <p>${esc(p.first)}にバレる危険:<b>${susLabel()}</b>${fr?`<br><span class="ripple down">${esc(o.first)}は${esc(p.first)}の友達。噂が伝わりやすい……</span>`:''}</p>
-  <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
+  <div class="row">${ok?`<button class="btn" onclick="next()" autofocus>次へ</button>`:`<button class="btn" onclick="leakConfront()" autofocus>次へ</button>`}</div>`,true);
 }
 /* 秘密の恋人と過ごしたとき:本命にバレる危険が上がる */
 function secretTouch(c,extra){
@@ -1076,6 +1076,42 @@ function secretTouch(c,extra){
   susUp(rnd(8,14)+(extra||0)+(fr?8:0));S.cheatedNow=true;S.lastCheat=c.id;S.skipped=true;rc('cheat');
   S.st[p.id].aff=Math.max(0,S.st[p.id].aff-1);
   return `<p style="margin-top:10px">${esc(p.first)}にバレる危険:<b>${susLabel()}</b>${fr?`<br><span class="ripple down">${esc(c.first)}は${esc(p.first)}の友達。噂が伝わりやすい……</span>`:''}</p>`;
+}
+/* 内緒の告白に失敗すると、本命に話が伝わって問い詰められる */
+const LEAK_OPTS={
+ sorry:'正直に認めて、心から謝る',
+ excuse:'「罰ゲームだったんだ」とごまかす',
+ blame:'「{o}のほうから思わせぶりだったんだよ」と人のせいにする',
+ sweet:'「やっぱり{t}が一番だって気づいたんだ」と言う',
+ open:'「別にいいでしょ」と開き直る',
+ end:'「……別れよう」と自分から切り出す'
+};
+function leakConfront(){
+  const p=S.partner?ch(S.partner):null,o=S.leak?ch(S.leak):null;
+  if(!p||!o){S.leak=null;return next()}
+  const ks=['sorry',...['excuse','blame','sweet','open','end'].sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
+  save();
+  show(`<span class="stamp hand">修羅場</span><h2 class="hand">噂は${esc(p.first)}の耳に</h2><p>${fmt3('振られた話は、あっという間に広まった。その日の夜、{t}から呼び出された。',p,o)}</p>
+  <div class="speaker">${ava(p)}<div class="quote hand">${fmt3('「……{o}に告白したらしいけど、なんで?」',p,o)}</div></div>
+  <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:0">どう答える?</p>
+  <div class="choices">${ks.map((k,i)=>`<button class="choice" onclick="leakAct('${k}')" ${i===0?'autofocus':''}>${fmt3(LEAK_OPTS[k],p,o)}</button>`).join('')}</div>`,true);
+}
+function leakAct(k){
+  const p=ch(S.partner),o=ch(S.leak),sp=S.st[p.id],so=S.st[o.id];S.leak=null;rc('caught');
+  const lvAdj=(3-(p.lv||3))*.05;let quote,res,broke=false;const b=sp.aff;
+  if(k==='sorry'){sp.aff=Math.max(0,sp.aff-12);if(Math.random()<clamp(sp.aff/100+.25+lvAdj,.1,.9)){quote=NN('forgive');res='なんとか許してもらえた。でも、しばらくは信用してもらえなさそうだ。';sp.awk=2}else{quote=NN('noForgive');res='許してはもらえなかった。';broke=true}}
+  else if(k==='excuse'){if(Math.random()<.45+lvAdj){sp.aff=Math.max(0,sp.aff-5);quote='「……ほんとに?ならいいけど」';res='なんとかごまかせた。……胸の奥が、ちくりと痛む。'}else{sp.aff=Math.max(0,sp.aff-25);if(Math.random()<.5){quote=NN('noForgive');res='見え透いたごまかしは、火に油を注いだだけだった。';broke=true}else{quote='「……しばらく一人にして」';res='関係は、ぎりぎりのところでつながっている。';sp.awk=3}}}
+  else if(k==='blame'){so.aff=Math.max(0,so.aff-10);if(Math.random()<.35+lvAdj){sp.aff=Math.max(0,sp.aff-3);quote='「……そうなんだ。{o}って、そういう人なんだ」';res=`${esc(p.first)}は信じてくれた。……${esc(o.first)}には悪いことをした。`}else{sp.aff=Math.max(0,sp.aff-30);if(Math.random()<.6){quote='「人のせいにするんだ。……最低」';res='言い訳は、最悪の形で裏目に出た。';broke=true}else{quote='「……もういい。今は話したくない」';res='信頼は、大きく揺らいでしまった。';sp.awk=3}}}
+  else if(k==='sweet'){if(sp.aff>=70&&Math.random()<.7+lvAdj){sp.aff=Math.max(0,sp.aff-5);quote='「……ずるい。そんなこと言われたら、怒れないじゃん」';res='なんとか気持ちは伝わったようだ。'}else{sp.aff=Math.max(0,sp.aff-20);quote='「調子いいこと言わないで」';res='その言葉は、今の'+esc(p.first)+'には届かなかった。';sp.awk=2}}
+  else if(k==='open'){sp.aff=Math.max(0,sp.aff-35);if(Math.random()<.8){quote=NN('noForgive');res='開き直った態度に、すべてが終わった。';broke=true}else{quote='「……信じられない」';res='かろうじて別れずに済んだが、関係は冷え切っている。';sp.awk=3}}
+  else{quote='「……そう。わかった」';res='自分から別れを切り出した。';broke=true}
+  if(broke){rc(k==='end'?'breakup':'dumped');cheatBreak(p,k==='end'?`${o.first}への告白がバレて、自分から${p.first}に別れを告げた。`:`${o.first}への告白がバレて、${p.first}に振られた。`)}
+  else{S.sus=Math.max(S.sus,20);log(`${o.first}への告白がバレたが、${p.first}とは別れずに済んだ。`)}
+  const rp=ripple(p,-4,`${o.first}に告白した`);save();
+  show(`<span class="stamp hand">修羅場</span><h2 class="hand">${broke?'終わり':'話し合い'}</h2><p>あなたは「${fmt3(LEAK_OPTS[k],p,o)}」と答えた。</p>
+  <div class="speaker">${ava(p)}<div class="quote hand">${fmt3(quote,p,o)}</div></div><p>${res}</p>${rp}
+  ${broke?`<p class="big hand">${esc(p.first)}と別れた……</p>`:`<div style="max-width:420px">${meter(sp.aff,1,sp.aff-b)}</div>`}
+  <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
 function sidePromote(){
   const o=ch(sides().shift());S.partner=o.id;S.target=o.id;S.tturns=0;S.sus=0;S.pc=null;log(`${o.first}と正式に付き合うことになった。`);save();
