@@ -857,7 +857,7 @@ function autoPref(){const g=document.querySelector('input[name=gd]:checked').val
 function start(){
   const name=document.getElementById('nm').value.trim();
   if(!name){document.getElementById('err').textContent='名前を入力してください。';return}
-  S={name,gender:document.querySelector('input[name=gd]:checked').value,pref:document.querySelector('input[name=pf]:checked').value,grade:+document.getElementById('gr').value,month:0,half:0,target:null,partner:null,st:{},rv:{},log:[],seen:{},gradDone:false,last:null,tturns:0,skipped:false,money:10000,stats:{},sus:0,pc:null,story:{},hints:{},turn:0,lastT:{},base:{},lastSocial:0,decayMsgs:[],tips:{},met:{},rec:{startGrade:+document.getElementById('gr').value}};
+  S={name,gender:document.querySelector('input[name=gd]:checked').value,pref:document.querySelector('input[name=pf]:checked').value,grade:+document.getElementById('gr').value,month:0,half:0,target:null,partner:null,st:{},rv:{},log:[],seen:{},gradDone:false,last:null,tturns:0,skipped:false,money:10000,stats:{},sus:0,pc:null,story:{},hints:{},turn:0,lastT:{},base:{},lastSocial:0,decayMsgs:[],tips:{},met:{},lastTags:{},hidden:rollHidden(),rec:{startGrade:+document.getElementById('gr').value}};
   STATS.forEach(k=>{S.stats[k]=rnd(15,30);S.base[k]=S.stats[k];S.lastT[k]=0});
   CHARS.forEach(c=>S.st[c.id]={aff:rnd(8,18),awk:0,ex:false});
   log(`${S.name}の大学生活が始まった。`);save();toPick();
@@ -1094,7 +1094,7 @@ function cheatGo(id){
 }
 function cheatAct(i){social();
   const x=cur.order[i],p=ch(S.partner),o=ch(S.cheatWith),so=S.st[o.id],sp=S.st[p.id];meet(o.id);
-  let d=3;if(o.likes.includes(x.tag))d+=7;if(o.dislikes.includes(x.tag))d-=8;d+=sbonus(TAGSTAT[x.tag]);
+  const ts=tagScore(o,x.tag,7,8);let d=3+ts.d;d+=sbonus(TAGSTAT[x.tag]);
   if(x.need){if(so.aff<x.need)d-=Math.min(14,Math.ceil((x.need-so.aff)/3));else d+=Math.round(x.need/8)+2}
   d+=o.chaos?rnd(-9,9):rnd(-4,4);
   let extra='';
@@ -1105,7 +1105,7 @@ function cheatAct(i){social();
   sp.aff=Math.max(0,sp.aff-2);rc('cheat');S.skipped=true;S.lastCheat=o.id;S.cheatedNow=true;S.tturns++;
   log(`${p.first}に内緒で${o.first}と会った(${cur.title})。`);save();
   show(`${tip('cheat',p)}<span class="stamp hand">浮気</span><h2 class="hand">${esc(cur.title)}</h2><p>あなたは「${fmt3(x.label,p,o)}」を選んだ。</p>
-  <div class="speaker">${ava(o)}<div class="quote hand">${fmt(quote,o)}</div></div>${extra?`<p>${extra}</p>`:''}
+  <div class="speaker">${ava(o)}<div class="quote hand">${fmt(quote,o)}</div></div>${extra?`<p>${extra}</p>`:''}${boredNote(o,ts)}
   <div style="max-width:420px">${meter(so.aff,1,so.aff-b)}</div>
   <p style="margin-top:12px">${esc(p.first)}にバレる危険:<b>${susLabel()}</b>${friendsOf(p.id).includes(o)?`<br><span class="ripple down">${esc(o.first)}は${esc(p.first)}の友達。噂が伝わりやすい……</span>`:''}</p>
   <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
@@ -1214,9 +1214,11 @@ function consult(paid){
   if(S.partner===c.id&&S.pc&&(paid||Math.random()<.5)){const acc=Math.random()<.8;ctx=(S.pc.truth===acc)?`「正直……${c.first}、最近ちょっと怪しいと思う。気をつけて」`:`「考えすぎだって。${c.first}はそんな人じゃないよ」`}
   else if(S.partner===c.id&&S.sus>=40)ctx=`「ねえ、最近こそこそしてない?${c.first}、勘づき始めてるよ」`;
   else if(r&&!r.taken&&r.prog>=60)ctx=`「急いだほうがいいよ。${r.name}、本気で${c.first}を狙ってるから」`;
-  const P=[['like',()=>`「${c.first}はね、${TAGWORD[pick(c.likes)]}がうれしいみたいだよ」`],['dislike',()=>`「${c.first}、${TAGWORD[pick(c.dislikes)]}はちょっと苦手らしいよ」`],];
+  const P=[['like',()=>`「${c.first}はね、${stageOf(c)?'最近は':''}${TAGWORD[pick(likesOf(c))]}がうれしいみたいだよ」`],['dislike',()=>`「${c.first}、${stageOf(c)?'今は':''}${TAGWORD[pick(dislikesOf(c))]}はちょっと苦手らしいよ」`],['bored',()=>`「同じことばっかりしてると飽きられちゃうよ。${c.first}にもいろんな面を見せてあげて」`]];
+  if(stageOf(c)>0)P.push(['stage',()=>`「${c.first}、${stageOf(c)===2?'付き合ってから':'仲良くなってから'}好みが少し変わったみたい。前と同じやり方だと、うまくいかないかもよ」`]);
   if((S.story[c.id]||0)<4)P.push(['story',()=>`「${c.first}、もう少し仲良くなったら、大事な話をしてくれるかもよ」`]);
   if(friendsOf(c.id).length)P.push(['friend',()=>`「${c.first}は${friendsOf(c.id).map(f=>f.first).join('や')}と仲いいから、そっちにも嫌われないようにね」`]);
+  if(paid&&S.hidden&&S.hidden[c.id])P.push(['hidden',()=>`「ここだけの話……${c.first}って、実は${TAGWORD[S.hidden[c.id]]}に弱いんだって。意外でしょ?」`]);
   if(paid)P.push(['fav',()=>`「ここだけの話、${c.first}は『${ITEMS.find(i=>i.id===c.fav).name}』をもらうとすごく喜ぶって」`],['dis',()=>`「『${ITEMS.find(i=>i.id===c.dis).name}』だけはやめときな。${c.first}の苦手なやつだから」`],['spot',()=>`「デートなら、${SPOTWORD[c.spot]}が好きらしいよ」`]);
   let pool2=P.filter(p=>!used.includes(p[0]));if(!pool2.length){S.hints[c.id]=[];pool2=P}
   const h=paid?pick(pool2.filter(p=>['fav','dis','spot'].includes(p[0])).concat(pool2).slice(0,Math.max(1,pool2.length))):pick(pool2);
@@ -1243,7 +1245,7 @@ function storyEvent(){
 }
 function storyAct(k){social();
   const o=cur.order[k],c=ch(S.target),st=S.st[c.id],i=S.story[c.id]||0;meet(c.id);
-  let d=4;if(c.likes.includes(o.tag))d+=6;if(c.dislikes.includes(o.tag))d-=6;d+=rnd(-2,3);d=gain(c,d);
+  const ts=tagScore(c,o.tag,6,6);let d=4+ts.d;d+=rnd(-2,3);d=gain(c,d);
   const b=st.aff;st.aff=clamp(st.aff+d,0,100);const kind=d>=8?'good':d>=0?'meh':'bad';S.story[c.id]=i+1;
   log(`${c.first}のひみつ(${i+1}/4)を知った。`);save();
   show(`<span class="stamp hand">${esc(c.first)}のひみつ ${i+1}/4</span><h2 class="hand">${esc(c.first)}のひみつ</h2><p>あなたの答え:<b>${fmt(o.label,c)}</b></p>
@@ -1264,11 +1266,11 @@ function chatEvent(){
 }
 function chatAct(i){
   const c=ch(S.target),st=S.st[c.id],lover=S.partner===c.id;let d,rep='',res;const opt=(S.chatOpts||[])[i]||{l:'',t:'ignore'},k=opt.t;if(k!=='ignore'&&k!=='cold')meet(c.id);
-  if(k==='cold'){const cool=c.likes.includes('quiet')&&c.lv>=4;d=cool?1:lover?-4:-2;rep=bubble(fmt(opt.l,c),'r');
+  if(k==='cold'){const cool=prefOf(c,'quiet')>0&&c.lv>=4;d=cool?1:lover?-4:-2;rep=bubble(fmt(opt.l,c),'r');
     res=cool?bubble('「わかった」','l'):bubble(fmt(pick(['(少しさみしそうなスタンプが返ってきた)','「……そっか。わかった」','「りょうかい……」']),c),'l')}
-  else if(k==='ignore'){const cool=c.likes.includes('quiet')&&c.lv>=4;d=cool?0:lover?-6:-4;
+  else if(k==='ignore'){const cool=prefOf(c,'quiet')>0&&c.lv>=4;d=cool?0:lover?-6:-4;
     res=cool?bubble(fmt('……(返事がなくても、気にしていないようだ)',c),'note'):lover?bubble(fmt(NN('ignoredLover'),c),'l'):bubble(fmt(NN('ignored'),c),'note')}
-  else{d=2;if(c.likes.includes(k))d+=6;if(c.dislikes.includes(k))d-=6;d+=sbonus(TAGSTAT[k])+rnd(-3,3);d=gain(c,d);
+  else{d=2+tagScore(c,k,6,6).d;d+=sbonus(TAGSTAT[k])+rnd(-3,3);d=gain(c,d);
     rep=bubble(fmt(opt.l,c),'r');const kind=d>=7?'good':d>=0?'meh':'bad';res=bubble(fmt(unq(L(c,kind)),c),'l')}
   const b=st.aff;st.aff=clamp(st.aff+d,0,100);log(`${c.first}からのメッセージに${k==='ignore'?'既読スルーした':'返信した'}。`);save();
   show(`<h2 class="hand">メッセージ</h2>
@@ -1320,6 +1322,7 @@ function howto(){
   <h3>浮気・二股</h3><p>恋人がいると、こっそり他の人と会ったり告白したりできます(五股まで)。付き合う人数が多いほど、また本命の難易度★が高いほどバレやすく、バレると修羅場です。恋人に浮気されることもあります。</p>
   <h3>メッセージ・ひみつ・人間関係</h3><p>夜には相手からメッセージが届きます。仲良くなると相手の「ひみつ」が明かされます。キャラ同士には友達関係があり、誰かを振ると、その友達からの印象も下がります。</p>
   <h3>親友のちひろ</h3><p>1日1回、時間を使わずに相談できます。ジュースをおごると、好きなプレゼントやデート先を教えてくれます。何回か相談すると、相手が重視する能力もわかります。</p>
+  <h3>相手の気持ちを読もう</h3><p>喜ぶ行動は、仲が深まったり付き合ったりすると変わります。同じタイプの行動を続けると「またそれ?」と飽きられます。さらに、はじめるたびに各キャラに1つ「裏の好み」がつくので、前回の知識だけでは通用しません。ちひろに聞いたり、反応を観察したりして見つけよう。</p>
   <h3>キープは禁物</h3><p>付き合っていない相手は、しばらく会わないと好感度が下がります(高いほど早く冷めます)。好感度70以上のまま付き合わずにいると「はっきりして」と呼び出され、好感度60以上の人を3人以上キープしていると「八方美人」の噂が立って、みんなの好感度が下がります。</p>
   <h3>バイト</h3><p>何が起きるかは日によって違います。3回続けると疲れてミスが増え、お金が減ってしまいます。</p>
   <h3>卒業</h3><p>4年生の3月が終わると卒業式。大学生活の振り返りと称号が表示されます。</p>
@@ -1347,8 +1350,7 @@ function scene(){
 function act(i){
   const o=cur.order[i],c=ch(S.target),st=S.st[c.id],r=rv(c);social();meet(c.id);
   let d=3,rushed=false,note='';
-  if(c.likes.includes(o.tag))d+=7;
-  if(c.dislikes.includes(o.tag))d-=8;
+  const ts=tagScore(c,o.tag,7,8);d+=ts.d;
   d+=sbonus(TAGSTAT[o.tag]);
   if(o.need){if(st.aff<o.need){d-=Math.min(14,Math.ceil((o.need-st.aff)/3));rushed=true}else d+=Math.round(o.need/8)+2}
   if(S.partner===c.id&&o.tag==='quiet'&&cur.id!=='fight')d-=2;
@@ -1367,7 +1369,7 @@ function act(i){
   show(`${tip('result',c)}<h2 class="hand">${esc(cur.title)}</h2>
   <p>あなたは「${fmt(o.label,c)}」を選んだ。</p>
   <div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div>
-  ${note?`<p>${fmt(note,c)}</p>`:''}<p>${fmt(feel,c)}${rnote?' '+fmt(rnote,c):''}</p>${fnote}<div style="max-width:420px">${meter(st.aff,1,real)}</div>
+  ${note?`<p>${fmt(note,c)}</p>`:''}<p>${fmt(feel,c)}${rnote?' '+fmt(rnote,c):''}</p>${boredNote(c,ts)}${fnote}<div style="max-width:420px">${meter(st.aff,1,real)}</div>
   <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
 function next(){
@@ -1415,6 +1417,47 @@ function next(){
   if(!taken(c.id)&&(st.aff>=15||S.partner===c.id)&&Math.random()<.28){save();return chatEvent()}
   save();plan();
 }
+/* ---------- 好みの計算(ここに一本化) ---------- */
+/* ⑥ 関係の段階で好みが変わる:0=知り合い、1=好感度60以上、2=恋人(本命・秘密の恋人) */
+const PREF2={
+hayate:{close:[['serious','ask','bold'],['joke']],lover:[['talk','quiet','help'],['joke']]},
+makoto:{close:[['ask','talk','help'],['bold']],lover:[['bold','talk','ask'],['joke']]},
+leo:{close:[['talk','serious','ask'],['joke']],lover:[['quiet','serious','talk'],['bold']]},
+haru:{close:[['joke','ask','quiet'],['bold']],lover:[['serious','quiet','joke'],['help']]},
+kanade:{close:[['talk','ask','help'],['bold']],lover:[['bold','talk','quiet'],['help']]},
+koharu:{close:[['talk','serious','help'],['bold']],lover:[['joke','help','bold'],['quiet']]},
+reika:{close:[['serious','talk','quiet'],['bold']],lover:[['quiet','help','serious'],['joke']]},
+mizuki:{close:[['ask','talk','serious'],['bold']],lover:[['talk','joke','help'],['bold']]},
+yume:{close:[['ask','talk','serious'],['joke']],lover:[['help','quiet','bold'],['joke']]},
+hiyori:{close:[['talk','joke','quiet'],['serious']],lover:[['help','ask','bold'],['serious']]},
+sota:{close:[['serious','bold','talk'],['quiet']],lover:[['joke','help','talk'],['serious']]},
+yu:{close:[['ask','serious','help'],['bold']],lover:[['joke','bold','talk'],['serious']]},
+hikaru:{close:[['quiet','ask','talk'],['joke']],lover:[['quiet','serious','help'],['bold']]},
+saku:{close:[['quiet','ask','serious'],['bold','talk']],lover:[['talk','quiet','help'],['bold']]},
+daiki:{close:[['ask','serious','talk'],['bold']],lover:[['joke','quiet','help'],['bold']]},
+rio:{close:[['serious','ask','talk'],['joke']],lover:[['help','bold','quiet'],['joke']]},
+shiori:{close:[['ask','serious','bold'],['help']],lover:[['joke','bold','talk'],['help']]},
+kaede:{close:[['help','talk','serious'],['joke']],lover:[['quiet','help','bold'],['serious']]},
+natsuki:{close:[['talk','ask','serious'],['help']],lover:[['bold','help','joke'],['serious']]},
+shion:{close:[['quiet','ask','serious'],['bold','joke']],lover:[['talk','ask','quiet'],['bold']]}
+};
+const PTAGS=['serious','ask','talk','joke','help','bold','quiet'];
+function stageOf(c){return (S.partner===c.id||sides().includes(c.id))?2:S.st[c.id].aff>=60?1:0}
+function likesOf(c){const g=stageOf(c),P=PREF2[c.id];return g===2&&P?P.lover[0]:g===1&&P?P.close[0]:c.likes}
+function dislikesOf(c){const g=stageOf(c),P=PREF2[c.id];return g===2&&P?P.lover[1]:g===1&&P?P.close[1]:c.dislikes}
+/* ⑦ 周回ごとの裏の好み(はじめるたびにランダム) */
+function rollHidden(){const h={};CHARS.forEach(c=>{const pool=PTAGS.filter(t=>!c.likes.includes(t));h[c.id]=pick(pool)});return h}
+function prefOf(c,tag){if(S.hidden&&S.hidden[c.id]===tag)return 1;return likesOf(c).includes(tag)?1:dislikesOf(c).includes(tag)?-1:0}
+/* ⑤ マンネリ:同じ相手に同じタイプの行動を続けると効き目が落ちる */
+function streakOf(c,tag){const a=(S.lastTags&&S.lastTags[c.id])||[];let n=0;for(let i=a.length-1;i>=0&&a[i]===tag;i--)n++;return n}
+function useTag(c,tag){if(!S.lastTags)S.lastTags={};const a=S.lastTags[c.id]=(S.lastTags[c.id]||[]);a.push(tag);if(a.length>4)a.shift()}
+/* good:好みのとき加点 bad:苦手なとき減点。戻り値 {d:点数, bored:マンネリか} */
+function tagScore(c,tag,good,bad){
+  const v=prefOf(c,tag),n=streakOf(c,tag);
+  let d=v>0?good*[1,.5,0][Math.min(n,2)]:v<0?-bad:0;if(n>=2)d-=2;
+  useTag(c,tag);return {d:Math.round(d),bored:n>=2,half:n===1&&v>0};
+}
+function boredNote(c,r){return r.bored?`<p class="ripple down">${esc(c.first)}は「またそれ?」という顔をした。同じような行動が続いて、飽きられてきたみたいだ。</p>`:r.half?`<p style="font-size:.85rem;color:var(--ink-soft)">${esc(c.first)}の反応が、前より少し薄い気がする……。</p>`:''}
 /* ---------- キープ防止 ---------- */
 /* A:付き合っていない相手は、会わないと好感度が下がる(高いほど早く冷める) */
 /* B:好感度70以上で付き合っていないと「はっきりして」と呼び出される */
@@ -1621,7 +1664,7 @@ function resetGame(){ask('セーブを消して、はじめからやり直しま
 function resume(){
   const saved=load();
   if(!saved||!saved.name)return setup();
-  S=saved;if(S.sus==null)S.sus=0;if(S.pc===undefined)S.pc=null;S.story=S.story||{};S.hints=S.hints||{};S.rec=S.rec||{};if(!S.lastT||typeof S.lastT!=='object'){S.lastT={};STATS.forEach(k=>S.lastT[k]=S.turn||0)}if(S.turn==null){S.turn=10;S.lastT={};S.base={};STATS.forEach(k=>{S.lastT[k]=10;S.base[k]=Math.min(S.stats[k],20)});S.lastSocial=10;S.decayMsgs=[];S.tips={start:1,result:1,train:1,advisor:1,gift:1,pick:1}}if(S.side){S.sides=[S.side];delete S.side}S.sides=S.sides||[];if(!S.met){S.met={};CHARS.forEach(c=>S.met[c.id]=S.turn||0)}CHARS.forEach(c=>{if(!S.st[c.id])S.st[c.id]={aff:rnd(8,18),awk:0,ex:false}});
+  S=saved;if(S.sus==null)S.sus=0;if(S.pc===undefined)S.pc=null;S.story=S.story||{};S.hints=S.hints||{};S.rec=S.rec||{};if(!S.lastT||typeof S.lastT!=='object'){S.lastT={};STATS.forEach(k=>S.lastT[k]=S.turn||0)}if(S.turn==null){S.turn=10;S.lastT={};S.base={};STATS.forEach(k=>{S.lastT[k]=10;S.base[k]=Math.min(S.stats[k],20)});S.lastSocial=10;S.decayMsgs=[];S.tips={start:1,result:1,train:1,advisor:1,gift:1,pick:1}}if(S.side){S.sides=[S.side];delete S.side}S.sides=S.sides||[];if(!S.hidden)S.hidden=rollHidden();if(!S.lastTags)S.lastTags={};if(!S.met){S.met={};CHARS.forEach(c=>S.met[c.id]=S.turn||0)}CHARS.forEach(c=>{if(!S.st[c.id])S.st[c.id]={aff:rnd(8,18),awk:0,ex:false}});
   S.target?plan():toPick();
 }
 function titleScreen(){
