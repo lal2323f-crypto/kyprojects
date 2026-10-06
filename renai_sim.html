@@ -881,6 +881,7 @@ function setTarget(id){
 
 /* ---------- 今日の予定 ---------- */
 function plan(){
+  if(S)S.mood=null;
   if(!S.partner&&sides().length)return sidePromote();
   const c=ch(S.target),st=S.st[c.id],lover=S.partner===c.id;
   const canDate=(lover||st.aff>=35)&&!taken(c.id);
@@ -1087,14 +1088,14 @@ function sideLeft(id){
   <div class="row"><button class="btn" onclick="plan()" autofocus>次へ</button></div>`,true);
 }
 function cheatGo(id){
-  const p=ch(S.partner),o=ch(id);S.cheatWith=id;cur=freshScene('ch',CHEATS);cur.order=[...cur.ch].sort(()=>Math.random()-.5);save();
-  show(`<span class="stamp hand">浮気</span><h2 class="hand">${esc(cur.title)}</h2><div class="speaker">${ava(o)}<p style="margin:0">${fmt3(cur.text,p,o)}</p></div>
+  const p=ch(S.partner),o=ch(id);S.cheatWith=id;cur=freshScene('ch',CHEATS);cur.order=[...cur.ch].sort(()=>Math.random()-.5);rollMood(o);save();const mt=moodText(o);
+  show(`<span class="stamp hand">浮気</span><h2 class="hand">${esc(cur.title)}</h2><div class="speaker">${ava(o)}<p style="margin:0">${fmt3(cur.text,p,o)}${mt?`<br><span style="color:var(--ink-soft)">${fmt(mt,o)}</span>`:''}</p></div>
   <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:0">どうする?</p>
   <div class="choices">${cur.order.map((x,i)=>`<button class="choice" onclick="cheatAct(${i})" ${i===0?'autofocus':''}>${fmt3(x.label,p,o)}</button>`).join('')}</div>`,true);
 }
 function cheatAct(i){social();
   const x=cur.order[i],p=ch(S.partner),o=ch(S.cheatWith),so=S.st[o.id],sp=S.st[p.id];meet(o.id);
-  const ts=tagScore(o,x.tag,7,8);let d=3+ts.d;d+=sbonus(TAGSTAT[x.tag]);
+  const me=moodEffect(o,x.tag);const ts=tagScore(o,x.tag,7,8);let d=3+ts.d;endMood();d+=sbonus(TAGSTAT[x.tag]);
   if(x.need){if(so.aff<x.need)d-=Math.min(14,Math.ceil((x.need-so.aff)/3));else d+=Math.round(x.need/8)+2}
   d+=o.chaos?rnd(-9,9):rnd(-4,4);
   let extra='';
@@ -1105,7 +1106,7 @@ function cheatAct(i){social();
   sp.aff=Math.max(0,sp.aff-2);rc('cheat');S.skipped=true;S.lastCheat=o.id;S.cheatedNow=true;S.tturns++;
   log(`${p.first}に内緒で${o.first}と会った(${cur.title})。`);save();
   show(`${tip('cheat',p)}<span class="stamp hand">浮気</span><h2 class="hand">${esc(cur.title)}</h2><p>あなたは「${fmt3(x.label,p,o)}」を選んだ。</p>
-  <div class="speaker">${ava(o)}<div class="quote hand">${fmt(quote,o)}</div></div>${extra?`<p>${extra}</p>`:''}${boredNote(o,ts)}
+  <div class="speaker">${ava(o)}<div class="quote hand">${fmt(quote,o)}</div></div>${extra?`<p>${extra}</p>`:''}${me}${boredNote(o,ts)}
   <div style="max-width:420px">${meter(so.aff,1,so.aff-b)}</div>
   <p style="margin-top:12px">${esc(p.first)}にバレる危険:<b>${susLabel()}</b>${friendsOf(p.id).includes(o)?`<br><span class="ripple down">${esc(o.first)}は${esc(p.first)}の友達。噂が伝わりやすい……</span>`:''}</p>
   <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
@@ -1290,6 +1291,7 @@ function decayStats(){
 }
 /* ---------- ちひろのチュートリアル ---------- */
 const TIPS={
+ mood:'今日の{t}、いつもとちょっと様子がちがうね。気分によって喜ぶことも変わるから、よく見てあげて。',
  keep:'いい感じの人を何人もキープしてない?会わないと気持ちは冷めていくし、そのうち「はっきりして」って言われるよ。',
  happo:'あちゃー……。好感度が高い人を3人以上キープしてると、こういう噂が立つの。気をつけてね。',
  start:'まずは{t}に会いに行ってみよう!選んだ行動しだいで好感度が上がったり下がったりするよ。',
@@ -1322,7 +1324,7 @@ function howto(){
   <h3>浮気・二股</h3><p>恋人がいると、こっそり他の人と会ったり告白したりできます(五股まで)。付き合う人数が多いほど、また本命の難易度★が高いほどバレやすく、バレると修羅場です。恋人に浮気されることもあります。</p>
   <h3>メッセージ・ひみつ・人間関係</h3><p>夜には相手からメッセージが届きます。仲良くなると相手の「ひみつ」が明かされます。キャラ同士には友達関係があり、誰かを振ると、その友達からの印象も下がります。</p>
   <h3>親友のちひろ</h3><p>1日1回、時間を使わずに相談できます。ジュースをおごると、好きなプレゼントやデート先を教えてくれます。何回か相談すると、相手が重視する能力もわかります。</p>
-  <h3>相手の気持ちを読もう</h3><p>喜ぶ行動は、仲が深まったり付き合ったりすると変わります。同じタイプの行動を続けると「またそれ?」と飽きられます。さらに、はじめるたびに各キャラに1つ「裏の好み」がつくので、前回の知識だけでは通用しません。ちひろに聞いたり、反応を観察したりして見つけよう。</p>
+  <h3>相手の気持ちを読もう</h3><p>会うたびに、相手にはその日の気分があります(機嫌がいい・疲れている・落ち込んでいる・イライラしている など)。いつもは喜ぶ冗談も、落ち込んでいる日には逆効果。場面の描写からよく読み取ろう。喜ぶ行動は、仲が深まったり付き合ったりすると変わります。同じタイプの行動を続けると「またそれ?」と飽きられます。さらに、はじめるたびに各キャラに1つ「裏の好み」がつくので、前回の知識だけでは通用しません。ちひろに聞いたり、反応を観察したりして見つけよう。</p>
   <h3>キープは禁物</h3><p>付き合っていない相手は、しばらく会わないと好感度が下がります(高いほど早く冷めます)。好感度70以上のまま付き合わずにいると「はっきりして」と呼び出され、好感度60以上の人を3人以上キープしていると「八方美人」の噂が立って、みんなの好感度が下がります。</p>
   <h3>バイト</h3><p>何が起きるかは日によって違います。3回続けると疲れてミスが増え、お金が減ってしまいます。</p>
   <h3>卒業</h3><p>4年生の3月が終わると卒業式。大学生活の振り返りと称号が表示されます。</p>
@@ -1340,17 +1342,17 @@ function makeScene(){
   return freshScene('sc',SCENES);
 }
 function scene(){
-  const c=ch(S.target);cur=makeScene();S.last=cur.id;save();
-  cur.order=[...cur.ch].sort(()=>Math.random()-.5);
-  show(`<span class="stamp hand">${esc(cur.title)}</span><h2 class="hand">${esc(cur.title)}</h2>
-  <div class="speaker">${ava(c)}<p style="margin:0">${fmt(cur.text,c)}</p></div>
+  const c=ch(S.target);cur=makeScene();S.last=cur.id;rollMood(c);save();
+  cur.order=[...cur.ch].sort(()=>Math.random()-.5);const mt=moodText(c);
+  show(`${mt?tip('mood',c):''}<span class="stamp hand">${esc(cur.title)}</span><h2 class="hand">${esc(cur.title)}</h2>
+  <div class="speaker">${ava(c)}<p style="margin:0">${fmt(cur.text,c)}${mt?`<br><span style="color:var(--ink-soft)">${fmt(mt,c)}</span>`:''}</p></div>
   <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:0">どうする?</p>
   <div class="choices">${cur.order.map((o,i)=>`<button class="choice" onclick="act(${i})" ${i===0?'autofocus':''}>${fmt(o.label,c)}</button>`).join('')}</div>`,true);
 }
 function act(i){
   const o=cur.order[i],c=ch(S.target),st=S.st[c.id],r=rv(c);social();meet(c.id);
   let d=3,rushed=false,note='';
-  const ts=tagScore(c,o.tag,7,8);d+=ts.d;
+  const me=moodEffect(c,o.tag);const ts=tagScore(c,o.tag,7,8);d+=ts.d;endMood();
   d+=sbonus(TAGSTAT[o.tag]);
   if(o.need){if(st.aff<o.need){d-=Math.min(14,Math.ceil((o.need-st.aff)/3));rushed=true}else d+=Math.round(o.need/8)+2}
   if(S.partner===c.id&&o.tag==='quiet'&&cur.id!=='fight')d-=2;
@@ -1369,7 +1371,7 @@ function act(i){
   show(`${tip('result',c)}<h2 class="hand">${esc(cur.title)}</h2>
   <p>あなたは「${fmt(o.label,c)}」を選んだ。</p>
   <div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div>
-  ${note?`<p>${fmt(note,c)}</p>`:''}<p>${fmt(feel,c)}${rnote?' '+fmt(rnote,c):''}</p>${boredNote(c,ts)}${fnote}<div style="max-width:420px">${meter(st.aff,1,real)}</div>
+  ${note?`<p>${fmt(note,c)}</p>`:''}<p>${fmt(feel,c)}${rnote?' '+fmt(rnote,c):''}</p>${me}${boredNote(c,ts)}${fnote}<div style="max-width:420px">${meter(st.aff,1,real)}</div>
   <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
 function next(){
@@ -1447,7 +1449,22 @@ function likesOf(c){const g=stageOf(c),P=PREF2[c.id];return g===2&&P?P.lover[0]:
 function dislikesOf(c){const g=stageOf(c),P=PREF2[c.id];return g===2&&P?P.lover[1]:g===1&&P?P.close[1]:c.dislikes}
 /* ⑦ 周回ごとの裏の好み(はじめるたびにランダム) */
 function rollHidden(){const h={};CHARS.forEach(c=>{const pool=PTAGS.filter(t=>!c.likes.includes(t));h[c.id]=pick(pool)});return h}
-function prefOf(c,tag){if(S.hidden&&S.hidden[c.id]===tag)return 1;return likesOf(c).includes(tag)?1:dislikesOf(c).includes(tag)?-1:0}
+function prefOf(c,tag,noMood){let v=(S.hidden&&S.hidden[c.id]===tag)?1:likesOf(c).includes(tag)?1:dislikesOf(c).includes(tag)?-1:0;
+  if(!noMood&&S.mood&&S.mood.id===c.id){const m=MOODS[S.mood.m];if(m&&m.mod[tag])v=clamp(v+m.mod[tag],-1,1)}return v}
+/* ④ その日の気分:会うたびに決まり、喜ぶ行動が変わる。ラベルは出さず描写で匂わせる */
+const MOODS={
+ normal:{w:40,mod:{},txt:[]},
+ good:{w:20,mod:{joke:1,bold:1,talk:1},txt:['{t}は鼻歌まじりで、なんだか機嫌がよさそうだ。','{t}の表情が、いつもよりぱっと明るい。','{t}はいいことがあったのか、にこにこしている。'],up:'{t}は今日、機嫌がよかったみたいだ。ノリのいい行動がよく響いた。',down:''},
+ tired:{w:15,mod:{help:1,quiet:1,bold:-1,talk:-1,joke:-1},txt:['{t}は小さくあくびをした。目の下にうっすらクマがある。','{t}の肩が、いつもより少し落ちている。','{t}は眠そうに目をこすっている。'],up:'疲れていた{t}には、その気づかいがうれしかったみたいだ。',down:'{t}は今日、疲れていたみたいだ。その勢いは少し重かったかも……。'},
+ down:{w:15,mod:{quiet:1,ask:1,serious:1,joke:-2,bold:-2},txt:['{t}の目が、少し赤い気がする。','{t}はいつもより口数が少なく、どこか元気がない。','{t}はぼんやりと遠くを見つめている。'],up:'落ち込んでいた{t}の心に、そっと届いたみたいだ。',down:'{t}は今日、落ち込んでいたみたいだ。……そのノリは逆効果だった。'},
+ angry:{w:10,mod:{quiet:1,help:1,bold:-2,joke:-1,ask:-1,talk:-1},txt:['{t}はスマホを見て、小さくため息をついた。眉間にしわが寄っている。','{t}の返事が、いつもより短くそっけない。','{t}は貧乏ゆすりをしている。何かにイライラしているようだ。'],up:'イライラしていた{t}には、そっとしておく優しさが効いた。',down:'{t}は今日、虫の居所が悪かったみたいだ。そっとしておけばよかったかも……。'}
+};
+function rollMood(c){const e=Object.entries(MOODS);let r=Math.random()*e.reduce((t,[,m])=>t+m.w,0);for(const [k,m] of e){if((r-=m.w)<0){S.mood={id:c.id,m:k};return}}S.mood={id:c.id,m:'normal'}}
+function moodText(c){const m=S.mood&&S.mood.id===c.id&&MOODS[S.mood.m];return m&&m.txt.length?pick(m.txt):''}
+/* 選んだ行動に気分が影響したかどうかの一言(結果画面用)。評価の前に呼ぶ */
+function moodEffect(c,tag){if(!S.mood||S.mood.id!==c.id)return'';const a=prefOf(c,tag,true),b=prefOf(c,tag),m=MOODS[S.mood.m];
+  return b>a&&m.up?`<p class="ripple up">${fmt(m.up,c)}</p>`:b<a&&m.down?`<p class="ripple down">${fmt(m.down,c)}</p>`:''}
+function endMood(){S.mood=null}
 /* ⑤ マンネリ:同じ相手に同じタイプの行動を続けると効き目が落ちる */
 function streakOf(c,tag){const a=(S.lastTags&&S.lastTags[c.id])||[];let n=0;for(let i=a.length-1;i>=0&&a[i]===tag;i--)n++;return n}
 function useTag(c,tag){if(!S.lastTags)S.lastTags={};const a=S.lastTags[c.id]=(S.lastTags[c.id]||[]);a.push(tag);if(a.length>4)a.shift()}
