@@ -205,6 +205,7 @@ details summary{cursor:pointer;font-weight:700}
   .tip{padding:8px 10px;margin-bottom:12px}
   .tip p{font-size:.85rem}
 }
+.choice.sp{border:2px solid #e8b400;background:linear-gradient(transparent 60%,var(--note) 60%)}
 /* ---------- 卒業の振り返り ---------- */
 .recap{margin-top:18px;border-top:2px dashed var(--line);padding-top:16px}
 .recap h3{font-size:1.4rem;margin:0 0 10px}
@@ -1088,14 +1089,14 @@ function sideLeft(id){
   <div class="row"><button class="btn" onclick="plan()" autofocus>次へ</button></div>`,true);
 }
 function cheatGo(id){
-  const p=ch(S.partner),o=ch(id);S.cheatWith=id;cur=freshScene('ch',CHEATS);cur.order=[...cur.ch].sort(()=>Math.random()-.5);rollMood(o);save();const mt=moodText(o);
+  const p=ch(S.partner),o=ch(id);S.cheatWith=id;cur=freshScene('ch',CHEATS);cur.order=buildChoices(cur);rollMood(o);save();const mt=moodText(o);
   show(`<span class="stamp hand">浮気</span><h2 class="hand">${esc(cur.title)}</h2><div class="speaker">${ava(o)}<p style="margin:0">${fmt3(cur.text,p,o)}${mt?`<br><span style="color:var(--ink-soft)">${fmt(mt,o)}</span>`:''}</p></div>
   <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:0">どうする?</p>
-  <div class="choices">${cur.order.map((x,i)=>`<button class="choice" onclick="cheatAct(${i})" ${i===0?'autofocus':''}>${fmt3(x.label,p,o)}</button>`).join('')}</div>`,true);
+  <div class="choices">${cur.order.map((x,i)=>`<button class="choice${x.sp?' sp':''}" onclick="cheatAct(${i})" ${i===0?'autofocus':''}>${choiceLabel(x,fmt3(x.label,p,o))}</button>`).join('')}</div>`,true);
 }
 function cheatAct(i){social();
   const x=cur.order[i],p=ch(S.partner),o=ch(S.cheatWith),so=S.st[o.id],sp=S.st[p.id];meet(o.id);
-  const me=moodEffect(o,x.tag);const ts=tagScore(o,x.tag,7,8);let d=3+ts.d;endMood();d+=sbonus(TAGSTAT[x.tag]);
+  const me=moodEffect(o,x.tag);const ts=tagScore(o,x.tag,7,8);let d=3+ts.d;endMood();const spx=spApply(x);d+=spx.d;d+=sbonus(TAGSTAT[x.tag]);
   if(x.need){if(so.aff<x.need)d-=Math.min(14,Math.ceil((x.need-so.aff)/3));else d+=Math.round(x.need/8)+2}
   d+=o.chaos?rnd(-9,9):rnd(-4,4);
   let extra='';
@@ -1106,7 +1107,7 @@ function cheatAct(i){social();
   sp.aff=Math.max(0,sp.aff-2);rc('cheat');S.skipped=true;S.lastCheat=o.id;S.cheatedNow=true;S.tturns++;
   log(`${p.first}に内緒で${o.first}と会った(${cur.title})。`);save();
   show(`${tip('cheat',p)}<span class="stamp hand">浮気</span><h2 class="hand">${esc(cur.title)}</h2><p>あなたは「${fmt3(x.label,p,o)}」を選んだ。</p>
-  <div class="speaker">${ava(o)}<div class="quote hand">${fmt(quote,o)}</div></div>${extra?`<p>${extra}</p>`:''}${me}${boredNote(o,ts)}
+  <div class="speaker">${ava(o)}<div class="quote hand">${fmt(quote,o)}</div></div>${extra?`<p>${extra}</p>`:''}${spx.html}${me}${boredNote(o,ts)}
   <div style="max-width:420px">${meter(so.aff,1,so.aff-b)}</div>
   <p style="margin-top:12px">${esc(p.first)}にバレる危険:<b>${susLabel()}</b>${friendsOf(p.id).includes(o)?`<br><span class="ripple down">${esc(o.first)}は${esc(p.first)}の友達。噂が伝わりやすい……</span>`:''}</p>
   <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
@@ -1325,6 +1326,7 @@ function howto(){
   <h3>メッセージ・ひみつ・人間関係</h3><p>夜には相手からメッセージが届きます。仲良くなると相手の「ひみつ」が明かされます。キャラ同士には友達関係があり、誰かを振ると、その友達からの印象も下がります。</p>
   <h3>親友のちひろ</h3><p>1日1回、時間を使わずに相談できます。ジュースをおごると、好きなプレゼントやデート先を教えてくれます。何回か相談すると、相手が重視する能力もわかります。</p>
   <h3>相手の気持ちを読もう</h3><p>会うたびに、相手にはその日の気分があります(機嫌がいい・疲れている・落ち込んでいる・イライラしている など)。いつもは喜ぶ冗談も、落ち込んでいる日には逆効果。場面の描写からよく読み取ろう。喜ぶ行動は、仲が深まったり付き合ったりすると変わります。同じタイプの行動を続けると「またそれ?」と飽きられます。さらに、はじめるたびに各キャラに1つ「裏の好み」がつくので、前回の知識だけでは通用しません。ちひろに聞いたり、反応を観察したりして見つけよう。</p>
+  <h3>選択肢</h3><p>同じ場面でも、出てくる選択肢は毎回変わります。能力を鍛えたりお金があったりすると、★マークの特別な選択肢が現れることがあり、効果も大きくなります。</p>
   <h3>キープは禁物</h3><p>付き合っていない相手は、しばらく会わないと好感度が下がります(高いほど早く冷めます)。好感度70以上のまま付き合わずにいると「はっきりして」と呼び出され、好感度60以上の人を3人以上キープしていると「八方美人」の噂が立って、みんなの好感度が下がります。</p>
   <h3>バイト</h3><p>何が起きるかは日によって違います。3回続けると疲れてミスが増え、お金が減ってしまいます。</p>
   <h3>卒業</h3><p>4年生の3月が終わると卒業式。大学生活の振り返りと称号が表示されます。</p>
@@ -1333,6 +1335,101 @@ function howto(){
 }
 
 /* ---------- イベント ---------- */
+/* ① 選択肢の候補を増やす:元の4つ+ここの3つから、毎回4つをランダムに出す */
+const MORE={
+lecture:[C('自分のノートをそっと{t}のほうに寄せる','quiet'),C('「ペン、お気に入りなの?」と話を広げる','talk'),C('講義が終わったら、要点を一緒に確認しようと提案する','serious')],
+cafeteria:[C('「ここ空くよ」と、食べ終わった自分の席を譲る','help'),C('「何頼んだの?」とトレーをのぞき込む','ask'),C('「満席すぎて、立ち食いそば屋みたい」と笑わせる','joke')],
+library:[C('検索端末で本の場所を調べてあげる','help'),C('「その本、たぶん貸し出し中だよ」と冗談めかして驚かせる','joke'),C('おすすめの参考書をメモに書いて渡す','serious')],
+circle:[C('「何か手伝えることある?」と聞く','ask'),C('片付けながら、今日の活動の話をする','talk'),C('少し離れたところで、自分の担当を黙々とこなす','quiet')],
+seminar:[C('お互いの案のいいところを合わせた折衷案を出す','talk'),C('「じゃあ両方試してみよう」と資料作りを引き受ける','help'),C('「今回はこっちでいこう」と押し切る','bold',30)],
+rain:[C('「傘、コンビニで買ってくるよ」と走っていく','help'),C('「止むまで、学食でお茶しない?」と誘う','bold',25),C('黙って、隣で雨宿りをする','quiet')],
+baito:[C('「何がおすすめか、教えようか?」とメニューを説明する','talk'),C('仕事中なので、目だけで合図をする','quiet'),C('「何を飲みたい気分?」と聞いてみる','ask')],
+exam:[C('「どこがわからないの?」と聞く','ask'),C('ノートの要点だけをまとめて送る','serious'),C('「了解」とだけ返して、こっそり付箋もつけて送る','quiet')],
+bench:[C('「いい天気だね」と、何気ない話をする','talk'),C('「空、何か面白いもの見える?」と冗談めかす','joke'),C('少し離れたところに座って、そっと見守る','quiet')],
+hobby:[C('その場で検索して、話についていこうとする','serious'),C('「どこが一番好きなの?」と聞き返す','ask'),C('「熱く語る{t}、いいね」と笑う','joke')],
+mistake:[C('黙って、残っているデータの復元を試す','quiet'),C('「誰にでもあるよ」と声をかける','talk'),C('「どの部分が消えたの?」と確認する','ask')],
+sns:[C('「その写真、すごくいいね」と直接言う','talk'),C('おもしろいコメントで笑わせる','joke'),C('見るだけにしておく','quiet')],
+cleanup:[C('「このへん、ゴミ多いね」と話しかける','talk'),C('拾ったものに変な名前をつけて笑わせる','joke'),C('「どっちから回る?」と相談する','ask')],
+shinkan:[C('「どんな活動してるの?」と質問攻めにする','ask'),C('「楽しそう!」と素直に話しかける','talk'),C('遠くからブースの様子を眺める','quiet')],
+hanabi:[C('はぐれないように、そっと袖をつかむ','bold',35),C('「たまやー!」と叫んで笑わせる','joke'),C('「どの花火が好き?」と聞く','ask')],
+kyugi:[C('作戦をちゃんと立てようと提案する','talk'),C('{t}のミスをさりげなくカバーする','help'),C('黙って自分のポジションを守る','quiet')],
+gakusai:[C('「一番人気のメニューは?」と聞く','ask'),C('行列の整理をして、静かに裏方に回る','quiet'),C('「売上、目標いけそう?」と真剣に作戦を考える','serious')],
+xmas:[C('「クリスマスなんて興味ないよね〜」とわざと言う','joke'),C('「よかったら、プレゼント交換しない?」と提案する','help'),C('予定のことは聞かずに、いつも通り接する','quiet')],
+valentine:[C('「チョコ、何個もらえるかな〜」とおどける','joke'),C('「甘いもの好き?」とさりげなく聞く','ask'),C('義理だと前置きして、真面目に渡す','serious')],
+haruyasumi:[C('「旅行先のおすすめ、調べておくね」と手伝う','help'),C('「お土産話、楽しみにしてる」と話す','talk'),C('「春休み明けも、また話そうね」と真面目に言う','serious')],
+date:[C('「{t}はどこ行きたい?」と聞く','ask'),C('街をぶらぶら歩きながらおしゃべりする','talk'),C('きっちり計画を立てた予定表を見せる','serious')],
+reply:[C('お詫びに、{t}の好きなお菓子を届ける','help'),C('「何の話だったの?」と内容を聞き直す','ask'),C('何事もなかったように返事をする','quiet')],
+jealous:[C('「さっき楽しそうだったね。何の話?」と聞く','ask'),C('いつも以上に優しくする','help'),C('「今度二人でどこか行こう」と誘う','bold',60)],
+fight:[C('「おなか空いてるとイライラするよね」と冗談で和ませる','joke'),C('「話してくれてありがとう」と、まず気持ちを受け止める','talk'),C('「次からこうしよう」とルールを決める提案をする','bold',50)],
+anniv:[C('二人の思い出の場所を、もう一度訪れる','serious'),C('{t}の好きなものを、こっそり準備しておく','help'),C('記念日にちなんだダジャレを考えて披露する','joke')],
+sick:[C('「治ったら、何がしたい?」と楽しい話をする','talk'),C('必要なものをリストにして、買い物を引き受ける','serious'),C('「すぐ行く!」と看病に駆けつける','bold',60)],
+future:[C('「一緒に考えよう」と、真剣に話し合う','talk'),C('「どんな未来でも応援する」と伝える','help'),C('黙って、{t}の話を聞く','quiet')],
+r1:[C('{t}に「あとで話そう」と声をかけておく','bold',25),C('二人の会話に、さりげなく面白いことを言って加わる','joke'),C('{t}が困っていないか、気にかけておく','help')],
+r2:[C('「楽しんできてね」と笑顔で送り出す','talk'),C('「誰と行くの?」とさりげなく聞く','ask'),C('自分の気持ちを、まじめに伝える','serious')],
+r3:[C('「負けないよ」と笑って宣戦布告する','bold',30),C('「お互い、がんばろう」と握手を求める','talk'),C('「{t}が選ぶことだよ」と冷静に返す','serious')],
+r4:[C('「どこで買ったの?」と聞く','ask'),C('「大事にしなよ」と言って、そっと離れる','help'),C('「自分の番はこれからだから」と笑う','joke')],
+c1:[C('{o}の話に、真剣にうなずく','serious'),C('{o}の分のケーキも注文してあげる','help'),C('他愛のない話で盛り上がる','talk')],
+c2:[C('{o}の話に、ずっと相づちを打つ','quiet'),C('くだらない話で笑わせる','joke'),C('{o}のことを、いろいろ質問する','ask')],
+c3:[C('「どれで迷ってるの?」と聞く','ask'),C('{o}が選ぶのを黙って待つ','quiet'),C('「全部似合うよ」と勢いで言う','bold',30)],
+c4:[C('「楽しかったね」と、今日の話をする','talk'),C('くだらない話で、帰り道を笑わせる','joke'),C('黙って隣を歩く','quiet')],
+lost:[C('{t}が探していないか、近くで待っていてあげる','quiet'),C('「これ、落としたよ。大事なものでしょ」と声をかける','talk'),C('「どこで落としたか覚えてる?」と聞く','ask')],
+train:[C('「今日どうだった?」と話しかける','ask'),C('「じゃんけんで負けたほうが座ろう」と笑わせる','joke'),C('「座って。顔、疲れてるよ」と真面目に言う','serious')],
+report:[C('図書館で一緒に資料を探そうと誘う','bold',25),C('自分のレポートの書き方を参考に話す','talk'),C('考えがまとまるまで、静かに待つ','quiet')],
+birthday:[C('{t}の好きそうなお菓子を、こっそり机に置いておく','help'),C('「誕生日おめでとう!」と大きな声で祝って笑わせる','joke'),C('メッセージカードに、丁寧にお祝いの言葉を書く','serious')],
+lab:[C('「どこで止まってる?」と聞く','ask'),C('「器具って、意外と重いよね」と話しかける','talk'),C('「貸して」と言って、先にやってしまう','bold',20)],
+night:[C('「眠くなるまで付き合うよ」と話し相手になる','talk'),C('ホットミルクのレシピを送る','help'),C('「おやすみ」とだけ返す','quiet')],
+cooking:[C('「何作るか、決めた?」と相談する','ask'),C('洗い物を全部引き受けて、静かに片付ける','quiet'),C('「味つけ、どうする?」と話しながら作る','talk')],
+cook:[C('「何を作りたいの?」と聞く','ask'),C('材料の買い出しをすべて引き受ける','serious'),C('「エプロン姿、似合ってる」とからかう','bold',50)],
+photo:[C('「一番いい写真を一緒に選ぼう」と話す','talk'),C('{t}の好きにさせてあげる','quiet'),C('「載せるなら、一言添えてほしいな」と頼む','help')],
+friends:[C('{t}の友達のことを、いろいろ質問する','ask'),C('{t}の自慢話をして、場を和ませる','talk'),C('「{t}のこと、大事にします」と宣言する','bold',60)],
+c5:[C('映画の内容について、{o}に質問する','ask'),C('上映前に、{o}の好きな席を確保する','help'),C('映画の名場面のモノマネをする','joke')]
+};
+/* ② 条件つきの特別な選択肢:能力やお金があるときだけ出る(★マーク・効果大) */
+const SP={
+lecture:{l:'講義の要点を、{t}にわかりやすく解説してあげる',t:'serious',st:'学力',min:55},
+cafeteria:{l:'「今日は二人分おごるよ」と、デザートつきのセットを頼む',t:'bold',money:1500},
+library:{l:'難しい問題を、その場でさらっと解いてみせる',t:'serious',st:'学力',min:60},
+circle:{l:'重い機材を一人で軽々と運び終える',t:'help',st:'体力',min:55},
+seminar:{l:'みんなが納得する一言で、議論を一瞬でまとめる',t:'talk',st:'話術',min:55},
+rain:{l:'タクシーを呼んで、{t}を家まで送る',t:'help',money:3000},
+baito:{l:'{t}のために、特製のラテアートを描いてみせる',t:'help',st:'ルックス',min:50},
+exam:{l:'出題されそうなところを予想して、まとめて送る',t:'serious',st:'学力',min:60},
+bench:{l:'気の利いた一言で、{t}をふっと笑顔にする',t:'talk',st:'話術',min:60},
+mistake:{l:'徹夜で、データを丸ごと作り直してみせる',t:'help',st:'体力',min:60},
+cleanup:{l:'ゴミ袋を両手に3つずつ持って、一気に運ぶ',t:'help',st:'体力',min:55},
+hanabi:{l:'人混みをかき分けて走り、{t}の手を引いて特等席へ',t:'bold',st:'体力',min:60,need:35},
+kyugi:{l:'華麗なプレーで、チームを逆転勝利に導く',t:'serious',st:'体力',min:60},
+gakusai:{l:'おしゃれに着こなした姿で呼び込みをして、行列を倍にする',t:'talk',st:'ルックス',min:60},
+xmas:{l:'雰囲気のいいレストランを予約して、さりげなく誘う',t:'bold',money:8000,need:45},
+valentine:{l:'有名店のチョコを、気負わずさらっと渡す',t:'bold',money:4000,need:35},
+date:{l:'夜景の見えるレストランを予約して、特別な一日にする',t:'bold',money:10000},
+anniv:{l:'{t}の名前入りのアクセサリーを贈る',t:'bold',money:8000},
+sick:{l:'栄養たっぷりのおかゆを手作りして届ける',t:'help',st:'学力',min:50},
+future:{l:'将来の夢を、言葉を選びながら堂々と語る',t:'serious',st:'話術',min:60},
+r3:{l:'余裕の笑顔で「{t}のいいところ、10個言える?」と返す',t:'talk',st:'話術',min:60},
+r4:{l:'「自分なら、こっちを選ぶな」と、もっといい物をさらっと見せる',t:'bold',st:'ルックス',min:60,need:40},
+lost:{l:'キャンパスを全力で走り回って、{t}を見つけ出して届ける',t:'help',st:'体力',min:55},
+report:{l:'{t}の興味から、面白いテーマをいくつも提案してみせる',t:'help',st:'学力',min:55},
+birthday:{l:'{t}の好きなお店のケーキを予約して、お祝いする',t:'bold',money:3000,need:35},
+night:{l:'眠れない夜にぴったりの、面白い話を次々と披露する',t:'talk',st:'話術',min:55},
+cooking:{l:'プロ顔負けの包丁さばきを見せる',t:'help',st:'学力',min:55},
+friends:{l:'ばっちり身だしなみを整えて、好印象で自己紹介する',t:'serious',st:'ルックス',min:55},
+c1:{l:'センスのいい話題で、{o}をずっと笑わせる',t:'talk',st:'話術',min:55},
+c3:{l:'{o}に似合う服を、プロのように選んであげる',t:'talk',st:'ルックス',min:55}
+};
+/* 候補から4つ選ぶ(なるべく違うタイプを混ぜる)+条件を満たせば★の特別な選択肢 */
+function spOk(sp){return sp.st?S.stats[sp.st]>=sp.min:S.money>=sp.money}
+function buildChoices(sc){
+  const all=[...sc.ch,...(MORE[sc.id]||[])].sort(()=>Math.random()-.5),out=[],seen=new Set();
+  for(const o of all)if(out.length<4&&!seen.has(o.tag)){out.push(o);seen.add(o.tag)}
+  for(const o of all)if(out.length<4&&!out.includes(o))out.push(o);
+  out.sort(()=>Math.random()-.5);
+  const sp=SP[sc.id];if(sp&&spOk(sp))out.push({label:sp.l,tag:sp.t,need:sp.need||0,sp:1,money:sp.money||0,st:sp.st||'',min:sp.min||0});
+  return out;
+}
+function choiceLabel(o,txt){return o.sp?`<b>★ ${txt}</b><br><span style="font-size:.75rem;color:var(--ink-soft)">${o.st?`${o.st}${o.min}以上なのでできる`:`${yen(o.money)}かかる`}</span>`:txt}
+function spApply(o){if(!o.sp)return{d:0,html:''};if(o.money)S.money=Math.max(0,S.money-o.money);
+  return{d:5,html:`<p class="ripple up">★ ${o.st?`鍛えた${o.st}が活きた!`:`${yen(o.money)}を使った特別な行動だった。`}</p>`}}
 function makeScene(){
   const c=ch(S.target),r=rv(c);
   if(r&&!r.taken&&S.partner!==c.id&&Math.random()<.3){return freshScene('rs',RSCENES)}
@@ -1343,16 +1440,16 @@ function makeScene(){
 }
 function scene(){
   const c=ch(S.target);cur=makeScene();S.last=cur.id;rollMood(c);save();
-  cur.order=[...cur.ch].sort(()=>Math.random()-.5);const mt=moodText(c);
+  cur.order=buildChoices(cur);const mt=moodText(c);
   show(`${mt?tip('mood',c):''}<span class="stamp hand">${esc(cur.title)}</span><h2 class="hand">${esc(cur.title)}</h2>
   <div class="speaker">${ava(c)}<p style="margin:0">${fmt(cur.text,c)}${mt?`<br><span style="color:var(--ink-soft)">${fmt(mt,c)}</span>`:''}</p></div>
   <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:0">どうする?</p>
-  <div class="choices">${cur.order.map((o,i)=>`<button class="choice" onclick="act(${i})" ${i===0?'autofocus':''}>${fmt(o.label,c)}</button>`).join('')}</div>`,true);
+  <div class="choices">${cur.order.map((o,i)=>`<button class="choice${o.sp?' sp':''}" onclick="act(${i})" ${i===0?'autofocus':''}>${choiceLabel(o,fmt(o.label,c))}</button>`).join('')}</div>`,true);
 }
 function act(i){
   const o=cur.order[i],c=ch(S.target),st=S.st[c.id],r=rv(c);social();meet(c.id);
   let d=3,rushed=false,note='';
-  const me=moodEffect(c,o.tag);const ts=tagScore(c,o.tag,7,8);d+=ts.d;endMood();
+  const me=moodEffect(c,o.tag);const ts=tagScore(c,o.tag,7,8);d+=ts.d;endMood();const spx=spApply(o);d+=spx.d;
   d+=sbonus(TAGSTAT[o.tag]);
   if(o.need){if(st.aff<o.need){d-=Math.min(14,Math.ceil((o.need-st.aff)/3));rushed=true}else d+=Math.round(o.need/8)+2}
   if(S.partner===c.id&&o.tag==='quiet'&&cur.id!=='fight')d-=2;
@@ -1371,7 +1468,7 @@ function act(i){
   show(`${tip('result',c)}<h2 class="hand">${esc(cur.title)}</h2>
   <p>あなたは「${fmt(o.label,c)}」を選んだ。</p>
   <div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div>
-  ${note?`<p>${fmt(note,c)}</p>`:''}<p>${fmt(feel,c)}${rnote?' '+fmt(rnote,c):''}</p>${me}${boredNote(c,ts)}${fnote}<div style="max-width:420px">${meter(st.aff,1,real)}</div>
+  ${note?`<p>${fmt(note,c)}</p>`:''}<p>${fmt(feel,c)}${rnote?' '+fmt(rnote,c):''}</p>${spx.html}${me}${boredNote(c,ts)}${fnote}<div style="max-width:420px">${meter(st.aff,1,real)}</div>
   <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
 function next(){
