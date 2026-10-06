@@ -857,7 +857,7 @@ function autoPref(){const g=document.querySelector('input[name=gd]:checked').val
 function start(){
   const name=document.getElementById('nm').value.trim();
   if(!name){document.getElementById('err').textContent='名前を入力してください。';return}
-  S={name,gender:document.querySelector('input[name=gd]:checked').value,pref:document.querySelector('input[name=pf]:checked').value,grade:+document.getElementById('gr').value,month:0,half:0,target:null,partner:null,st:{},rv:{},log:[],seen:{},gradDone:false,last:null,tturns:0,skipped:false,money:10000,stats:{},sus:0,pc:null,story:{},hints:{},turn:0,lastT:{},base:{},lastSocial:0,decayMsgs:[],tips:{},rec:{startGrade:+document.getElementById('gr').value}};
+  S={name,gender:document.querySelector('input[name=gd]:checked').value,pref:document.querySelector('input[name=pf]:checked').value,grade:+document.getElementById('gr').value,month:0,half:0,target:null,partner:null,st:{},rv:{},log:[],seen:{},gradDone:false,last:null,tturns:0,skipped:false,money:10000,stats:{},sus:0,pc:null,story:{},hints:{},turn:0,lastT:{},base:{},lastSocial:0,decayMsgs:[],tips:{},met:{},rec:{startGrade:+document.getElementById('gr').value}};
   STATS.forEach(k=>{S.stats[k]=rnd(15,30);S.base[k]=S.stats[k];S.lastT[k]=0});
   CHARS.forEach(c=>S.st[c.id]={aff:rnd(8,18),awk:0,ex:false});
   log(`${S.name}の大学生活が始まった。`);save();toPick();
@@ -893,6 +893,7 @@ function plan(){
   else if(u4&&!S.tips.gift)t=tip('gift',c);
   else if(lover&&!S.tips.lover)t=tip('lover',c);
   else if(!lover&&st.aff>=40&&!S.tips.conf40)t=tip('conf40',c);
+  else if(keepers(60).length>=2&&!S.tips.keep)t=tip('keep',c);
   else if(S.decayMsgs&&S.decayMsgs.length&&!S.tips.decay)t=tip('decay',c);
   const dm=(S.decayMsgs||[]).length?`<div class="decay">${S.decayMsgs.map(esc).join('<br>')}</div>`:'';S.decayMsgs=[];save();
   const next2=!u2?'あと'+(2-S.turn)+'ターンで自分磨きが解放':!u4?'あと'+(4-S.turn)+'ターンでプレゼントとデートが解放':'';
@@ -972,7 +973,7 @@ function giftMenu(who){
   <div class="row"><button class="btn ghost" onclick="plan()">やめる</button></div>`,true);
 }
 function give(id,who){social();
-  const c=ch(who||S.target),st=S.st[c.id],it=ITEMS.find(i=>i.id===id),r=rv(c);S.money-=it.price;rc('gifts');
+  const c=ch(who||S.target),st=S.st[c.id],it=ITEMS.find(i=>i.id===id),r=rv(c);meet(c.id);S.money-=it.price;rc('gifts');
   let d,kind,msg;
   if(it.price>=6000&&st.aff<30&&S.partner!==c.id&&!sides().includes(c.id)){d=-6;kind='bad';msg=NN('giftHeavy')}
   else if(it.id===c.fav){d=14+Math.round(it.price/3000);kind='good';msg=NN('giftFav')}
@@ -990,7 +991,7 @@ function dateMenu(who){
   <div class="row"><button class="btn ghost" onclick="plan()">やめる</button></div>`,true);
 }
 function invite(id,who){social();
-  const c=ch(who||S.target),st=S.st[c.id],s=SPOTS.find(x=>x.id===id),r=rv(c),lover=S.partner===c.id||sides().includes(c.id);
+  const c=ch(who||S.target),st=S.st[c.id],s=SPOTS.find(x=>x.id===id),r=rv(c);meet(c.id);const lover=S.partner===c.id||sides().includes(c.id);
   let p=lover?1:clamp((st.aff-20)/40+(S.stats['ルックス']-40)/200-(st.awk>0?.3:0),.1,.95);
   if(Math.random()>p){rc('dateNg');st.aff=Math.max(0,st.aff-3);log(`${c.first}をデートに誘ったが断られた。`);save();
     return show(`<h2 class="hand">デートのお誘い</h2><p>${esc(c.first)}を${s.name}に誘ってみた。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,'refuse'),c)}</div></div><p>${fmt(NN('refuseAfter'),c)}</p><div style="max-width:420px">${meter(st.aff,1,-3)}</div><div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true)}
@@ -1049,7 +1050,7 @@ function cheatConfess(id){
   ask(`${esc(p.first)}と付き合ったまま、${esc(o.first)}に告白しますか?<br>成功すると${['','','二股','三股','四股','五股'][sides().length+2]}になり、${esc(p.first)}にバレる危険が一気に上がります。`,'告白する',()=>doCheatConfess(id));
 }
 function doCheatConfess(id){social();
-  const p=ch(S.partner),o=ch(id),so=S.st[o.id];
+  const p=ch(S.partner),o=ch(id),so=S.st[o.id];meet(o.id);
   let pr=(so.aff-45)/50+(o.diff||0)+(S.stats[o.want]-40)/150;if(so.ex)pr-=.2;if(so.awk>0)pr-=.15;if((S.story[o.id]||0)>=4)pr+=.1;if(so.knows)pr-=.1;
   pr=clamp(pr,.03,.85);const ok=Math.random()<pr;const fr=friendsOf(p.id).includes(o);
   rc('conf');S.lastCheat=o.id;S.cheatedNow=true;S.skipped=true;S.tturns++;
@@ -1092,7 +1093,7 @@ function cheatGo(id){
   <div class="choices">${cur.order.map((x,i)=>`<button class="choice" onclick="cheatAct(${i})" ${i===0?'autofocus':''}>${fmt3(x.label,p,o)}</button>`).join('')}</div>`,true);
 }
 function cheatAct(i){social();
-  const x=cur.order[i],p=ch(S.partner),o=ch(S.cheatWith),so=S.st[o.id],sp=S.st[p.id];
+  const x=cur.order[i],p=ch(S.partner),o=ch(S.cheatWith),so=S.st[o.id],sp=S.st[p.id];meet(o.id);
   let d=3;if(o.likes.includes(x.tag))d+=7;if(o.dislikes.includes(x.tag))d-=8;d+=sbonus(TAGSTAT[x.tag]);
   if(x.need){if(so.aff<x.need)d-=Math.min(14,Math.ceil((x.need-so.aff)/3));else d+=Math.round(x.need/8)+2}
   d+=o.chaos?rnd(-9,9):rnd(-4,4);
@@ -1241,7 +1242,7 @@ function storyEvent(){
   <div class="choices">${cur.order.map((o,k)=>`<button class="choice" onclick="storyAct(${k})" ${k===0?'autofocus':''}>${fmt(o.label,c)}</button>`).join('')}</div>`,true);
 }
 function storyAct(k){social();
-  const o=cur.order[k],c=ch(S.target),st=S.st[c.id],i=S.story[c.id]||0;
+  const o=cur.order[k],c=ch(S.target),st=S.st[c.id],i=S.story[c.id]||0;meet(c.id);
   let d=4;if(c.likes.includes(o.tag))d+=6;if(c.dislikes.includes(o.tag))d-=6;d+=rnd(-2,3);d=gain(c,d);
   const b=st.aff;st.aff=clamp(st.aff+d,0,100);const kind=d>=8?'good':d>=0?'meh':'bad';S.story[c.id]=i+1;
   log(`${c.first}のひみつ(${i+1}/4)を知った。`);save();
@@ -1262,7 +1263,7 @@ function chatEvent(){
   <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:0">なんて返す?</p><div class="choices">${S.chatOpts.map((o,i)=>`<button class="choice" onclick="chatAct(${i})" ${i===0?'autofocus':''}>${o.t==='ignore'||/^[(（]/.test(o.l)?fmt(o.l,c):'「'+fmt(o.l,c)+'」'}</button>`).join('')}</div>`,true);
 }
 function chatAct(i){
-  const c=ch(S.target),st=S.st[c.id],lover=S.partner===c.id;let d,rep='',res;const opt=(S.chatOpts||[])[i]||{l:'',t:'ignore'},k=opt.t;
+  const c=ch(S.target),st=S.st[c.id],lover=S.partner===c.id;let d,rep='',res;const opt=(S.chatOpts||[])[i]||{l:'',t:'ignore'},k=opt.t;if(k!=='ignore'&&k!=='cold')meet(c.id);
   if(k==='cold'){const cool=c.likes.includes('quiet')&&c.lv>=4;d=cool?1:lover?-4:-2;rep=bubble(fmt(opt.l,c),'r');
     res=cool?bubble('「わかった」','l'):bubble(fmt(pick(['(少しさみしそうなスタンプが返ってきた)','「……そっか。わかった」','「りょうかい……」']),c),'l')}
   else if(k==='ignore'){const cool=c.likes.includes('quiet')&&c.lv>=4;d=cool?0:lover?-6:-4;
@@ -1287,6 +1288,8 @@ function decayStats(){
 }
 /* ---------- ちひろのチュートリアル ---------- */
 const TIPS={
+ keep:'いい感じの人を何人もキープしてない?会わないと気持ちは冷めていくし、そのうち「はっきりして」って言われるよ。',
+ happo:'あちゃー……。好感度が高い人を3人以上キープしてると、こういう噂が立つの。気をつけてね。',
  start:'まずは{t}に会いに行ってみよう!選んだ行動しだいで好感度が上がったり下がったりするよ。',
  result:'好感度メーターを見てね。相手の性格に合う行動ほど大きく上がるよ。性格は選択画面の説明がヒント!',
  train:'自分磨きができるようになったよ!能力を上げると、相手の反応がよくなるし告白も成功しやすくなる。でもサボると下がるから気をつけて。体力は特に落ちやすいよ。',
@@ -1317,6 +1320,7 @@ function howto(){
   <h3>浮気・二股</h3><p>恋人がいると、こっそり他の人と会ったり告白したりできます(五股まで)。付き合う人数が多いほど、また本命の難易度★が高いほどバレやすく、バレると修羅場です。恋人に浮気されることもあります。</p>
   <h3>メッセージ・ひみつ・人間関係</h3><p>夜には相手からメッセージが届きます。仲良くなると相手の「ひみつ」が明かされます。キャラ同士には友達関係があり、誰かを振ると、その友達からの印象も下がります。</p>
   <h3>親友のちひろ</h3><p>1日1回、時間を使わずに相談できます。ジュースをおごると、好きなプレゼントやデート先を教えてくれます。何回か相談すると、相手が重視する能力もわかります。</p>
+  <h3>キープは禁物</h3><p>付き合っていない相手は、しばらく会わないと好感度が下がります(高いほど早く冷めます)。好感度70以上のまま付き合わずにいると「はっきりして」と呼び出され、好感度60以上の人を3人以上キープしていると「八方美人」の噂が立って、みんなの好感度が下がります。</p>
   <h3>バイト</h3><p>何が起きるかは日によって違います。3回続けると疲れてミスが増え、お金が減ってしまいます。</p>
   <h3>卒業</h3><p>4年生の3月が終わると卒業式。大学生活の振り返りと称号が表示されます。</p>
   </div><div class="row"><button class="btn" data-c>閉じる</button></div></div>`;
@@ -1341,7 +1345,7 @@ function scene(){
   <div class="choices">${cur.order.map((o,i)=>`<button class="choice" onclick="act(${i})" ${i===0?'autofocus':''}>${fmt(o.label,c)}</button>`).join('')}</div>`,true);
 }
 function act(i){
-  const o=cur.order[i],c=ch(S.target),st=S.st[c.id],r=rv(c);social();
+  const o=cur.order[i],c=ch(S.target),st=S.st[c.id],r=rv(c);social();meet(c.id);
   let d=3,rushed=false,note='';
   if(c.likes.includes(o.tag))d+=7;
   if(c.dislikes.includes(o.tag))d-=8;
@@ -1372,7 +1376,7 @@ function next(){
   S.half++;if(S.half>1){S.half=0;S.month++;if(S.month>11){S.month=0;S.grade++;}}
   CHARS.forEach(c=>{if(S.st[c.id].awk>0)S.st[c.id].awk--});
   const skipped=S.skipped;S.skipped=false;S.hintUsed=false;
-  S.turn++;decayStats();
+  S.turn++;decayStats();coolDown();
   if(S.grade===5&&!S.gradDone){S.gradDone=true;save();return graduation()}
   const c=ch(S.target),st=S.st[c.id],lover=S.partner===c.id;
   let r=rv(c);
@@ -1406,9 +1410,68 @@ function next(){
     if(st.aff<35&&Math.random()<.45)return dumped();
     if(st.aff<55&&Math.random()<.04)return dumped();
   }else if(!taken(c.id)&&st.aff>=78&&st.awk===0&&Math.random()<.25)return confessed();
+  {const hl=happoCheck();if(hl)return happo(hl);const cw=clarifyCheck();if(cw)return clarify(cw)}
   if(!taken(c.id)){const si=S.story[c.id]||0;if(si<4&&st.aff>=TH[si]){save();return storyEvent()}}
   if(!taken(c.id)&&(st.aff>=15||S.partner===c.id)&&Math.random()<.28){save();return chatEvent()}
   save();plan();
+}
+/* ---------- キープ防止 ---------- */
+/* A:付き合っていない相手は、会わないと好感度が下がる(高いほど早く冷める) */
+/* B:好感度70以上で付き合っていないと「はっきりして」と呼び出される */
+/* C:好感度60以上の人が3人以上いると「八方美人」の噂が立つ */
+function meet(id){if(!S.met)S.met={};S.met[id]=S.turn}
+function keepers(min){return pool().filter(c=>c.id!==S.partner&&!sides().includes(c.id)&&!taken(c.id)&&S.st[c.id].aff>=min)}
+function coolDown(){
+  if(!S.met)S.met={};const cooled=[];
+  keepers(40).forEach(c=>{if(c.id===S.target)return;const st=S.st[c.id];
+    if(S.met[c.id]==null)S.met[c.id]=S.turn;
+    const idle=S.turn-S.met[c.id];
+    if(idle>=3&&(idle-3)%2===0){const amt=st.aff>=70?3:st.aff>=55?2:1;st.aff=Math.max(0,st.aff-amt);cooled.push(`${c.first}(-${amt})`)}});
+  if(cooled.length){if(!S.decayMsgs)S.decayMsgs=[];S.decayMsgs.push(`しばらく会っていないので、気持ちが冷めてきた:${cooled.join('・')}`);log(`会っていない相手の好感度が下がった:${cooled.join('・')}`)}
+}
+function clarifyCheck(){
+  if((S.turn-(S.clarifyAt??-99))<4)return null;
+  const list=keepers(70).filter(c=>S.st[c.id].awk===0);
+  if(!list.length||Math.random()>.2)return null;
+  return list.sort((a,b)=>S.st[b.id].aff-S.st[a.id].aff)[0];
+}
+function clarify(c){
+  S.clarifyAt=S.turn;S.clarifyWho=c.id;save();
+  const waited=S.waited&&S.waited[c.id];
+  const yes=S.partner?(sides().length<MAXSIDE?`「(${esc(ch(S.partner).first)}には内緒で)付き合おう」`:null):'「付き合ってください」';
+  show(`<span class="stamp hand">決断</span><h2 class="hand">はっきりして</h2><p>${esc(c.first)}に呼び出された。いつもより、少し真剣な顔をしている。</p>
+  <div class="speaker">${ava(c)}<div class="quote hand">${waited?'「この前、待ってって言ったよね。……もう一回だけ聞くよ。わたしのこと、どう思ってるの?」':'「ねえ、わたしのこと、どう思ってるの?……最近、ほかの人とも仲いいみたいだし」'}</div></div>
+  <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:0">どう答える?</p>
+  <div class="choices">${yes?`<button class="choice" onclick="clarifyAct('yes')" autofocus>${yes}</button>`:''}<button class="choice" onclick="clarifyAct('no')">「ごめん、友達でいたい」</button><button class="choice" onclick="clarifyAct('wait')">「もう少しだけ、待ってほしい」</button></div>`,true);
+}
+function clarifyAct(k){
+  const c=ch(S.clarifyWho),st=S.st[c.id];if(!S.waited)S.waited={};meet(c.id);let h='',b=st.aff;
+  if(k==='yes'){rc('confessedBy');rc('confOk');addLover(c.id);st.ex=false;st.awk=0;st.aff=Math.min(100,st.aff+8);delete S.waited[c.id];
+    if(S.partner){sides().push(c.id);rc('twoTiming');S.rec.maxMata=Math.max(S.rec.maxMata||0,sides().length+1);susUp(rnd(30,40)+5*(sides().length-1));S.cheatedNow=true;S.lastCheat=c.id;
+      log(`${c.first}に迫られ、内緒で付き合うことになった(${mata()})。`);h=`<p class="big hand">${esc(c.first)}とも付き合うことになった!</p><p>これで${mata()}。${esc(ch(S.partner).first)}にバレる危険:<b>${susLabel()}</b></p>`}
+    else{S.partner=c.id;S.target=c.id;S.tturns=0;log(`${c.first}に気持ちを伝え、付き合うことになった!`);h=`<p class="big hand">付き合うことになった!</p><p>${esc(c.first)}はうれしそうに笑った。</p>`}
+    h=`<div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,'yes'),c)}</div></div>`+h}
+  else if(k==='no'){st.aff=Math.max(0,st.aff-20);st.awk=3;delete S.waited[c.id];log(`${c.first}に「友達でいたい」と伝えた。`);
+    h=`<div class="speaker">${ava(c)}<div class="quote hand">「……そっか。はっきり言ってくれて、ありがとう」</div></div><p>${esc(c.first)}は無理に笑ってみせた。しばらくは気まずくなりそうだ。</p>${ripple(c,-3,`${c.first}を振った`)}`}
+  else if(!S.waited[c.id]){S.waited[c.id]=1;st.aff=Math.max(0,st.aff-8);log(`${c.first}に「もう少し待って」と答えた。`);
+    h=`<div class="speaker">${ava(c)}<div class="quote hand">「……わかった。でも、ずっとは待てないからね」</div></div><p>次に聞かれたときは、はっきり答えないといけなさそうだ。</p>`}
+  else{st.aff=Math.max(0,st.aff-25);st.awk=4;delete S.waited[c.id];rc('dumped');log(`${c.first}をまた待たせてしまい、愛想を尽かされた。`);
+    h=`<div class="speaker">${ava(c)}<div class="quote hand">「もういいよ。……都合のいい人でいるの、疲れちゃった」</div></div><p class="big hand">愛想を尽かされた……</p>${ripple(c,-4,`${c.first}をキープし続けた`)}`}
+  save();
+  show(`<span class="stamp hand">決断</span><h2 class="hand">${k==='yes'?'付き合うことに':k==='no'?'友達のまま':'答えを保留'}</h2>${h}<div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div><div class="row"><button class="btn" onclick="plan()" autofocus>次へ</button></div>`,true);
+}
+function happoCheck(){
+  const list=keepers(60);
+  if(list.length<3||(S.turn-(S.happoAt??-99))<6||Math.random()>.35)return null;
+  return list;
+}
+function happo(list){
+  S.happoAt=S.turn;rc('happo');const rows=[];
+  list.forEach(c=>{const fr=list.some(o=>o!==c&&friendsOf(c.id).includes(o));const amt=8+(fr?4:0);const st=S.st[c.id];const b=st.aff;st.aff=Math.max(0,st.aff-amt);rows.push(`<li>${ava(c,1)}<div style="flex:1;min-width:0">${esc(c.first)} <span class="delta down">-${b-st.aff}</span>${fr?' <span style="font-size:.75rem;color:var(--bad)">友達同士で話が伝わった</span>':''}${meter(st.aff)}</div></li>`)});
+  log(`八方美人のうわさが立ち、${list.map(c=>c.first).join('・')}の好感度が下がった。`);save();
+  show(`${tip('happo')}<span class="stamp hand">うわさ</span><h2 class="hand">八方美人のうわさ</h2><p>「${esc(S.name)}って、誰にでもいい顔してるよね」……そんな噂が、キャンパスに広まってしまった。</p>
+  <ul class="plist" style="margin:12px 0">${rows.join('')}</ul><p style="color:var(--ink-soft);font-size:.9rem">いい感じの人を何人もキープしていると、こうなる。そろそろ気持ちをはっきりさせたほうがいいかもしれない。</p>
+  <div class="row"><button class="btn" onclick="plan()" autofocus>次へ</button></div>`,true);
 }
 function rivalAppear(){const c=ch(S.target),r=rv(c);
   show(`${tip('rival',c)}<span class="stamp hand">ライバル出現</span><h2 class="hand">ライバル出現!</h2><p>${esc(r.name)}も、${esc(c.first)}のことが気になっているらしい。</p><div style="max-width:420px">${rmeter(r)}</div><p>接近度が100になると、先に${esc(c.first)}と付き合われてしまう。${esc(c.first)}と過ごして好反応を引き出せば引き離せるが、自分磨きの日は差を詰められる。</p><div class="row"><button class="btn" onclick="plan()" autofocus>次へ</button></div>`,true)}
@@ -1447,7 +1510,7 @@ function confessed(){
   <div class="choices"><button class="choice" onclick="answer(true)" autofocus>「うん、よろしくお願いします」</button><button class="choice" onclick="answer(false)">「ごめん、今は付き合えない」</button></div>`,true);
 }
 function answer(yes){
-  const c=ch(S.target),st=S.st[c.id],r=rv(c);rc('confessedBy');if(yes)addLover(c.id);
+  const c=ch(S.target),st=S.st[c.id],r=rv(c);rc('confessedBy');meet(c.id);if(yes)addLover(c.id);
   if(yes){S.partner=c.id;st.aff=Math.min(100,st.aff+8);st.ex=false;if(r)r.prog=15;log(`${c.first}から告白され、付き合うことになった!`)}
   let rp='';if(!yes){st.aff=Math.max(0,st.aff-12);st.awk=2;log(`${c.first}からの告白を断った。`);rp=ripple(c,-5,`${c.first}の告白を断った`)}
   save();
@@ -1505,6 +1568,7 @@ function recapTitle(d){
   if(d.twoTiming)return['禁断の二股','二人を同時に愛した、危うい4年間。'];
   if(d.cheat>=3)return['キャンパスの小悪魔','スリルと修羅場に満ちた4年間だった。'];
   if(d.partner&&d.lovers.length===1&&!d.cheat)return['一途な恋人','最初に結ばれた人と、最後まで。'];
+  if((S.rec&&S.rec.happo||0)>=2)return['八方美人','みんなにいい顔をして、噂になった4年間。'];
   if(d.lovers.length>=3)return['恋多き旅人','たくさんの恋を経験した4年間。'];
   if(rej>=4)return['七転び八起き','何度振られても、前を向き続けた。'];
   if(!d.lovers.length&&!d.conf)return['見守り専門','想いは胸に秘めたまま、卒業の日を迎えた。'];
@@ -1557,7 +1621,7 @@ function resetGame(){ask('セーブを消して、はじめからやり直しま
 function resume(){
   const saved=load();
   if(!saved||!saved.name)return setup();
-  S=saved;if(S.sus==null)S.sus=0;if(S.pc===undefined)S.pc=null;S.story=S.story||{};S.hints=S.hints||{};S.rec=S.rec||{};if(!S.lastT||typeof S.lastT!=='object'){S.lastT={};STATS.forEach(k=>S.lastT[k]=S.turn||0)}if(S.turn==null){S.turn=10;S.lastT={};S.base={};STATS.forEach(k=>{S.lastT[k]=10;S.base[k]=Math.min(S.stats[k],20)});S.lastSocial=10;S.decayMsgs=[];S.tips={start:1,result:1,train:1,advisor:1,gift:1,pick:1}}if(S.side){S.sides=[S.side];delete S.side}S.sides=S.sides||[];CHARS.forEach(c=>{if(!S.st[c.id])S.st[c.id]={aff:rnd(8,18),awk:0,ex:false}});
+  S=saved;if(S.sus==null)S.sus=0;if(S.pc===undefined)S.pc=null;S.story=S.story||{};S.hints=S.hints||{};S.rec=S.rec||{};if(!S.lastT||typeof S.lastT!=='object'){S.lastT={};STATS.forEach(k=>S.lastT[k]=S.turn||0)}if(S.turn==null){S.turn=10;S.lastT={};S.base={};STATS.forEach(k=>{S.lastT[k]=10;S.base[k]=Math.min(S.stats[k],20)});S.lastSocial=10;S.decayMsgs=[];S.tips={start:1,result:1,train:1,advisor:1,gift:1,pick:1}}if(S.side){S.sides=[S.side];delete S.side}S.sides=S.sides||[];if(!S.met){S.met={};CHARS.forEach(c=>S.met[c.id]=S.turn||0)}CHARS.forEach(c=>{if(!S.st[c.id])S.st[c.id]={aff:rnd(8,18),awk:0,ex:false}});
   S.target?plan():toPick();
 }
 function titleScreen(){
