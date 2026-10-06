@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2学期中間 練習テスト（鶴亀算・仕事算・旅人算）</title>
+<style>
+  :root {
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --correct: #16a34a;
+    --correct-light: #dcfce7;
+    --wrong: #dc2626;
+    --wrong-light: #fee2e2;
+    --neutral: #64748b;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --subtext: #475569;
+    --radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100%;
+    padding: 20px 16px 60px;
+  }
+  header { text-align: center; margin-bottom: 24px; }
+  header .subject-label {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+  header h1 { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.3; }
+  header p { font-size: 13px; color: var(--subtext); margin-top: 6px; }
+
+  .progress-wrap {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 14px 20px;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 14px;
+  }
+  .progress-text { font-size: 14px; font-weight: 700; color: var(--primary); white-space: nowrap; }
+  .progress-bar-outer {
+    flex: 1; height: 8px; background: var(--border);
+    border-radius: 99px; overflow: hidden;
+  }
+  .progress-bar-inner {
+    height: 100%; background: var(--primary);
+    border-radius: 99px; transition: width .4s; width: 0%;
+  }
+  .cheer { font-size: 13px; color: var(--subtext); white-space: nowrap; }
+
+  .quiz-section { max-width: 720px; margin: 0 auto; }
+
+  .question-card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 22px 22px 18px;
+    margin-bottom: 18px; border-left: 4px solid var(--primary);
+  }
+  .question-card.answered-correct { border-left-color: var(--correct); }
+  .question-card.answered-wrong   { border-left-color: var(--wrong); }
+
+  .q-number {
+    font-size: 11px; font-weight: 800; letter-spacing: .1em;
+    color: var(--primary); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .question-card.answered-correct .q-number { color: var(--correct); }
+  .question-card.answered-wrong   .q-number { color: var(--wrong); }
+
+  .q-context {
+    font-size: 14px; color: var(--subtext); background: #f1f5f9;
+    border-radius: 6px; padding: 10px 14px; margin-bottom: 10px;
+    line-height: 1.75; border-left: 3px solid #cbd5e1;
+  }
+  .q-text { font-size: 15px; font-weight: 600; line-height: 1.75; margin-bottom: 16px; }
+
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; margin: 0 2px; font-size: .9em; line-height: 1.1;
+  }
+  .frac span:first-child { border-bottom: 1.5px solid currentColor; padding-bottom: 1px; }
+  .frac span:last-child  { padding-top: 1px; }
+
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 480px) { .choices { grid-template-columns: 1fr; } }
+
+  .choice-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: #fff; cursor: pointer;
+    font-size: 14px; font-weight: 500; color: var(--text);
+    text-align: left; transition: border-color .15s, background .15s, color .15s;
+    line-height: 1.5;
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--primary); background: var(--primary-light);
+  }
+  .choice-btn .choice-label {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #e2e8f0; color: var(--subtext);
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+    transition: background .15s, color .15s;
+  }
+  .choice-btn:hover:not(:disabled) .choice-label { background: var(--primary); color: #fff; }
+  .choice-btn.correct { border-color: var(--correct); background: var(--correct-light); color: var(--correct); }
+  .choice-btn.correct .choice-label { background: var(--correct); color: #fff; }
+  .choice-btn.wrong   { border-color: var(--wrong);   background: var(--wrong-light);   color: var(--wrong); }
+  .choice-btn.wrong   .choice-label { background: var(--wrong);   color: #fff; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback { margin-top: 10px; font-size: 13px; font-weight: 600; display: none; }
+  .feedback.correct { color: var(--correct); display: block; }
+  .feedback.wrong   { color: var(--wrong);   display: block; }
+
+  #result-box {
+    display: none; background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 28px 24px; margin-bottom: 24px;
+    text-align: center; max-width: 720px; margin-left: auto; margin-right: auto;
+  }
+  #result-box h2 { font-size: 20px; margin-bottom: 6px; }
+  #result-box .score-big {
+    font-size: 48px; font-weight: 900; color: var(--primary); line-height: 1.1; margin: 10px 0 6px;
+  }
+  #result-box .score-sub { font-size: 14px; color: var(--subtext); margin-bottom: 16px; }
+
+  #wrong-list { max-width: 720px; margin: 0 auto 20px; display: none; }
+  #wrong-list h3 { font-size: 15px; font-weight: 700; color: var(--wrong); margin-bottom: 10px; }
+  .wrong-item {
+    background: var(--card); border-radius: 8px; padding: 12px 16px;
+    margin-bottom: 8px; border-left: 3px solid var(--wrong);
+    font-size: 13px; line-height: 1.6;
+  }
+  .wrong-item .wi-q { font-weight: 600; margin-bottom: 4px; }
+  .wrong-item .wi-a { color: var(--correct); }
+
+  #record-section { max-width: 720px; margin: 0 auto 20px; }
+  #record-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  #record-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    background: var(--card); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  #record-table th {
+    background: var(--primary); color: #fff;
+    padding: 8px 12px; font-weight: 700; text-align: center;
+  }
+  #record-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; }
+  #record-table tr:last-child td { border-bottom: none; }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+  .btn {
+    padding: 10px 22px; border-radius: 8px; border: none;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity .15s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-danger  { background: var(--wrong); color: #fff; }
+  .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+
+  .q-cat { margin-left: 8px; font-weight: 700; letter-spacing: 0; color: var(--subtext);
+    background: var(--border); padding: 1px 8px; border-radius: 99px; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg:#0f172a; --card:#1e293b; --primary:#60a5fa; --primary-light:#1e3a5f;
+    --correct:#4ade80; --correct-light:#14532d; --wrong:#f87171; --wrong-light:#4c1d1d;
+    --border:#334155; --text:#e2e8f0; --subtext:#94a3b8; } }
+  :root[data-theme="dark"] {
+    --bg:#0f172a; --card:#1e293b; --primary:#60a5fa; --primary-light:#1e3a5f;
+    --correct:#4ade80; --correct-light:#14532d; --wrong:#f87171; --wrong-light:#4c1d1d;
+    --border:#334155; --text:#e2e8f0; --subtext:#94a3b8; }
+  .choice-btn { background: var(--card); }
+  .q-context { background: var(--bg); }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="subject-label">数的推理</div>
+  <h1>2学期中間 練習テスト（鶴亀算・仕事算・旅人算）</h1>
+  <p>選択肢を選ぶと、その場で採点されます。出題順は毎回ランダムです。</p>
+</header>
+
+<div class="progress-wrap">
+  <span class="progress-text" id="prog-text">0 / 0</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" id="prog-bar"></div></div>
+  <span class="cheer" id="cheer-text">がんばって！</span>
+</div>
+
+<div id="result-box">
+  <h2>全問解答完了！</h2>
+  <div class="score-big" id="score-big">0／0</div>
+  <div class="score-sub" id="score-sub"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="restartAll()">選択肢をシャッフルしてもう一度</button>
+    <button class="btn btn-outline" onclick="restartWrong()">間違えた問題のみもう一度</button>
+  </div>
+</div>
+
+<div id="wrong-list">
+  <h3>間違えた問題</h3>
+  <div id="wrong-items"></div>
+</div>
+
+<div class="quiz-section" id="quiz"></div>
+
+<div id="record-section">
+  <h3>成長記録</h3>
+  <table id="record-table">
+    <thead>
+      <tr><th>回</th><th>日付</th><th>正解数</th><th>正答率</th><th>前回比</th></tr>
+    </thead>
+    <tbody id="record-body"></tbody>
+  </table>
+  <div class="btn-row" style="margin-top:12px">
+    <button class="btn btn-danger" onclick="clearRecord()">記録をリセット</button>
+  </div>
+</div>
+
+<script>
+// =====================
+// 問題データ
+// =====================
+const QUESTIONS_MASTER = [
+  {"id": "tk-ex", "cat": "鶴亀算", "context": null, "text": "1個200円の柿と1個120円のりんごが合わせて13個ある。合計金額は2200円である。りんごは何個あるか。", "choices": ["A：1個", "B：3個", "C：5個", "D：7個", "E：9個", "F：11個", "G：13個", "H：A〜Gのいずれでもない"], "answer": 2},
+  {"id": "tk-q1", "cat": "鶴亀算", "context": null, "text": "1個60円のレモンと1個80円のりんごを合わせて16個買ったところ、代金の合計は1040円であった。りんごは何個買ったか。", "choices": ["A：2個", "B：3個", "C：4個", "D：8個", "E：10個", "F：12個", "G：13個", "H：A〜Gのいずれでもない"], "answer": 2},
+  {"id": "tk-q2", "cat": "鶴亀算", "context": null, "text": "1本60円の鉛筆と1本90円のサインペンを合わせて18本買い、1500円出したら240円おつりがあった。鉛筆は何本買ったか。", "choices": ["A：12本", "B：13本", "C：14本", "D：15本", "E：16本", "F：17本", "G：18本", "H：A〜Gのいずれでもない"], "answer": 0},
+  {"id": "tk-q3", "cat": "鶴亀算", "context": null, "text": "ある公園の入場料は、大人250円、子ども120円である。昨日の入場料は大人と子ども合わせて98人で、入場料の合計は18000円であった。昨日の大人の入場者数は何人か。", "choices": ["A：26人", "B：28人", "C：30人", "D：36人", "E：42人", "F：48人", "G：52人", "H：A〜Gのいずれでもない"], "answer": 5},
+  {"id": "tk-q4", "cat": "鶴亀算", "context": null, "text": "ネット販売で1個700円のキーホルダーと、1個400円のストラップを合わせて8個買ったところ、送料500円込みで4600円であった。ストラップは何個買ったか。", "choices": ["A：1個", "B：2個", "C：3個", "D：4個", "E：5個", "F：6個", "G：7個", "H：A〜Gのいずれでもない"], "answer": 4},
+  {"id": "tk-q5", "cat": "鶴亀算", "context": null, "text": "600枚のクッキーを、15枚用の箱と25枚用の箱に詰め合わせたところ、合計で30箱できて余りが10枚となった。15枚用の箱は何箱だったことになるか。", "choices": ["A：12箱", "B：13箱", "C：14箱", "D：15箱", "E：16箱", "F：17箱", "G：18箱", "H：A〜Gのいずれでもない"], "answer": 4},
+  {"id": "tk-q6", "cat": "鶴亀算", "context": null, "text": "ギフト用に、1個300円の洋梨と1個200円の柿を合わせて20個詰め合わせてもらったところ、箱代の200円を含めて5000円となった。柿は何個詰めたことになるか。", "choices": ["A：7個", "B：8個", "C：9個", "D：10個", "E：11個", "F：12個", "G：13個", "H：A〜Gのいずれでもない"], "answer": 5},
+  {"id": "tk-q7", "cat": "鶴亀算", "context": null, "text": "プリントを何人かの生徒に配布するのに、1人9枚ずつ配布すると34枚足りない。また、1人6枚ずつ配布すると14枚余る。プリントは何枚あるか。", "choices": ["A：100枚", "B：110枚", "C：120枚", "D：130枚", "E：140枚", "F：150枚", "G：160枚", "H：A〜Gのいずれでもない"], "answer": 1},
+  {"id": "tk-q8", "cat": "鶴亀算", "context": null, "text": "ボールペン1本の値段は、鉛筆1本の値段より30円高い。鉛筆とボールペンを5本ずつ買うつもりだったが、全商品1割引きだったので、ちょうどボールペンを1本多く買えた。もとの鉛筆1本の値段はいくらか。", "choices": ["A：90円", "B：100円", "C：110円", "D：120円", "E：130円", "F：140円", "G：150円", "H：A〜Gのいずれでもない"], "answer": 3},
+  {"id": "wk-ex1", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事をAさん1人で行うと15日で終わり、Bさん1人で行うと30日で終わる。AさんとBさんの2人で仕事をすると、何日で終わるか。", "choices": ["A：7日", "B：8日", "C：9日", "D：10日", "E：11日", "F：13日", "G：15日", "H：A〜Gのいずれでもない"], "answer": 3},
+  {"id": "wk-ex2", "cat": "仕事算・水槽算", "context": null, "text": "空のプールを満水にしたい。給水装置Aだけでは2.5時間、給水装置Bだけでは5時間かかる。2つの給水装置を使う場合、満水になるまでの時間を求めよ。", "choices": ["A：65分", "B：80分", "C：90分", "D：95分", "E：100分", "F：115分", "G：140分", "H：A〜Gのいずれでもない"], "answer": 4},
+  {"id": "wk-q1", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事を仕上げるのに、Aさんが1人ですれば9日かかり、Bさんが1人ですれば18日かかる。この仕事をAさんとBさんの2人ですれば何日かかるか。", "choices": ["A：2日", "B：3日", "C：4日", "D：5日", "E：6日", "F：7日", "G：8日", "H：A〜Gのいずれでもない"], "answer": 4},
+  {"id": "wk-q2", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事を仕上げるのに、Aさんが1人ですれば4日かかり、AさんとBさんの2人ですれば3日かかる。この仕事をBさんが1人ですれば何日かかるか。", "choices": ["A：6日", "B：7日", "C：8日", "D：10日", "E：12日", "F：16日", "G：20日", "H：A〜Gのいずれでもない"], "answer": 4},
+  {"id": "wk-q3", "cat": "仕事算・水槽算", "context": null, "text": "ある水槽には、AとBの2つの注水管がある。注水管Aだけで注水すれば、満水になるまで30分かかり、注水管Bだけで注水すれば、満水になるまで20分かかる。注水管Aと注水管Bの2つを同時に使うと、満水になるまで何分かかるか。", "choices": ["A：10分", "B：12分", "C：14分", "D：16分", "E：18分", "F：20分", "G：22分", "H：A〜Gのいずれでもない"], "answer": 1},
+  {"id": "wk-q4", "cat": "仕事算・水槽算", "context": null, "text": "ある宿題をAさんが1人ですると9時間、Bさんが1人ですると18時間かかる。2人が一緒にすると、どれだけの時間で宿題が完了するか。", "choices": ["A：4時間", "B：4時間30分", "C：5時間", "D：5時間30分", "E：6時間", "F：7時間", "G：8時間", "H：A〜Gのいずれでもない"], "answer": 4},
+  {"id": "wk-q5-1", "cat": "仕事算・水槽算", "context": "空の水槽を満水にするのにポンプS1台で12分、ポンプT1台で8分かかる。", "text": "ポンプS3台とポンプT3台を使う場合、満水になるまでの時間を求めよ。", "choices": ["A：1分20秒", "B：1分24秒", "C：1分26秒", "D：1分30秒", "E：1分32秒", "F：1分35秒", "G：1分36秒", "H：A〜Gのいずれでもない"], "answer": 6},
+  {"id": "wk-q5-2", "cat": "仕事算・水槽算", "context": "空の水槽を満水にするのにポンプS1台で12分、ポンプT1台で8分かかる。", "text": "水槽から水を排水するポンプUは、1台で水槽を空にするのに24分かかる。ポンプS、ポンプT、ポンプUそれぞれ1台を同時に使用するとき、空の水槽が満水になるまでの時間を求めよ。", "choices": ["A：4分30秒", "B：5分", "C：5分30秒", "D：6分", "E：6分30秒", "F：7分", "G：7分30秒", "H：A〜Gのいずれでもない"], "answer": 3},
+  {"id": "wk-q6", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事を仕上げるのに、Aさんは12日、Bさんは8日かかる。また、Aさん、Bさん、Cさんの3人が一緒にこの仕事をすると4日かかる。この仕事を仕上げるのに、Cさん1人では何日かかるか。", "choices": ["A：20日", "B：21日", "C：22日", "D：23日", "E：24日", "F：25日", "G：26日", "H：A〜Gのいずれでもない"], "answer": 4},
+  {"id": "tb-ex1", "cat": "旅人算", "context": null, "text": "弟が歩いて家を出てから6分後に兄が走って弟を追いかけた。弟の歩く速さは90m/分、兄の走る速さは120m/分である。兄は何分後に弟に追いつくか。", "choices": ["A：14分後", "B：15分後", "C：16分後", "D：17分後", "E：18分後", "F：19分後", "G：20分後", "H：A〜Gのいずれでもない"], "answer": 4},
+  {"id": "tb-ex2", "cat": "旅人算", "context": null, "text": "1周7.2kmのサイクリングコースがある。サイクリングコース上のA地点をスタート地点として、PさんとQさんが自転車で走った。Pさんは280m/分、Qさんは200m/分で走るものとする。2人がA地点を同時に出発して逆向きに走ったとき、2人が最初に出会うのはスタートしてから何分後か。", "choices": ["A：14分後", "B：15分後", "C：16分後", "D：17分後", "E：18分後", "F：19分後", "G：20分後", "H：A〜Gのいずれでもない"], "answer": 1},
+  {"id": "tb-q1-1", "cat": "旅人算", "context": "A地点とB地点は10km離れている。Pの速さは8km/時、Qの速さは12km/時である。", "text": "PはA地点からB地点へと、QはB地点からA地点へと向かう。P、Qが同時に出発したとき、2人は出発してから何分後に出会うか。", "choices": ["A：20分後", "B：25分後", "C：28分後", "D：30分後", "E：34分後", "F：40分後", "G：42分後", "H：A〜Gのいずれでもない"], "answer": 3},
+  {"id": "tb-q1-2", "cat": "旅人算", "context": "A地点とB地点は10km離れている。Pの速さは8km/時、Qの速さは12km/時である。", "text": "PはA地点からB地点へと向かい、QはPが出発してから15分後にA地点からB地点へと向かった。QがPに追いつくのはQが出発してから何分後か。", "choices": ["A：15分後", "B：18分後", "C：21分後", "D：24分後", "E：30分後", "F：45分後", "G：48分後", "H：A〜Gのいずれでもない"], "answer": 4},
+  {"id": "tb-q2", "cat": "旅人算", "context": null, "text": "11時にバスがS駅を出発して40km離れたT駅へ向かった。同じ時刻に別のバスがT駅を出発してS駅へと向かった。2台のバスの速さはどちらも700m/分である。11時6分の2台のバスの距離は何kmか。", "choices": ["A：20.5km", "B：21.8km", "C：24.6km", "D：28.2km", "E：30.3km", "F：31.6km", "G：33.9km", "H：A〜Gのいずれでもない"], "answer": 5},
+  {"id": "tb-q3", "cat": "旅人算", "context": null, "text": "姉は64km/時で、妹は46km/時で同時に、同じ地点から同じ方向へ車を運転し始めた。40分後に2人は何km離れているか。", "choices": ["A：6km", "B：8km", "C：10km", "D：12km", "E：14km", "F：16km", "G：18km", "H：A〜Gのいずれでもない"], "answer": 3},
+  {"id": "tb-q4", "cat": "旅人算", "context": null, "text": "A町とB町は4km離れていて、PさんはA町を自転車に乗って時速12kmで、QさんはB町から歩いて時速4kmで同時に出発すると、2人が出会うのは何分後か。", "choices": ["A：14分後", "B：15分後", "C：16分後", "D：17分後", "E：18分後", "F：19分後", "G：20分後", "H：A〜Gのいずれでもない"], "answer": 1},
+  {"id": "tb-q5", "cat": "旅人算", "context": null, "text": "Pさんの歩く速さは分速70m、Qさんの歩く速さは分速50mである。2人が同じ場所を出発して、2.4km離れた場所で折り返す。2人が出会うのは、出発した場所から何km離れたところか。", "choices": ["A：1.2km", "B：1.4km", "C：1.6km", "D：1.8km", "E：2km", "F：2.2km", "G：2.4km", "H：A〜Gのいずれでもない"], "answer": 4},
+  {"id": "tb-q6", "cat": "旅人算", "context": null, "text": "Pさんの歩く速さは分速70m、Qさんの歩く速さは分速50mである。Pさんが午後5時に学校を出発して12分後にQさんが追いかけた。Pさんは学校から2.4km離れたところでQさんからの電話で連絡を受けて引き返した。2人が出会うのは何時何分か。", "choices": ["A：5時33分", "B：5時40分", "C：5時43分", "D：5時45分", "E：5時48分", "F：5時53分", "G：5時55分", "H：A〜Gのいずれでもない"], "answer": 3}
+];
+
+let questions = [];
+let answered = {};
+let wrongIds = new Set();
+let isAllMode = true; // 全問モードかどうか
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function init(qList) {
+  questions = qList;
+  answered = {};
+  document.getElementById("prog-bar").style.width = "0%";
+  document.getElementById("prog-text").textContent = "0 / " + qList.length;
+  document.getElementById("cheer-text").textContent = "がんばって！";
+  renderQuiz();
+}
+
+function restartAll() {
+  document.getElementById("result-box").style.display = "none";
+  document.getElementById("wrong-list").style.display = "none";
+  wrongIds = new Set();
+  isAllMode = true;
+  init(shuffle([...QUESTIONS_MASTER]));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function restartWrong() {
+  if (wrongIds.size === 0) { alert("間違えた問題はありません！"); return; }
+  const wrongQs = QUESTIONS_MASTER.filter(q => wrongIds.has(q.id));
+  document.getElementById("result-box").style.display = "none";
+  document.getElementById("wrong-list").style.display = "none";
+  wrongIds = new Set();
+  isAllMode = false;
+  init(shuffle(wrongQs));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderQuiz() {
+  const container = document.getElementById("quiz");
+  container.innerHTML = "";
+  questions.forEach((q, idx) => {
+    const card = document.createElement("div");
+    card.className = "question-card";
+    card.id = "card-" + q.id;
+
+    let html = `<div class="q-number">問 ${idx + 1}<span class="q-cat">${q.cat}</span></div>`;
+    if (q.context) html += `<div class="q-context">${q.context}</div>`;
+    html += `<div class="q-text">${q.text}</div>`;
+    html += `<div class="choices" id="choices-${q.id}">`;
+    q.choices.forEach((c, ci) => {
+      html += `<button class="choice-btn" id="btn-${q.id}-${ci}"
+        onclick="selectAnswer('${q.id}', ${ci})">
+        <span class="choice-label">${String.fromCharCode(65 + ci)}</span>${c}</button>`;
+    });
+    html += `</div><div class="feedback" id="fb-${q.id}"></div>`;
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+}
+
+function selectAnswer(qid, chosen) {
+  if (answered[qid] !== undefined) return;
+  const q = questions.find(x => x.id === qid);
+  const correct = q.answer;
+  answered[qid] = chosen;
+
+  const card = document.getElementById("card-" + qid);
+  const fb = document.getElementById("fb-" + qid);
+  const isCorrect = (chosen === correct);
+
+  q.choices.forEach((_, ci) => {
+    const btn = document.getElementById(`btn-${qid}-${ci}`);
+    btn.disabled = true;
+    if (ci === correct) btn.classList.add("correct");
+    if (ci === chosen && !isCorrect) btn.classList.add("wrong");
+  });
+
+  if (isCorrect) {
+    card.classList.add("answered-correct");
+    fb.className = "feedback correct";
+    fb.textContent = "✓ 正解！";
+  } else {
+    card.classList.add("answered-wrong");
+    fb.className = "feedback wrong";
+    fb.textContent = "✗ 不正解。正解は「" + q.choices[correct] + "」";
+    wrongIds.add(qid);
+  }
+
+  updateProgress();
+  checkAllDone();
+}
+
+function updateProgress() {
+  const done = Object.keys(answered).length;
+  const total = questions.length;
+  document.getElementById("prog-text").textContent = done + " / " + total;
+  document.getElementById("prog-bar").style.width = (total ? done / total * 100 : 0) + "%";
+  let cheer = "がんばって！";
+  if (done === total && total > 0) cheer = "全問解答完了！";
+  else if (done / total >= 0.8) cheer = "もう少し！";
+  else if (done / total >= 0.5) cheer = "折り返し！";
+  else if (done / total >= 0.2) cheer = "いい調子！";
+  document.getElementById("cheer-text").textContent = cheer;
+}
+
+function checkAllDone() {
+  if (Object.keys(answered).length < questions.length) return;
+  const correctCount = questions.filter(q => answered[q.id] === q.answer).length;
+  const total = questions.length;
+  const pct = Math.round(correctCount / total * 100);
+
+  const rb = document.getElementById("result-box");
+  rb.style.display = "block";
+  document.getElementById("score-big").textContent = correctCount + "／" + total;
+  document.getElementById("score-sub").textContent = "正答率 " + pct + "%";
+
+  if (wrongIds.size > 0) {
+    const wl = document.getElementById("wrong-list");
+    const wi = document.getElementById("wrong-items");
+    wi.innerHTML = "";
+    wrongIds.forEach(id => {
+      const q = QUESTIONS_MASTER.find(x => x.id === id);
+      if (!q) return;
+      const div = document.createElement("div");
+      div.className = "wrong-item";
+      div.innerHTML = `<div class="wi-q">${q.text}</div><div class="wi-a">正解：${q.choices[q.answer]}</div>`;
+      wi.appendChild(div);
+    });
+    wl.style.display = "block";
+    // 間違い一覧の少し上（result-boxの先頭）にスクロール
+    setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  } else {
+    // 全問正解の場合は result-box へスクロール
+    setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+  }
+
+  if (isAllMode) saveRecord(correctCount, total, pct);
+}
+
+function saveRecord(correct, total, pct) {
+  let records = [];
+  try { records = JSON.parse(localStorage.getItem("midterm2QuizRecords") || "[]"); } catch(e) {}
+  records.push({ date: new Date().toLocaleDateString("ja-JP"), correct, total, pct });
+  try { localStorage.setItem("midterm2QuizRecords", JSON.stringify(records)); } catch(e) {}
+  renderRecord();
+}
+
+function renderRecord() {
+  let records = [];
+  try { records = JSON.parse(localStorage.getItem("midterm2QuizRecords") || "[]"); } catch(e) {}
+  const tbody = document.getElementById("record-body");
+  tbody.innerHTML = "";
+  records.forEach((r, i) => {
+    const prev = i > 0 ? records[i - 1] : null;
+    const diff = prev ? (r.pct - prev.pct) : null;
+    const diffStr = diff === null ? "—" : diff > 0 ? "▲" + diff + "%" : diff < 0 ? "▼" + Math.abs(diff) + "%" : "±0%";
+    const diffColor = diff > 0 ? "color:#16a34a" : diff < 0 ? "color:#dc2626" : "";
+    tbody.innerHTML += `<tr>
+      <td>${i + 1}</td><td>${r.date}</td>
+      <td>${r.correct}／${r.total}</td><td>${r.pct}%</td>
+      <td style="${diffColor}">${diffStr}</td></tr>`;
+  });
+}
+
+function clearRecord() {
+  if (!confirm("記録をリセットしますか？")) return;
+  try { localStorage.removeItem("midterm2QuizRecords"); } catch(e) {}
+  renderRecord();
+}
+
+window.onload = () => { renderRecord(); restartAll(); };
+</script>
+</body>
+</html>
