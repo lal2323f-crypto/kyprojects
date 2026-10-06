@@ -882,7 +882,7 @@ function setTarget(id){
 
 /* ---------- 今日の予定 ---------- */
 function plan(){
-  if(S)S.mood=null;
+  if(S){S.mood=null;S.follow=null}
   if(!S.partner&&sides().length)return sidePromote();
   const c=ch(S.target),st=S.st[c.id],lover=S.partner===c.id;
   const canDate=(lover||st.aff>=35)&&!taken(c.id);
@@ -1327,6 +1327,7 @@ function howto(){
   <h3>親友のちひろ</h3><p>1日1回、時間を使わずに相談できます。ジュースをおごると、好きなプレゼントやデート先を教えてくれます。何回か相談すると、相手が重視する能力もわかります。</p>
   <h3>相手の気持ちを読もう</h3><p>会うたびに、相手にはその日の気分があります(機嫌がいい・疲れている・落ち込んでいる・イライラしている など)。いつもは喜ぶ冗談も、落ち込んでいる日には逆効果。場面の描写からよく読み取ろう。喜ぶ行動は、仲が深まったり付き合ったりすると変わります。同じタイプの行動を続けると「またそれ?」と飽きられます。さらに、はじめるたびに各キャラに1つ「裏の好み」がつくので、前回の知識だけでは通用しません。ちひろに聞いたり、反応を観察したりして見つけよう。</p>
   <h3>選択肢</h3><p>同じ場面でも、出てくる選択肢は毎回変わります。能力を鍛えたりお金があったりすると、★マークの特別な選択肢が現れることがあり、効果も大きくなります。</p>
+  <h3>続きのあるイベント</h3><p>うまくいくと、イベントに「続き」が起きることがあります。続きでの選び方しだいで、さらに仲良くなれます(時間は1回分しか進みません)。</p>
   <h3>キープは禁物</h3><p>付き合っていない相手は、しばらく会わないと好感度が下がります(高いほど早く冷めます)。好感度70以上のまま付き合わずにいると「はっきりして」と呼び出され、好感度60以上の人を3人以上キープしていると「八方美人」の噂が立って、みんなの好感度が下がります。</p>
   <h3>バイト</h3><p>何が起きるかは日によって違います。3回続けると疲れてミスが増え、お金が減ってしまいます。</p>
   <h3>卒業</h3><p>4年生の3月が終わると卒業式。大学生活の振り返りと称号が表示されます。</p>
@@ -1417,6 +1418,43 @@ friends:{l:'ばっちり身だしなみを整えて、好印象で自己紹介�
 c1:{l:'センスのいい話題で、{o}をずっと笑わせる',t:'talk',st:'話術',min:55},
 c3:{l:'{o}に似合う服を、プロのように選んであげる',t:'talk',st:'ルックス',min:55}
 };
+/* ③ 2段階に続くイベント:1回目がうまくいくと(好反応は必ず・まずまずは40%)、続きの場面が起きる。時間は1回分だけ進む */
+const FOLLOW={
+rain:{text:'雨が上がった帰り道。{t}がこちらを見て、少し照れくさそうに言った。「さっきはありがとう。……このあと、少し時間ある?」',ch:[C('「あるよ。どこか寄っていこう」','bold'),C('「何かあった?」と聞く','ask'),C('「お礼なんていいよ」と笑う','talk'),C('黙ってうなずいて、隣を歩く','quiet'),C('「虹、出てないかな」と空を探してみせる','joke'),C('「家まで送るよ」','help')]},
+cafeteria:{text:'一緒に座ったテーブルで、{t}がおかずを一つ差し出してきた。「これ、よかったら食べて」',ch:[C('「いいの?ありがとう!」と喜んで食べる','talk'),C('「じゃあ交換ね」と自分のおかずも渡す','help'),C('「もしかして毒見係?」とふざける','joke'),C('「どうして?」と聞く','ask'),C('照れながら、静かに受け取る','quiet'),C('「明日は一緒にお弁当作ろうよ」と誘う','bold')]},
+bench:{text:'少しだけ表情がやわらいだ{t}が、ぽつりと話し始めた。「……実はね、今日ちょっとへこむことがあって」',ch:[C('黙って最後まで話を聞く','quiet'),C('「何があったの?」とやさしく聞く','ask'),C('「話してくれてうれしい」と伝える','talk'),C('「元気が出るもの食べに行こう!」と誘う','bold'),C('「へこんだ分、明日いいことあるよ」と笑わせる','joke'),C('「何か手伝えることある?」','help'),C('「それは{t}のせいじゃないよ」とまっすぐ言う','serious')]},
+lecture:{text:'講義が終わると、{t}が声をかけてきた。「さっきはありがとう。……このあと、空きコマだったりする?」',ch:[C('「空いてる!どこか行こう」','bold'),C('「空いてるけど、どうしたの?」','ask'),C('「空きコマは寝る時間って決めてるんだ」とボケる','joke'),C('「次の講義の予習、一緒にしない?」','serious'),C('「うん、少し話そうか」','talk'),C('「{t}の行きたいところでいいよ」','quiet')]},
+library:{text:'探していた本が見つかって、{t}がほっとした顔をした。「助かった……。ねえ、お礼に何かさせて」',ch:[C('「じゃあ、一緒に勉強しよう」','bold'),C('「お礼なんていいよ」と笑う','talk'),C('「今度、おすすめの本を教えて」','ask'),C('「ジュース一本で手を打とう」','joke'),C('「試験、がんばろうね」と真面目に言う','serious'),C('黙って、にっこり笑う','quiet')]},
+hanabi:{text:'最後の大きな花火が上がった。{t}がこちらを見て、何か言いかけた。',ch:[C('「……どうしたの?」と聞く','ask'),C('何も言わず、同じ空を見上げる','quiet'),C('「来年も一緒に見ようね」と言う','bold'),C('「今のが一番きれいだった」と話す','talk'),C('「たまやー!」と叫んで照れ隠しする','joke'),C('「帰りの人混み、気をつけようね」と気づかう','help')]},
+gakusai:{text:'模擬店が落ち着いたころ、{t}がジュースを2本持ってきた。「おつかれさま。……少しだけ、一緒に回らない?」',ch:[C('「行こう!」と手を引く','bold'),C('「どこから回りたい?」','ask'),C('「片付けがあるなら手伝うよ」','help'),C('「売上一位、取れそうだね」と話す','talk'),C('「エプロン姿、似合ってたよ」とからかう','joke'),C('「うん」とだけ言って、隣を歩く','quiet')]},
+xmas:{text:'数日後。{t}のほうから「ねえ、24日の夜って……」とメッセージが来た。',ch:[C('「空いてるよ。一緒に過ごそう」','bold'),C('「24日がどうしたの?」','ask'),C('「サンタのバイトが……うそ、空いてる」','joke'),C('「みんなで集まる?」と提案する','talk'),C('「予定を確認して、すぐ返すね」と丁寧に返す','serious'),C('「楽しみにしてる」とだけ返す','quiet')]},
+baito:{text:'{t}が帰り際、レシートの裏に何か書いて渡してきた。「……これ、連絡先」',ch:[C('「ありがとう、あとで連絡する」と大事にしまう','talk'),C('「店長に見つかったら怒られるよ」とからかう','joke'),C('「バイト終わったら、会える?」','bold'),C('照れて、小さくうなずく','quiet'),C('「どうして書いてくれたの?」','ask'),C('「仕事中だから、また後で」と真面目に返す','serious')]},
+train:{text:'降りる駅が近づいてきた。{t}が少しだけ寂しそうに言った。「もう着いちゃうね」',ch:[C('「一駅、乗り過ごしちゃおうか」','bold'),C('「また明日ね」と笑顔で手を振る','talk'),C('「次はいつ会える?」','ask'),C('「寂しい?」とからかう','joke'),C('黙って、ドアが開くまで隣にいる','quiet'),C('「暗いから、駅から送っていくよ」','help')]},
+mistake:{text:'課題はなんとか提出できた。{t}が深々と頭を下げた。「本当にありがとう。……何かお礼させて」',ch:[C('「打ち上げしよう!」','bold'),C('「お礼なんていらないよ」','talk'),C('「次は自動保存、設定しとこうね」と真面目に言う','serious'),C('「伝説の復活劇だったね」と笑う','joke'),C('「{t}がほっとしてくれたなら十分」','quiet'),C('「次の課題も一緒にやろう」','help')]},
+night:{text:'しばらく話していると、{t}が「……なんか、声を聞いたら安心した」とつぶやいた。',ch:[C('「いつでも電話してね」','talk'),C('「何が不安だったの?」','ask'),C('黙って、{t}が眠くなるのを待つ','quiet'),C('「子守歌、歌おうか?」とふざける','joke'),C('「明日、会いに行くよ」','bold'),C('「温かいものでも飲んで、ゆっくり休んで」','help')]},
+date:{text:'デートの帰り道。{t}が少し名残惜しそうに、歩くペースを落とした。',ch:[C('「もう少しだけ、歩こうか」','quiet'),C('「次はどこ行きたい?」','ask'),C('「今日、すごく楽しかった」と伝える','talk'),C('そっと手をつなぐ','bold'),C('「家まで送るよ」','help'),C('「足が棒みたい」と笑わせる','joke')]},
+fight:{text:'少し落ち着いたころ、{t}から「……さっきはごめんね」とメッセージが来た。',ch:[C('「こっちこそ、ごめん」とすぐ返す','talk'),C('「今から会える?」と聞く','bold'),C('「何が嫌だったか、ちゃんと聞かせて」','serious'),C('(仲直りのスタンプを送る)','joke'),C('「気にしてないよ」とだけ返す','quiet'),C('「おいしいもの食べに行こう、おごるよ」','help')]},
+sick:{text:'数日後、元気になった{t}から連絡が来た。「おかげで治った!お礼したいな」',ch:[C('「治ってよかった!」','talk'),C('「じゃあ、元気になった記念にデートしよう」','bold'),C('「まだ無理しないでね」と気づかう','help'),C('「次は自分が風邪をひく番かな」と笑う','joke'),C('「何が一番つらかった?」','ask'),C('「お礼なんていいよ」と静かに返す','quiet')]}
+};
+function followUp(){
+  const c=ch(S.target),f=FOLLOW[S.follow];if(!f){S.follow=null;return next()}
+  S.mood=S.followMood||null;cur={id:'f_'+S.follow,title:S.followTitle,ch:f.ch};cur.order=buildChoices(cur);
+  show(`<span class="stamp hand">続き</span><h2 class="hand">${esc(cur.title)}(続き)</h2>
+  <div class="speaker">${ava(c)}<p style="margin:0">${fmt(f.text,c)}</p></div>
+  <p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:0">どうする?</p>
+  <div class="choices">${cur.order.map((o,i)=>`<button class="choice" onclick="act2(${i})" ${i===0?'autofocus':''}>${fmt(o.label,c)}</button>`).join('')}</div>`,true);
+}
+function act2(i){
+  const o=cur.order[i],c=ch(S.target),st=S.st[c.id];meet(c.id);social();S.follow=null;
+  const me=moodEffect(c,o.tag);const ts=tagScore(c,o.tag,4,6);endMood();S.followMood=null;
+  let d=ts.d+sbonus(TAGSTAT[o.tag])+(c.chaos?rnd(-6,6):rnd(-3,3));if(st.awk>0)d-=2;
+  const kind=d>=4?'good':d>=0?'meh':'bad';d=gain(c,d);const b=st.aff;st.aff=clamp(st.aff+d,0,100);
+  log(`${cur.title}(続き):「${o.label.replace(/\{t\}/g,c.first)}」→ ${kind==='good'?'好反応':kind==='meh'?'まずまず':'失敗'}`);save();
+  show(`<h2 class="hand">${esc(cur.title)}(続き)</h2><p>あなたは「${fmt(o.label,c)}」を選んだ。</p>
+  <div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div>
+  <p>${fmt(NN(kind),c)}</p>${me}${boredNote(c,ts)}<div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div>
+  <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
+}
 /* 候補から4つ選ぶ(なるべく違うタイプを混ぜる)+条件を満たせば★の特別な選択肢 */
 function spOk(sp){return sp.st?S.stats[sp.st]>=sp.min:S.money>=sp.money}
 function buildChoices(sc){
@@ -1449,7 +1487,7 @@ function scene(){
 function act(i){
   const o=cur.order[i],c=ch(S.target),st=S.st[c.id],r=rv(c);social();meet(c.id);
   let d=3,rushed=false,note='';
-  const me=moodEffect(c,o.tag);const ts=tagScore(c,o.tag,7,8);d+=ts.d;endMood();const spx=spApply(o);d+=spx.d;
+  const me=moodEffect(c,o.tag);const ts=tagScore(c,o.tag,7,8);d+=ts.d;const msv=S.mood;endMood();const spx=spApply(o);d+=spx.d;
   d+=sbonus(TAGSTAT[o.tag]);
   if(o.need){if(st.aff<o.need){d-=Math.min(14,Math.ceil((o.need-st.aff)/3));rushed=true}else d+=Math.round(o.need/8)+2}
   if(S.partner===c.id&&o.tag==='quiet'&&cur.id!=='fight')d-=2;
@@ -1464,12 +1502,13 @@ function act(i){
     if(cur.rival)rnote=rd<0?'{r}を少し引き離せた気がする。':rd>0?'{r}に差をつけられてしまったかもしれない。':'';}
   const feel=rushed&&d<0?NN('rush'):NN(kind);
   log(`${cur.title}:「${o.label.replace(/\{t\}/g,c.first).replace(/\{r\}/g,r?r.name:'')}」→ ${kind==='good'?'好反応':kind==='meh'?'まずまず':'失敗'}`);
+  const fol=!!FOLLOW[cur.id]&&(kind==='good'||(kind==='meh'&&Math.random()<.4));if(fol){S.follow=cur.id;S.followTitle=cur.title;S.followMood=msv}
   S.tturns++;save();
   show(`${tip('result',c)}<h2 class="hand">${esc(cur.title)}</h2>
   <p>あなたは「${fmt(o.label,c)}」を選んだ。</p>
   <div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div>
   ${note?`<p>${fmt(note,c)}</p>`:''}<p>${fmt(feel,c)}${rnote?' '+fmt(rnote,c):''}</p>${spx.html}${me}${boredNote(c,ts)}${fnote}<div style="max-width:420px">${meter(st.aff,1,real)}</div>
-  <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
+  <div class="row">${fol?`<button class="btn" onclick="followUp()" autofocus>続きへ ▶</button>`:`<button class="btn" onclick="next()" autofocus>次へ</button>`}</div>`,true);
 }
 function next(){
   if(!S.didBaito)S.baitoStreak=0;S.didBaito=false;
