@@ -905,6 +905,12 @@ function plan(){
    ${u4?A('giftMenu()','プレゼントを渡す','好みに合えば大きく好感度アップ'):''}
    ${u2?A('advisor()','親友のちひろに相談',S.hintUsed?'今日はもう相談した':'ヒントがもらえる(時間は進まない)',S.hintUsed):''}
   </div>
+  ${S.partner?sides().map(id=>{const o=ch(id);return `<div class="grp">${esc(o.first)}と過ごす <span class="hint">秘密の恋人・${esc(ch(S.partner).first)}にバレる危険あり</span></div>
+  <div class="acts">
+   ${A(`cheatGo('${id}')`,`${esc(o.first)}に会いに行く`,'こっそり会う')}
+   ${A(`dateMenu('${id}')`,'デートに誘う','こっそりデート(お金が必要)')}
+   ${A(`giftMenu('${id}')`,'プレゼントを渡す','好みに合えば大きく好感度アップ')}
+  </div>`}).join(''):''}
   ${u2?`<div class="grp">自分磨き・バイト <span class="hint">この日は${esc(c.first)}に会えない${rv(c)&&!taken(c.id)?'。ライバルが近づく':''}</span></div>
   <div class="acts">
    ${A("train('study')",'図書館で勉強','学力アップ')}
@@ -959,32 +965,32 @@ function train(k){
   html+=`<p style="color:var(--ink-soft)">${fmt(NN(S.partner===c.id?'missLover':'miss'),c)}</p>`;
   save();show(`<h2 class="hand">${T[0]}</h2>${html}<div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
-function giftMenu(){
-  const c=ch(S.target);
+function giftMenu(who){
+  const c=ch(who||S.target);
   show(`<h2 class="hand">プレゼントを選ぶ</h2><p>${fmt('{t}に何を渡そう?好みに合えば大喜び、外すと逆効果。まだ仲良くないのに高すぎる物は重いと思われるかも。',c)}</p><div class="money">所持金 <b>${yen(S.money)}</b></div>
-  <div class="acts">${ITEMS.map(it=>`<button class="act" onclick="give('${it.id}')" ${S.money<it.price?'disabled':''}><b>${it.name}</b><span>${yen(it.price)}</span></button>`).join('')}</div>
+  <div class="acts">${ITEMS.map(it=>`<button class="act" onclick="give('${it.id}','${who||''}')" ${S.money<it.price?'disabled':''}><b>${it.name}</b><span>${yen(it.price)}</span></button>`).join('')}</div>
   <div class="row"><button class="btn ghost" onclick="plan()">やめる</button></div>`,true);
 }
-function give(id){social();
-  const c=ch(S.target),st=S.st[c.id],it=ITEMS.find(i=>i.id===id),r=rv(c);S.money-=it.price;rc('gifts');
+function give(id,who){social();
+  const c=ch(who||S.target),st=S.st[c.id],it=ITEMS.find(i=>i.id===id),r=rv(c);S.money-=it.price;rc('gifts');
   let d,kind,msg;
-  if(it.price>=6000&&st.aff<30&&S.partner!==c.id){d=-6;kind='bad';msg=NN('giftHeavy')}
+  if(it.price>=6000&&st.aff<30&&S.partner!==c.id&&!sides().includes(c.id)){d=-6;kind='bad';msg=NN('giftHeavy')}
   else if(it.id===c.fav){d=14+Math.round(it.price/3000);kind='good';msg=NN('giftFav')}
   else if(it.id===c.dis){d=-8;kind='bad';msg=NN('giftDis')}
   else{d=4+Math.round(it.price/4000);kind='meh';msg=NN('giftMeh')}
   d+=rnd(-2,2);d=gain(c,d);const b=st.aff;st.aff=clamp(st.aff+d,0,100);
   if(r&&!r.taken)r.prog=clamp(r.prog+(kind==='good'?-8:kind==='bad'?4:-2),0,100);
-  log(`${c.first}に「${it.name}」をプレゼント → ${kind==='good'?'大喜び':kind==='meh'?'まずまず':'失敗'}`);save();
-  show(`<h2 class="hand">プレゼント</h2><p>${esc(c.first)}に「${it.name}」を渡した。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div><p>${fmt(msg,c)}</p><div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div><div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
+  log(`${c.first}に「${it.name}」をプレゼント → ${kind==='good'?'大喜び':kind==='meh'?'まずまず':'失敗'}`);const sn=secretTouch(c);save();
+  show(`${sn?'<span class="stamp hand">秘密</span>':''}<h2 class="hand">プレゼント</h2><p>${esc(c.first)}に「${it.name}」を渡した。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div><p>${fmt(msg,c)}</p><div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div>${sn}<div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
-function dateMenu(){
-  const c=ch(S.target);
+function dateMenu(who){
+  const c=ch(who||S.target);
   show(`<h2 class="hand">デートに誘う</h2><p>${fmt('どこに誘おう?{t}の好きな雰囲気の場所なら大成功。断られたらお金は使わずに済む。',c)}</p><div class="money">所持金 <b>${yen(S.money)}</b></div>
-  <div class="acts">${SPOTS.map(s=>`<button class="act" onclick="invite('${s.id}')" ${S.money<s.price?'disabled':''}><b>${s.name}</b><span>${yen(s.price)}</span></button>`).join('')}</div>
+  <div class="acts">${SPOTS.map(s=>`<button class="act" onclick="invite('${s.id}','${who||''}')" ${S.money<s.price?'disabled':''}><b>${s.name}</b><span>${yen(s.price)}</span></button>`).join('')}</div>
   <div class="row"><button class="btn ghost" onclick="plan()">やめる</button></div>`,true);
 }
-function invite(id){social();
-  const c=ch(S.target),st=S.st[c.id],s=SPOTS.find(x=>x.id===id),r=rv(c),lover=S.partner===c.id;
+function invite(id,who){social();
+  const c=ch(who||S.target),st=S.st[c.id],s=SPOTS.find(x=>x.id===id),r=rv(c),lover=S.partner===c.id||sides().includes(c.id);
   let p=lover?1:clamp((st.aff-20)/40+(S.stats['ルックス']-40)/200-(st.awk>0?.3:0),.1,.95);
   if(Math.random()>p){rc('dateNg');st.aff=Math.max(0,st.aff-3);log(`${c.first}をデートに誘ったが断られた。`);save();
     return show(`<h2 class="hand">デートのお誘い</h2><p>${esc(c.first)}を${s.name}に誘ってみた。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,'refuse'),c)}</div></div><p>${fmt(NN('refuseAfter'),c)}</p><div style="max-width:420px">${meter(st.aff,1,-3)}</div><div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true)}
@@ -993,8 +999,8 @@ function invite(id){social();
   if(s.price>=8000&&st.aff<50&&!lover)d-=5;
   const kind=d>=10?'good':d>=0?'meh':'bad';d=gain(c,d);const b=st.aff;st.aff=clamp(st.aff+d,0,100);
   if(r&&!r.taken)r.prog=clamp(r.prog-10,0,100);
-  log(`${c.first}と${s.name}でデート → ${kind==='good'?'大成功':kind==='meh'?'まずまず':'いまいち'}`);save();
-  show(`<h2 class="hand">${s.name}デート</h2><p>${esc(c.first)}と${s.name}へ出かけた。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div><p>${fmt(NN(kind==='good'?'dateGood':kind==='meh'?'dateMeh':'dateBad'),c)}</p><div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div><div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
+  log(`${c.first}と${s.name}でデート → ${kind==='good'?'大成功':kind==='meh'?'まずまず':'いまいち'}`);const sn=secretTouch(c,6);save();
+  show(`${sn?'<span class="stamp hand">秘密</span>':''}<h2 class="hand">${s.name}デート</h2><p>${esc(c.first)}と${s.name}へ出かけた。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div><p>${fmt(NN(kind==='good'?'dateGood':kind==='meh'?'dateMeh':'dateBad'),c)}</p><div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div>${sn}<div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
 
 /* ---------- 浮気 ---------- */
@@ -1059,6 +1065,14 @@ function doCheatConfess(id){social();
   <p>${ok?`これで${mata()}。${esc(p.first)}に内緒の日々が続く。付き合う人数が多いほど、バレる危険は毎日どんどん上がっていく。`:`${esc(o.first)}から話が広まるかもしれない……。`}</p>
   <p>${esc(p.first)}にバレる危険:<b>${susLabel()}</b>${fr?`<br><span class="ripple down">${esc(o.first)}は${esc(p.first)}の友達。噂が伝わりやすい……</span>`:''}</p>
   <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
+}
+/* 秘密の恋人と過ごしたとき:本命にバレる危険が上がる */
+function secretTouch(c,extra){
+  if(!S.partner||!sides().includes(c.id))return'';
+  const p=ch(S.partner),fr=friendsOf(p.id).includes(c);
+  susUp(rnd(8,14)+(extra||0)+(fr?8:0));S.cheatedNow=true;S.lastCheat=c.id;S.skipped=true;rc('cheat');
+  S.st[p.id].aff=Math.max(0,S.st[p.id].aff-1);
+  return `<p style="margin-top:10px">${esc(p.first)}にバレる危険:<b>${susLabel()}</b>${fr?`<br><span class="ripple down">${esc(c.first)}は${esc(p.first)}の友達。噂が伝わりやすい……</span>`:''}</p>`;
 }
 function sidePromote(){
   const o=ch(sides().shift());S.partner=o.id;S.target=o.id;S.tturns=0;S.sus=0;S.pc=null;log(`${o.first}と正式に付き合うことになった。`);save();
