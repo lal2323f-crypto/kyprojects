@@ -767,7 +767,8 @@ return `<div class="meter${big?' big':''}" role="meter" aria-valuemin="0" aria-v
 ${big?'<div class="ticks"><span style="left:20%">友達</span><span style="left:45%">仲良し</span><span style="left:70%">いい感じ</span></div>':''}</div>`}
 function rmeter(r){return `<div class="meter rival"><div class="mtop"><span>${esc(r.name)}の接近度 <b>${Math.round(r.prog)}</b>/100</span></div><div class="bar"><div class="fill" style="width:${r.prog}%"></div></div></div>`}
 function sbar(k,v,d,w){return `<div class="sbar"><span class="sk">${k}${w?'<span class="warn" title="下がりそう"> ↓</span>':''}</span><div class="bar"><div class="fill" style="width:${v}%"></div></div><span class="sv">${v}${d?`<span class="delta up"> +${d}</span>`:''}</span></div>`}
-function status(id){const st=S.st[id];if(S.partner===id)return'恋人';if(sides().includes(id))return'秘密の恋人';if(taken(id))return'ライバルと交際中';let b=st.aff<20?'顔見知り':st.aff<45?'友達':st.aff<70?'仲良し':'いい感じ';if(st.awk>0)b='気まずい';return st.ex?'元恋人・'+b:b}
+function status(id){const r=statusBase(id);return distrustOf(id)?r+'・不信':r}
+function statusBase(id){const st=S.st[id];if(S.partner===id)return'恋人';if(sides().includes(id))return'秘密の恋人';if(taken(id))return'ライバルと交際中';let b=st.aff<20?'顔見知り':st.aff<45?'友達':st.aff<70?'仲良し':'いい感じ';if(st.awk>0)b='気まずい';return st.ex?'元恋人・'+b:b}
 function ava(c,sm){return `<img class="ava${sm?' sm':''}" src="${IMG[c.id]}" alt="${esc(c.name)}の顔">`}
 function log(t){S.log.unshift(`[${gradeLabel()} ${MONTHS[S.month]}] ${t}`);S.log=S.log.slice(0,80)}
 /* 浮気・複数交際 */
@@ -834,7 +835,7 @@ function side(){
   if(t){const st=S.st[t.id];const lover=S.partner===t.id;const r=rv(t);const can=st.aff>=40&&st.awk===0&&!taken(t.id);
     h+=`<div class="note"><h3 class="hand">狙っている相手</h3><div class="who">${ava(t,1)}<div><div><b>${esc(t.name)}</b></div><span class="status${lover?' lover':''}">${status(t.id)}</span></div></div>
     <div style="margin-top:10px">${meter(st.aff,1)}</div><div class="legend">縦線は告白の目安ライン(40)・重視する能力:${wantLabel(t)}</div><div class="legend">難易度 ${stars(t.lv)} ・ ひみつ ${S.story[t.id]||0}/4</div>
-    ${lover&&sides().length?`<div class="legend" style="color:var(--bad)">${sideNames()}とも付き合っている(${mata()}中)</div>`:''}${lover&&S.sus>0?`<div class="legend" style="color:var(--bad)">浮気がバレる危険:${susLabel()}</div>`:''}${lover&&S.pc?`<div class="legend">最近、${esc(t.first)}の様子が少しおかしい……</div>`:''}
+    ${distrustOf(t.id)?`<div class="legend" style="color:var(--bad)">浮気のことを知っている:${TRUST_NAME[distrustOf(t.id)]}(好感度が上がりにくい)</div>`:''}${lover&&sides().length?`<div class="legend" style="color:var(--bad)">${sideNames()}とも付き合っている(${mata()}中)</div>`:''}${lover&&S.sus>0?`<div class="legend" style="color:var(--bad)">浮気がバレる危険:${susLabel()}</div>`:''}${lover&&S.pc?`<div class="legend">最近、${esc(t.first)}の様子が少しおかしい……</div>`:''}
     ${r?`<div style="margin-top:10px">${rmeter(r)}</div><div class="legend">${r.taken>0?`${esc(t.first)}は今${esc(r.name)}と付き合っている。`:'100になると先に付き合われてしまう。'}</div>`:''}
     <div class="row">${lover?`<button class="btn small ghost" onclick="breakUp()">別れを切り出す</button>`:`<button class="btn small" onclick="confess()">告白する</button>`}<button class="btn small ghost" onclick="toPick()">相手を変える</button></div>
     ${!lover&&!can?`<p style="font-size:.8rem;color:var(--ink-soft);margin:8px 0 0">${taken(t.id)?`今は${esc(rv(t).name)}と付き合っている。告白しても望みは薄い。`:st.awk>0?'今は気まずい。告白しても成功しにくそう。':'今告白しても成功は難しそう。好感度40を超えてからが勝負。'}</p>`:''}</div>`;}
@@ -984,7 +985,7 @@ function give(id,who){social();
   d+=rnd(-2,2);d=gain(c,d);const b=st.aff;st.aff=clamp(st.aff+d,0,100);
   if(r&&!r.taken)r.prog=clamp(r.prog+(kind==='good'?-8:kind==='bad'?4:-2),0,100);
   log(`${c.first}に「${it.name}」をプレゼント → ${kind==='good'?'大喜び':kind==='meh'?'まずまず':'失敗'}`);const sn=secretTouch(c);save();
-  show(`${sn?'<span class="stamp hand">秘密</span>':''}<h2 class="hand">プレゼント</h2><p>${esc(c.first)}に「${it.name}」を渡した。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div><p>${fmt(msg,c)}</p><div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div>${sn}<div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
+  show(`${sn?'<span class="stamp hand">秘密</span>':''}<h2 class="hand">プレゼント</h2><p>${esc(c.first)}に「${it.name}」を渡した。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div><p>${fmt(msg,c)}</p>${trustNote(c,st.aff-b)}<div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div>${sn}<div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
 function dateMenu(who){
   const c=ch(who||S.target);
@@ -1003,7 +1004,7 @@ function invite(id,who){social();
   const kind=d>=10?'good':d>=0?'meh':'bad';d=gain(c,d);const b=st.aff;st.aff=clamp(st.aff+d,0,100);
   if(r&&!r.taken)r.prog=clamp(r.prog-10,0,100);
   log(`${c.first}と${s.name}でデート → ${kind==='good'?'大成功':kind==='meh'?'まずまず':'いまいち'}`);const sn=secretTouch(c,6);save();
-  show(`${sn?'<span class="stamp hand">秘密</span>':''}<h2 class="hand">${s.name}デート</h2><p>${esc(c.first)}と${s.name}へ出かけた。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div><p>${fmt(NN(kind==='good'?'dateGood':kind==='meh'?'dateMeh':'dateBad'),c)}</p><div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div>${sn}<div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
+  show(`${sn?'<span class="stamp hand">秘密</span>':''}<h2 class="hand">${s.name}デート</h2><p>${esc(c.first)}と${s.name}へ出かけた。</p><div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div><p>${fmt(NN(kind==='good'?'dateGood':kind==='meh'?'dateMeh':'dateBad'),c)}</p>${trustNote(c,st.aff-b)}<div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div>${sn}<div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
 
 /* ---------- 浮気 ---------- */
@@ -1097,7 +1098,7 @@ function leakConfront(){
   <div class="choices">${ks.map((k,i)=>`<button class="choice" onclick="leakAct('${k}')" ${i===0?'autofocus':''}>${fmt3(LEAK_OPTS[k],p,o)}</button>`).join('')}</div>`,true);
 }
 function leakAct(k){
-  const p=ch(S.partner),o=ch(S.leak),sp=S.st[p.id],so=S.st[o.id];S.leak=null;rc('caught');
+  const p=ch(S.partner),o=ch(S.leak),sp=S.st[p.id],so=S.st[o.id];S.leak=null;rc('caught');addDistrust(p.id,2);addDistrust(o.id,1);distrustFriends(p.id,1);
   const lvAdj=(3-(p.lv||3))*.05;let quote,res,broke=false;const b=sp.aff;
   if(k==='sorry'){sp.aff=Math.max(0,sp.aff-12);if(Math.random()<clamp(sp.aff/100+.25+lvAdj,.1,.9)){quote=NN('forgive');res='なんとか許してもらえた。でも、しばらくは信用してもらえなさそうだ。';sp.awk=2}else{quote=NN('noForgive');res='許してはもらえなかった。';broke=true}}
   else if(k==='excuse'){if(Math.random()<.45+lvAdj){sp.aff=Math.max(0,sp.aff-5);quote='「……ほんとに?ならいいけど」';res='なんとかごまかせた。……胸の奥が、ちくりと痛む。'}else{sp.aff=Math.max(0,sp.aff-25);if(Math.random()<.5){quote=NN('noForgive');res='見え透いたごまかしは、火に油を注いだだけだった。';broke=true}else{quote='「……しばらく一人にして」';res='関係は、ぎりぎりのところでつながっている。';sp.awk=3}}}
@@ -1136,9 +1137,9 @@ function cheatAct(i){social();
   if(x.need){if(so.aff<x.need)d-=Math.min(14,Math.ceil((x.need-so.aff)/3));else d+=Math.round(x.need/8)+2}
   d+=o.chaos?rnd(-9,9):rnd(-4,4);
   let extra='';
-  if(x.honest){so.knows=true;d-=4;extra=fmt3('{o}は少し驚いた顔をしたが、正直に話してくれたことには感謝しているようだ。',p,o)}
+  if(x.honest){so.knows=true;addDistrust(o.id,1);d-=4;extra=fmt3('{o}は少し驚いた顔をしたが、正直に話してくれたことには感謝しているようだ。',p,o)}
   d=gain(o,d);const b=so.aff;so.aff=clamp(so.aff+d,0,100);let kind=d>=8?'good':d>=0?'meh':'bad';let quote=L(o,kind);
-  if(!so.knows&&Math.random()<.2){so.knows=true;so.aff=Math.max(0,so.aff-10);kind='bad';quote=NN('foundOut');extra=fmt3('{o}は、あなたに恋人がいることを知ってしまった。',p,o)}
+  if(!so.knows&&Math.random()<.2){so.knows=true;addDistrust(o.id,1);so.aff=Math.max(0,so.aff-10);kind='bad';quote=NN('foundOut');extra=fmt3('{o}は、あなたに恋人がいることを知ってしまった。',p,o)}
   susUp(rnd(15,25)+(x.tag==='bold'?8:0)-(x.tag==='quiet'?5:0)+(friendsOf(p.id).includes(o)?10:0));
   sp.aff=Math.max(0,sp.aff-2);rc('cheat');S.skipped=true;S.lastCheat=o.id;S.cheatedNow=true;S.tturns++;
   log(`${p.first}に内緒で${o.first}と会った(${cur.title})。`);save();
@@ -1161,7 +1162,7 @@ function caught(){
   <div class="choices">${opts.map(([k,l],i)=>`<button class="choice" onclick="caughtAct('${k}')" ${i===0?'autofocus':''}>${l}</button>`).join('')}</div>`,true);
 }
 function caughtAct(k){
-  const p=ch(S.partner),o=ch(S.lastCheat),sp=S.st[p.id];let quote,res,broke=false;rc('caught');const rp=ripple(p,-6,'浮気がバレた');
+  const p=ch(S.partner),o=ch(S.lastCheat),sp=S.st[p.id];let quote,res,broke=false;rc('caught');const rp=ripple(p,-6,'浮気がバレた');addDistrust(p.id,2);distrustFriends(p.id,1);
   if(k==='sorry'){sp.aff=Math.max(0,sp.aff-20);if(Math.random()<clamp(sp.aff/100+.25,.1,.9)){quote=NN('forgive');res='なんとか許してもらえた。でも、信頼を取り戻すには時間がかかりそうだ。';S.sus=0;sp.awk=2;log(`浮気がバレたが、${p.first}は許してくれた。`)}else{quote=NN('noForgive');res='許してはもらえなかった。';broke=true}}
   else if(k==='excuse'){if(Math.random()<.45){sp.aff=Math.max(0,sp.aff-5);S.sus=Math.max(0,S.sus-30);quote='「……そっか。ならいいんだけど」';res='なんとかごまかせた。……胸の奥に、罪悪感が残る。';log('浮気を言い訳でごまかした。')}else{sp.aff=Math.max(0,sp.aff-30);if(Math.random()<.6){quote=NN('noForgive');res='見え透いた言い訳は、火に油を注いだだけだった。';broke=true}else{quote='「……しばらく一人にして」';res=`${esc(p.first)}は黙り込んでしまった。関係はぎりぎりのところでつながっている。`;S.sus=20;sp.awk=3;log('浮気の言い訳が通じず、関係がぎくしゃくした。')}}}
   else if(k==='open'){sp.aff=Math.max(0,sp.aff-35);if(Math.random()<.8){quote=NN('noForgive');res='開き直った態度に、すべてが終わった。';broke=true}else{quote='「……信じられない。でも、嫌いになれない自分がもっと嫌」';res='かろうじて別れずに済んだが、関係は冷え切っている。';S.sus=25;sp.awk=3}}
@@ -1171,7 +1172,7 @@ function caughtAct(k){
   if(broke)cheatBreak(p,k==='end'?`浮気がバレて、自分から${p.first}に別れを告げた。`:`浮気がバレて、${p.first}に振られた。`);
   if(sides().length){const lost=[],kept=[];
     sides().slice().forEach(id=>{const sd=ch(id),ss=S.st[id];
-      if(Math.random()<.5){ss.ex=true;ss.awk=3;ss.aff=Math.max(0,ss.aff-20);rc('dumped');lost.push(sd.first);log(`浮気が${sd.first}にもバレて、振られた。`)}
+      if(Math.random()<.5){ss.ex=true;ss.awk=3;ss.aff=Math.max(0,ss.aff-20);addDistrust(id,2);rc('dumped');lost.push(sd.first);log(`浮気が${sd.first}にもバレて、振られた。`)}
       else if(!broke&&k==='sorry'){ss.ex=true;ss.awk=2;ss.aff=Math.max(0,ss.aff-10);rc('breakup');lost.push(sd.first);log(`けじめとして${sd.first}とは別れた。`)}
       else kept.push(id)});
     S.sides=kept;
@@ -1223,7 +1224,15 @@ function ripple(c,amt,why){const fs=friendsOf(c.id);if(!fs.length)return'';fs.fo
   const names=fs.map(f=>f.first).join('・');log(`${why}ため、${names}からの印象が${amt<0?'下がった':'上がった'}。`);
   return `<p class="ripple ${amt<0?'down':'up'}">${esc(c.first)}と仲のいい${esc(names)}の耳にも入ったようだ。(好感度${amt>0?'+':''}${amt})</p>`}
 function stars(lv){return `<span class="stars" aria-label="難易度${lv}">${'★'.repeat(lv)}<span class="off">${'★'.repeat(5-lv)}</span></span> <span class="lvn">${LVNAME[lv]}</span>`}
-function gain(c,d){return d>0?Math.round(d*GAIN[c.lv]):d}
+function gain(c,d){return d>0?Math.round(d*GAIN[c.lv]*trustF(c)):d}
+/* 浮気の情報を知った人は不信感を持ち、好感度が上がりにくくなる(下がる量は変わらない)。1年ごとに1段階ずつ薄れる */
+const TRUST_F=[1,.75,.6,.5],TRUST_NAME=['','少し疑われている','疑われている','信用されていない'];
+function trustF(c){return TRUST_F[(S.distrust&&S.distrust[c.id])||0]}
+function distrustOf(id){return (S.distrust&&S.distrust[id])||0}
+function addDistrust(id,n){if(!S.distrust)S.distrust={};if(!S.distrustAt)S.distrustAt={};S.distrust[id]=Math.min(3,(S.distrust[id]||0)+n);S.distrustAt[id]=S.turn}
+function distrustFriends(id,n){friendsOf(id).forEach(f=>addDistrust(f.id,n))}
+function fadeDistrust(){if(!S.distrust)return;Object.keys(S.distrust).forEach(id=>{if(S.distrust[id]>0&&S.turn-(S.distrustAt[id]||0)>=24){S.distrust[id]--;S.distrustAt[id]=S.turn;if(!S.distrust[id])log(`${ch(id).first}の不信感が、やっと消えた。`)}})}
+function trustNote(c,d){const v=distrustOf(c.id);return v&&d>0?`<p style="font-size:.85rem;color:var(--bad)">${esc(c.first)}はまだ浮気のことを気にしているようだ。好感度が上がりにくい……(${TRUST_NAME[v]})</p>`:''}
 const TAGWORD={serious:'真面目で誠実な態度',ask:'話をちゃんと聞いて質問してくれること',talk:'気軽に話しかけてくれること',joke:'冗談で笑わせてくれること',help:'さりげなく手伝ってくれること',bold:'ぐいぐい誘ってくれること',quiet:'そっと見守ってくれること'};
 const SPOTWORD={calm:'落ち着いた静かな場所',fun:'にぎやかに遊べる場所',lux:'ちょっと高級な場所',nature:'自然の中でのんびりできる場所'};
 const TH=[30,50,70,90];
@@ -1364,6 +1373,7 @@ function howto(){
   <h3>相手の気持ちを読もう</h3><p>会うたびに、相手にはその日の気分があります(機嫌がいい・疲れている・落ち込んでいる・イライラしている など)。いつもは喜ぶ冗談も、落ち込んでいる日には逆効果。場面の描写からよく読み取ろう。喜ぶ行動は、仲が深まったり付き合ったりすると変わります。同じタイプの行動を続けると「またそれ?」と飽きられます。さらに、はじめるたびに各キャラに1つ「裏の好み」がつくので、前回の知識だけでは通用しません。ちひろに聞いたり、反応を観察したりして見つけよう。</p>
   <h3>選択肢</h3><p>同じ場面でも、出てくる選択肢は毎回変わります。能力を鍛えたりお金があったりすると、★マークの特別な選択肢が現れることがあり、効果も大きくなります。</p>
   <h3>続きのあるイベント</h3><p>うまくいくと、イベントに「続き」が起きることがあります。続きでの選び方しだいで、さらに仲良くなれます(時間は1回分しか進みません)。</p>
+  <h3>浮気の噂</h3><p>浮気や内緒の告白がバレると、恋人・その友達・相手に「不信感」が残り、しばらく好感度が上がりにくくなります(最大で半分)。不信感は1年ごとに少しずつ薄れます。</p>
   <h3>キープは禁物</h3><p>付き合っていない相手は、しばらく会わないと好感度が下がります(高いほど早く冷めます)。好感度70以上のまま付き合わずにいると「はっきりして」と呼び出され、好感度60以上の人を3人以上キープしていると「八方美人」の噂が立って、みんなの好感度が下がります。</p>
   <h3>バイト</h3><p>何が起きるかは日によって違います。3回続けると疲れてミスが増え、お金が減ってしまいます。</p>
   <h3>卒業</h3><p>4年生の3月が終わると卒業式。大学生活の振り返りと称号が表示されます。</p>
@@ -1488,7 +1498,7 @@ function act2(i){
   log(`${cur.title}(続き):「${o.label.replace(/\{t\}/g,c.first)}」→ ${kind==='good'?'好反応':kind==='meh'?'まずまず':'失敗'}`);save();
   show(`<h2 class="hand">${esc(cur.title)}(続き)</h2><p>あなたは「${fmt(o.label,c)}」を選んだ。</p>
   <div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div>
-  <p>${fmt(NN(kind),c)}</p>${me}${boredNote(c,ts)}<div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div>
+  <p>${fmt(NN(kind),c)}</p>${me}${boredNote(c,ts)}${trustNote(c,st.aff-b)}<div style="max-width:420px">${meter(st.aff,1,st.aff-b)}</div>
   <div class="row"><button class="btn" onclick="next()" autofocus>次へ</button></div>`,true);
 }
 /* 候補から4つ選ぶ(なるべく違うタイプを混ぜる)+条件を満たせば★の特別な選択肢 */
@@ -1543,7 +1553,7 @@ function act(i){
   show(`${tip('result',c)}<h2 class="hand">${esc(cur.title)}</h2>
   <p>あなたは「${fmt(o.label,c)}」を選んだ。</p>
   <div class="speaker">${ava(c)}<div class="quote hand">${fmt(L(c,kind),c)}</div></div>
-  ${note?`<p>${fmt(note,c)}</p>`:''}<p>${fmt(feel,c)}${rnote?' '+fmt(rnote,c):''}</p>${spx.html}${me}${boredNote(c,ts)}${fnote}<div style="max-width:420px">${meter(st.aff,1,real)}</div>
+  ${note?`<p>${fmt(note,c)}</p>`:''}<p>${fmt(feel,c)}${rnote?' '+fmt(rnote,c):''}</p>${spx.html}${me}${boredNote(c,ts)}${trustNote(c,real)}${fnote}<div style="max-width:420px">${meter(st.aff,1,real)}</div>
   <div class="row">${fol?`<button class="btn" onclick="followUp()" autofocus>続きへ ▶</button>`:`<button class="btn" onclick="next()" autofocus>次へ</button>`}</div>`,true);
 }
 function next(){
@@ -1552,7 +1562,7 @@ function next(){
   S.half++;if(S.half>1){S.half=0;S.month++;if(S.month>11){S.month=0;S.grade++;}}
   CHARS.forEach(c=>{if(S.st[c.id].awk>0)S.st[c.id].awk--});
   const skipped=S.skipped;S.skipped=false;S.hintUsed=false;
-  S.turn++;decayStats();coolDown();
+  S.turn++;decayStats();coolDown();fadeDistrust();
   if(S.grade===5&&!S.gradDone){S.gradDone=true;save();return graduation()}
   const c=ch(S.target),st=S.st[c.id],lover=S.partner===c.id;
   let r=rv(c);
