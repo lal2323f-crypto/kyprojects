@@ -423,7 +423,7 @@ const SUBJECTS = [
     tab: "英語スタサプ",
     eyebrow: "英語",
     icon: "A",
-    meta: "仮定法・分詞（第21講・第22講・第16講・第17講・高3スタンダード）",
+    meta: "仮定法・分詞・分詞構文",
     title: "英語スタサプ",
     desc: "解く単元を選んでください",
     children: [
@@ -566,6 +566,46 @@ const SUBJECTS = [
           {"id": "h3-27", "cat": "第11講(5)", "text": "The Bank of New York, (　　) in 1784, is one of the oldest companies in the United States.", "choices": ["to be found", "it was founded", "founding", "founded"], "answer": 3, "exp": "銀行は「設立された」側なので過去分詞 founded（found「設立する」の過去分詞）。1は find（見つける）の形で意味が合わず、2は接続詞なしで文を2つつなぐことになるので不可。"},
           {"id": "h3-28", "cat": "第11講(6)", "text": "Ken's been sitting by the phone all day (　　) for her to call.", "choices": ["wait", "waited", "waiting", "have waited"], "answer": 2, "exp": "「〜しながら座っている」という付帯状況の分詞構文。Ken が「待つ」（能動）ので waiting。"},
           {"id": "h3-29", "cat": "第11講(7)", "text": "All things (　　), Ted did well.", "choices": ["consider", "be considering", "considered", "being considering"], "answer": 2, "exp": "All things considered ＝「すべてを考慮すると」という慣用的な独立分詞構文。things は「考慮される」側なので過去分詞。"}
+        ]
+      },
+      {
+        id: "eng-l14",
+        tab: "第14講　分詞②",
+        eyebrow: "英語スタサプ ・ ベーシック／高1・高2スタンダード",
+        icon: "ing",
+        meta: "ベーシック Chapter 1〜4 ＋ スタンダード【1】〜【3】（分詞構文）",
+        title: "第14講　分詞②",
+        desc: "ベーシックレベル英語 第14講（Chapter 1〜4）と、高1・高2スタンダードレベル英語＜文法・読解編＞ 第14講【1】〜【3】の復習テスト。",
+        recordKey: "midterm2_eng_l14",
+        choiceLabels: ["①", "②", "③", "④"],
+        questions: [
+          {"id": "l14-1", "cat": "ベーシック Chapter 1", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>If you turn left there, you'll find a convenience store.", "text": "⇒ (　　) left there, you'll find a convenience store.", "choices": ["Turned", "If you turning", "If turned", "Turning"], "answer": 3, "exp": "主語 you が「曲がる」（能動）ので現在分詞 → Turning。接続詞 if と主語 you は消す。"},
+          {"id": "l14-2", "cat": "ベーシック Chapter 1", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>She practiced hard every day, and she became a professional tennis player.", "text": "⇒ She practiced hard every day, (　　) a professional tennis player.", "choices": ["become", "becoming", "she become", "she becoming"], "answer": 1, "exp": "「そして〜になった」という結果の分詞構文。主語が同じ she なので消して becoming。"},
+          {"id": "l14-3", "cat": "ベーシック Chapter 1", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>Because he lived alone, he sometimes felt lonely.", "text": "⇒ (　　) alone, he sometimes felt lonely.", "choices": ["Living", "Lived", "Because lived", "Because living"], "answer": 0, "exp": "接続詞 because と主語 he を消し、動詞を現在分詞に → Living alone「一人暮らしだったので」。"},
+          {"id": "l14-4", "cat": "ベーシック Chapter 2", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>When it is seen from the moon, the earth looks blue.", "text": "⇒ (　　) from the moon, the earth looks blue.", "choices": ["Seeing", "It seeing", "Seen", "It seen"], "answer": 2, "exp": "it（＝the earth）は「見られる」側なので being seen → being を省略して Seen。主語は主節と同じなので消す。"},
+          {"id": "l14-5", "cat": "ベーシック Chapter 2", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>Because it was hot, he turned on the electric fan.", "text": "⇒ (　　) hot, he turned on the electric fan.", "choices": ["It being", "It been", "He being", "Been"], "answer": 0, "exp": "従属節の主語 it（天候）と主節の主語 he が違うので、it を残す独立分詞構文 → It being hot。"},
+          {"id": "l14-6", "cat": "ベーシック Chapter 2", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>Because it was written in Russian, the web page was impossible for me to read.", "text": "⇒ (　　) in Russian, the web page was impossible for me to read.", "choices": ["It written", "It writing", "Written", "Writing"], "answer": 2, "exp": "it（＝the web page）は「書かれた」側。主語が主節と同じなので消し、being を省略して Written。"},
+          {"id": "l14-7", "cat": "ベーシック Chapter 3", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>Because she didn't know how to say <i>tanuki</i> in English, she asked her teacher.", "text": "⇒ (　　) how to say <i>tanuki</i> in English, she asked her teacher.", "choices": ["Knowing", "Knowing not", "Not knowing", "Not known"], "answer": 2, "exp": "分詞構文の否定は not を分詞の前に置く → Not knowing。"},
+          {"id": "l14-8", "cat": "ベーシック Chapter 3", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>After I had finished reading a book, I went to sleep.", "text": "⇒ (　　) reading a book, I went to sleep.", "choices": ["Having been finished", "Having being finished", "Having finishing", "Having finished"], "answer": 3, "exp": "主節（went）より前のことなので完了形の分詞構文 Having＋過去分詞 → Having finished。"},
+          {"id": "l14-9", "cat": "ベーシック Chapter 3", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>He was not hungry because he had eaten a big meal.", "text": "⇒ He was not hungry, (　　) a big meal.", "choices": ["having eaten", "having eating", "not eating", "not eaten"], "answer": 0, "exp": "「食べた」のは「空腹でなかった」より前なので完了形 → having eaten。"},
+          {"id": "l14-10", "cat": "ベーシック Chapter 4", "text": "(　　) last summer, it is hotter this summer.", "ja": "去年の夏と比べると，今年の夏の方が暑い。", "choices": ["Judging from", "Compared with", "Weather permitting", "Generally speaking"], "answer": 1, "exp": "compared with 〜 ＝「〜と比べると」（慣用的な分詞構文）。"},
+          {"id": "l14-11", "cat": "ベーシック Chapter 4", "text": "(　　) his dry answer, it seems he doesn't want to join the party.", "ja": "彼のそっけない返事から判断すると，彼はパーティーに参加したくないようだ。", "choices": ["Compared with", "Frankly speaking", "Speaking of", "Judging from"], "answer": 3, "exp": "judging from 〜 ＝「〜から判断すると」。"},
+          {"id": "l14-12", "cat": "ベーシック Chapter 4", "text": "(　　), dogs are more friendly than cats.", "ja": "一般的に言うと，イヌの方がネコよりも人なつこい。", "choices": ["All things considered", "Frankly speaking", "Generally speaking", "Strictly speaking"], "answer": 2, "exp": "generally speaking ＝「一般的に言うと」。frankly は「率直に」、strictly は「厳密に」。"},
+          {"id": "l14-13", "cat": "スタンダード【1】", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>When she arrived at the station, she looked for her friend.", "text": "⇒ (　　) at the station, she looked for her friend.", "choices": ["Being arrived", "Arriving", "Having arrived", "Having been arrived"], "answer": 1, "exp": "「着いたとき」と主節は同じ時点なので単純形 → Arriving。arrive は自動詞なので受け身（Being arrived）にはならない。"},
+          {"id": "l14-14", "cat": "スタンダード【1】", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>If computers are used in the right way, they will be helpful to you.", "text": "⇒ (　　) in the right way, computers will be helpful to you.", "choices": ["Using", "Having used", "Used", "Being using"], "answer": 2, "exp": "computers は「使われる」側なので（Being）Used → Used。"},
+          {"id": "l14-15", "cat": "スタンダード【1】", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>As he has a quick brain, he will solve this math question.", "text": "⇒ (　　) a quick brain, he will solve this math question.", "choices": ["Had been", "Being", "As had", "Having"], "answer": 3, "exp": "has を現在分詞にして Having a quick brain「頭の回転が速いので」。"},
+          {"id": "l14-16", "cat": "スタンダード【1】", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>When the sound was heard from a distance, it was a bit strange.", "text": "⇒ (　　) from a distance, the sound was a bit strange.", "choices": ["Hearing", "Heard", "Been heard", "Being hearing"], "answer": 1, "exp": "the sound は「聞かれる」側なので（Being）Heard → Heard。"},
+          {"id": "l14-17", "cat": "スタンダード【1】", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>Our hockey team practiced hard every day, and won the tournament.", "text": "⇒ Our hockey team practiced hard every day, (　　) the tournament.", "choices": ["having won", "being won", "winning", "being winning"], "answer": 2, "exp": "「そして優勝した」という結果の分詞構文。チームが「勝つ」（能動）ので winning。"},
+          {"id": "l14-18", "cat": "スタンダード【2】", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>Since he did not understand the theory, he asked his teacher to explain it.", "text": "⇒ (　　) the theory, he asked his teacher to explain it.", "choices": ["Being understandings", "Not understanding", "Understood", "Not understood"], "answer": 1, "exp": "否定の分詞構文は not を分詞の前に置く。彼が「理解する」（能動）ので Not understanding。"},
+          {"id": "l14-19", "cat": "スタンダード【2】", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>As it was rainy, we decided not to go outside for the moment.", "text": "⇒ (　　) rainy, we decided not to go outside for the moment.", "choices": ["Being", "Having been", "It having been", "It being"], "answer": 3, "exp": "従属節の主語 it（天候）と主節の主語 we が違うので it を残す独立分詞構文。時は同じなので It being。"},
+          {"id": "l14-20", "cat": "スタンダード【2】", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>After I had finished slow jogging, I hit the shower.", "text": "⇒ (　　) slow jogging, I hit the shower.", "choices": ["Been finished", "Finished", "Finishing", "Having finished"], "answer": 3, "exp": "主節（hit）より前のことなので完了形の分詞構文 → Having finished。"},
+          {"id": "l14-21", "cat": "スタンダード【2】", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>If this box is compared with that one, it is heavier.", "text": "⇒ (　　) with that box, this one is heavier.", "choices": ["Comparing", "Being comparing", "Compared", "Having compared"], "answer": 2, "exp": "this box は「比べられる」側なので Compared。compared with 〜「〜と比べると」。"},
+          {"id": "l14-22", "cat": "スタンダード【2】", "context": "次の英文を分詞構文に書き換えるとき、空所に入る語（句）を選びなさい。<br>When all things are considered, today was a good day.", "text": "⇒ All things (　　), today was a good day.", "choices": ["considered", "considering", "being considering", "having been considered"], "answer": 0, "exp": "all things は主節の主語 today と違うので残す（独立分詞構文）。things は「考慮される」側 → All things considered「すべてを考えると」。"},
+          {"id": "l14-23", "cat": "スタンダード【3】", "context": "下線部について、英文内での意味としてもっとも適切なものを選びなさい。", "text": "<u>Shopping</u> at a supermarket, we met one of our neighbors.", "choices": ["買い物しているので", "買い物していると", "買い物しているが", "買い物するなら"], "answer": 1, "exp": "「スーパーで買い物していると、近所の人に会った」という時を表す分詞構文。"},
+          {"id": "l14-24", "cat": "スタンダード【3】", "context": "下線部について、英文内での意味としてもっとも適切なものを選びなさい。", "text": "She took a long bath, <u>talking</u> to one of her friends on the smartphone.", "choices": ["しゃべっていると", "しゃべりながら", "しゃべっているが", "しゃべるなら"], "answer": 1, "exp": "「スマホで友達としゃべりながら長風呂した」という付帯状況の分詞構文。"},
+          {"id": "l14-25", "cat": "スタンダード【3】", "context": "下線部について、英文内での意味としてもっとも適切なものを選びなさい。", "text": "<u>Looked</u> at through the telescope, the planet was red.", "choices": ["見たので", "見ながら", "見ると", "見られたので"], "answer": 2, "exp": "惑星は「見られる」側なので過去分詞。「望遠鏡で見ると赤かった」という時・条件の意味。"},
+          {"id": "l14-26", "cat": "スタンダード【3】", "context": "下線部について、英文内での意味としてもっとも適切なものを選びなさい。", "text": "My uncle studied day and night, <u>passing</u> the bar exam.", "choices": ["〜に合格した", "〜に合格したので", "〜に合格している", "〜に合格するだろう"], "answer": 0, "exp": "文の後ろに置かれた分詞構文で「そして〜した」という結果を表す。→「昼も夜も勉強して、司法試験に合格した」。"},
+          {"id": "l14-27", "cat": "スタンダード【3】", "context": "下線部について、英文内での意味としてもっとも適切なものを選びなさい。", "text": "<u>Moving</u> here just recently, I'm not familiar with this neighborhood.", "choices": ["引っ越すと", "引っ越しながら", "引っ越すなら", "引っ越したので"], "answer": 3, "exp": "「最近引っ越してきたので、この辺りに詳しくない」という理由を表す分詞構文。"}
         ]
       }
     ]
