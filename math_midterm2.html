@@ -282,6 +282,17 @@
   .subject-head p { font-size: 13px; color: var(--subtext); margin-top: 4px; }
   .progress-wrap { max-width: 720px; margin-left: auto; margin-right: auto; }
   :root { padding-top: 0; }
+  .hero-back {
+    display: table; margin-bottom: 14px; border: 1px solid rgba(255,255,255,.35);
+    background: rgba(255,255,255,.12); color: #fff; font-size: 13px; font-weight: 700;
+    padding: 6px 12px; border-radius: 99px; cursor: pointer; font-family: inherit;
+  }
+  .hero-back:hover { background: rgba(255,255,255,.22); }
+  .q-ja { font-size: 13.5px; color: var(--subtext); margin: -8px 0 14px; line-height: 1.7; }
+  .q-exp {
+    margin-top: 8px; padding: 10px 12px; border-radius: 8px; background: var(--bg);
+    color: var(--text); font-weight: 500; line-height: 1.7; font-size: 13px;
+  }
 </style>
 </head>
 <body>
@@ -290,14 +301,15 @@
 <div id="menu-view">
   <header class="hero">
     <div class="hero-inner">
-      <div class="hero-eyebrow">3年 2学期</div>
-      <h1>3年2学期中間テスト</h1>
-      <p class="hero-sub">選択肢を選ぶとその場で採点。出題順は毎回ランダムです。</p>
+      <button class="hero-back hidden" id="hero-back" onclick="goUp()"></button>
+      <div class="hero-eyebrow" id="hero-eyebrow">3年 2学期</div>
+      <h1 id="hero-title">3年2学期中間テスト</h1>
+      <p class="hero-sub" id="hero-sub">選択肢を選ぶとその場で採点。出題順は毎回ランダムです。</p>
     </div>
   </header>
   <div class="view">
     <div class="menu">
-      <div class="menu-label">解く科目を選んでください</div>
+      <div class="menu-label" id="menu-label">解く科目を選んでください</div>
       <div id="menu-list"></div>
     </div>
   </div>
@@ -308,9 +320,9 @@
 
 <div class="topbar">
   <div class="topbar-inner">
-    <button class="back-btn" onclick="goMenu()">‹ 科目一覧</button>
+    <button class="back-btn" id="back-btn" onclick="goUp()">‹ 科目一覧</button>
     <div class="topbar-text">
-      <div class="topbar-eyebrow">3年2学期中間テスト</div>
+      <div class="topbar-eyebrow" id="topbar-eyebrow">3年2学期中間テスト</div>
       <div class="topbar-title" id="topbar-title"></div>
     </div>
   </div>
@@ -362,7 +374,9 @@
 <script>
 // =====================
 // 科目データ
-// 科目を追加するときは SUBJECTS に { id, tab, eyebrow, icon, meta, title, desc, recordKey, questions } を足す
+// 問題セット: { id, tab, eyebrow, icon, meta, title, desc, recordKey, questions, choiceLabels? }
+// まとめ(単元一覧): { id, tab, eyebrow, icon, meta, title, desc, children: [問題セット...] }
+// 問題: { id, cat, context?, text, ja?, choices, answer(0始まり), exp? }
 // =====================
 const SUBJECTS = [
   {
@@ -403,6 +417,48 @@ const SUBJECTS = [
       {"id": "tb-q5", "cat": "旅人算", "context": null, "text": "Pさんの歩く速さは分速70m、Qさんの歩く速さは分速50mである。2人が同じ場所を出発して、2.4km離れた場所で折り返す。2人が出会うのは、出発した場所から何km離れたところか。", "choices": ["A：1.2km", "B：1.4km", "C：1.6km", "D：1.8km", "E：2km", "F：2.2km", "G：2.4km", "H：A〜Gのいずれでもない"], "answer": 4},
       {"id": "tb-q6", "cat": "旅人算", "context": null, "text": "Pさんの歩く速さは分速70m、Qさんの歩く速さは分速50mである。Pさんが午後5時に学校を出発して12分後にQさんが追いかけた。Pさんは学校から2.4km離れたところでQさんからの電話で連絡を受けて引き返した。2人が出会うのは何時何分か。", "choices": ["A：5時33分", "B：5時40分", "C：5時43分", "D：5時45分", "E：5時48分", "F：5時53分", "G：5時55分", "H：A〜Gのいずれでもない"], "answer": 3}
     ]
+  },
+  {
+    id: "eng-stsp",
+    tab: "英語スタサプ",
+    eyebrow: "英語",
+    icon: "A",
+    meta: "仮定法",
+    title: "英語スタサプ",
+    desc: "解く単元を選んでください",
+    children: [
+      {
+        id: "eng-katei1",
+        tab: "仮定法①",
+        eyebrow: "英語スタサプ ・ ベーシックレベル英語 第21講",
+        icon: "If",
+        meta: "Chapter 1〜6（仮定法過去・過去完了・I wish・It is time・as if）",
+        title: "仮定法①",
+        desc: "ベーシックレベル英語 第21講 復習テスト（Chapter 1〜6）。空所に入る最も適切な語（句）を選びましょう。",
+        recordKey: "midterm2_eng_katei1",
+        choiceLabels: ["①", "②", "③", "④"],
+        questions: [
+          {"id": "k1-c1-1", "cat": "Chapter 1", "text": "If it (　　) next Sunday, I will watch online videos at home.", "choices": ["will rain", "rains", "rained", "to rain"], "answer": 1, "exp": "「時・条件」を表す副詞節（if 〜）の中では、未来のことでも現在形を使う。→ rains"},
+          {"id": "k1-c1-2", "cat": "Chapter 1", "text": "If I (　　) him, I would not say such a thing.", "choices": ["am", "are", "were", "will be"], "answer": 2, "exp": "主節が would not say なので仮定法過去。be動詞は主語に関係なく were。"},
+          {"id": "k1-c1-3", "cat": "Chapter 1", "text": "If it (　　) sunny now, I could go to that park.", "choices": ["is", "has been", "will be", "were"], "answer": 3, "exp": "now と主節 could go から、現在の事実に反する仮定（仮定法過去）。→ were"},
+          {"id": "k1-c2-1", "cat": "Chapter 2", "text": "If she (　　) here, we could enjoy this party more.", "choices": ["is", "were", "will be", "had been"], "answer": 1, "exp": "主節が could enjoy なので仮定法過去。→ were"},
+          {"id": "k1-c2-2", "cat": "Chapter 2", "text": "If I (　　) harder, I could have passed that test.", "choices": ["study", "studied", "have studied", "had studied"], "answer": 3, "exp": "主節が could have passed なので仮定法過去完了（過去の事実に反する仮定）。if節は had＋過去分詞。"},
+          {"id": "k1-c2-3", "cat": "Chapter 2", "text": "If I had 200 yen in my pocket now, I (　　) a drink.", "choices": ["buy", "will buy", "could buy", "had bought"], "answer": 2, "exp": "if節が had（過去形）＋ now なので仮定法過去。主節は助動詞の過去形＋原形。→ could buy"},
+          {"id": "k1-c3-1", "cat": "Chapter 3", "text": "If I (　　) money yesterday, I could buy this video game now.", "choices": ["save", "saved", "have saved", "had saved"], "answer": 3, "exp": "if節は yesterday（過去）→ 仮定法過去完了 had saved。主節は now（現在）→ could buy。過去と現在がまざった「混合仮定法」。"},
+          {"id": "k1-c3-2", "cat": "Chapter 3", "text": "If we had taken her advice at that time, we (　　) happier now.", "choices": ["would have been", "would be", "are", "had been"], "answer": 1, "exp": "if節は at that time（過去）、主節は now（現在）の混合仮定法。主節は would＋原形。→ would be"},
+          {"id": "k1-c3-3", "cat": "Chapter 3", "text": "If you had not skipped breakfast this morning, you (　　) hungry now.", "choices": ["wouldn't have been", "have been", "wouldn't be", "had been"], "answer": 2, "exp": "if節は this morning（過去）、主節は now（現在）の混合仮定法。→ wouldn't be"},
+          {"id": "k1-c4-1", "cat": "Chapter 4", "text": "I wish I (　　) that girl's name.", "choices": ["know", "am knowing", "knew", "have known"], "answer": 2, "exp": "I wish＋過去形 で「（今）〜ならいいのに」。know は状態動詞なので進行形にしない。→ knew"},
+          {"id": "k1-c4-2", "cat": "Chapter 4", "text": "I hope she (　　) to the party tomorrow.", "choices": ["come", "will come", "came", "had come"], "answer": 1, "exp": "hope は実現の可能性がある願望なので仮定法にしない。tomorrow なので will come。"},
+          {"id": "k1-c4-3", "cat": "Chapter 4", "text": "I wish I (　　) the festival last week.", "choices": ["join", "joined", "have joined", "had joined"], "answer": 3, "exp": "last week（過去）のことへの願望は I wish＋過去完了。→ had joined"},
+          {"id": "k1-c5-1", "cat": "Chapter 5", "text": "It is time we (　　) for the station.", "ja": "私たちは駅に向かって出発する時間だ。", "choices": ["will leave", "left", "have left", "had left"], "answer": 1, "exp": "It is time＋S＋過去形 で「もう〜する時間だ」。→ left"},
+          {"id": "k1-c5-2", "cat": "Chapter 5", "text": "It's about time we (　　) toilet paper rolls.", "ja": "そろそろトイレットペーパーを買う時期だ。", "choices": ["will buy", "had bought", "have bought", "bought"], "answer": 3, "exp": "It's about time＋S＋過去形 で「そろそろ〜する時間だ」。→ bought"},
+          {"id": "k1-c5-3", "cat": "Chapter 5", "text": "It's high time you (　　) English.", "ja": "君はとっくに英語を勉強する時間だ。", "choices": ["studied", "have studied", "will study", "had studied"], "answer": 0, "exp": "It's high time＋S＋過去形 で「とっくに〜する時間だ」。→ studied"},
+          {"id": "k1-c6-1", "cat": "Chapter 6", "text": "He plays the guitar (　　) he were a famous musician.", "ja": "彼はまるで自分が有名な音楽家であるかのようにギターを弾く。", "choices": ["if", "though", "as like", "as if"], "answer": 3, "exp": "「まるで〜であるかのように」は as if＋仮定法。as like という言い方はない。"},
+          {"id": "k1-c6-2", "cat": "Chapter 6", "text": "She talks as if she (　　) there, too.", "ja": "彼女はまるで自分もそこに居合わせていたかのような口ぶりだ。", "choices": ["is", "had been", "have been", "has been"], "answer": 1, "exp": "話している（今）より前のこと「居合わせていた」なので as if＋過去完了。→ had been"},
+          {"id": "k1-c6-3", "cat": "Chapter 6", "text": "He talked as though he (　　) the video.", "ja": "彼はまるでその動画を見たことがあるかのような口ぶりだった。", "choices": ["saw", "sees", "have seen", "had seen"], "answer": 3, "exp": "as though は as if と同じ意味。話した時点より前のこと「見たことがある」なので過去完了。→ had seen"}
+        ]
+      }
+    ]
   }
 ];
 
@@ -425,20 +481,45 @@ function esc(t) {
   return String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 }
 
-function renderMenu() {
+// id から項目と親を探す（親がなければトップ）
+function findNode(id, list = SUBJECTS, parent = null) {
+  for (const n of list) {
+    if (n.id === id) return { node: n, parent };
+    if (n.children) { const r = findNode(id, n.children, n); if (r) return r; }
+  }
+  return null;
+}
+
+function countQuestions(n) {
+  return n.children ? n.children.reduce((t, c) => t + countQuestions(c), 0) : n.questions.length;
+}
+
+function renderMenu(group) {
+  const items = group ? group.children : SUBJECTS;
+  document.getElementById("hero-back").classList.toggle("hidden", !group);
+  document.getElementById("hero-back").textContent = "‹ 科目一覧";
+  document.getElementById("hero-eyebrow").textContent = group ? "3年2学期中間テスト" : "3年 2学期";
+  document.getElementById("hero-title").textContent = group ? group.title : "3年2学期中間テスト";
+  document.getElementById("hero-sub").textContent = group
+    ? `${group.children.length}単元 ・ 全${countQuestions(group)}問`
+    : "選択肢を選ぶとその場で採点。出題順は毎回ランダムです。";
+  document.getElementById("menu-label").textContent = group ? "解く単元を選んでください" : "解く科目を選んでください";
   const list = document.getElementById("menu-list");
   list.innerHTML = "";
-  SUBJECTS.forEach(s => {
+  items.forEach(s => {
     let records = [];
-    try { records = JSON.parse(localStorage.getItem(s.recordKey) || "[]"); } catch(e) {}
+    if (s.recordKey) { try { records = JSON.parse(localStorage.getItem(s.recordKey) || "[]"); } catch(e) {} }
     const best = records.length ? Math.max(...records.map(r => r.pct)) : null;
+    const meta = s.children
+      ? `${s.children.length}単元 ・ ${esc(s.meta)}`
+      : `全${s.questions.length}問 ・ ${esc(s.meta)}`;
     const b = document.createElement("button");
     b.className = "sel-card";
     b.innerHTML = `<div class="sel-icon">${esc(s.icon)}</div>
       <div class="sel-body">
         <div class="sel-eyebrow">${esc(s.eyebrow)}</div>
         <div class="sel-title">${esc(s.tab)}</div>
-        <div class="sel-meta">全${s.questions.length}問 ・ ${esc(s.meta)}</div>
+        <div class="sel-meta">${meta}</div>
         ${best === null ? "" : `<span class="sel-best">最高 ${best}%（${records.length}回挑戦）</span>`}
       </div>
       <div class="sel-arrow">›</div>`;
@@ -447,23 +528,32 @@ function renderMenu() {
   });
 }
 
-function goMenu() {
-  if (location.hash) history.pushState(null, "", location.pathname + location.search);
+// ひとつ上の画面へ（単元 → 単元一覧 → 科目一覧）
+function goUp() {
+  const f = findNode(location.hash.slice(1));
+  const url = location.pathname + location.search + (f && f.parent ? "#" + f.parent.id : "");
+  history.pushState(null, "", url);
   route();
 }
 
-// URL の #科目id で問題画面、なければ科目選択画面
+// URL の #id が問題セットなら問題画面、まとめなら単元一覧、なければ科目一覧
 function route() {
-  const subj = SUBJECTS.find(s => s.id === location.hash.slice(1));
-  document.getElementById("menu-view").classList.toggle("hidden", !!subj);
-  document.getElementById("quiz-view").classList.toggle("hidden", !subj);
-  if (subj) selectSubject(subj.id);
-  else renderMenu();
+  const f = findNode(location.hash.slice(1));
+  const isQuiz = !!(f && f.node.questions);
+  document.getElementById("menu-view").classList.toggle("hidden", isQuiz);
+  document.getElementById("quiz-view").classList.toggle("hidden", !isQuiz);
+  if (isQuiz) {
+    document.getElementById("back-btn").textContent = "‹ " + (f.parent ? f.parent.tab : "科目一覧");
+    document.getElementById("topbar-eyebrow").textContent = f.parent ? "3年2学期中間テスト ・ " + f.parent.tab : "3年2学期中間テスト";
+    selectSubject(f.node);
+  } else {
+    renderMenu(f && f.node.children ? f.node : null);
+  }
   window.scrollTo(0, 0);
 }
 
-function selectSubject(id) {
-  current = SUBJECTS.find(s => s.id === id);
+function selectSubject(node) {
+  current = node;
   document.getElementById("topbar-title").textContent = current.tab;
   document.getElementById("subject-title").textContent = current.title;
   document.getElementById("subject-desc").textContent = current.desc;
@@ -524,17 +614,27 @@ function renderQuiz() {
     let html = `<div class="q-number">問 ${idx + 1}<span class="q-cat">${q.cat}</span></div>`;
     if (q.context) html += `<div class="q-context">${q.context}</div>`;
     html += `<div class="q-text">${q.text}</div>`;
+    if (q.ja) html += `<div class="q-ja">${q.ja}</div>`;
     html += `<div class="choices" id="choices-${q.id}">`;
     q.choices.forEach((c, ci) => {
       html += `<button class="choice-btn" id="btn-${q.id}-${ci}"
         onclick="selectAnswer('${q.id}', ${ci})">
-        <span class="choice-label">${String.fromCharCode(65 + ci)}</span>${c}</button>`;
+        <span class="choice-label">${labelOf(ci)}</span>${c}</button>`;
     });
     html += `</div><div class="feedback" id="fb-${q.id}"></div>`;
     card.innerHTML = html;
     container.appendChild(card);
     if (s.answered[q.id] !== undefined) markAnswer(q, s.answered[q.id]);
   });
+}
+
+function labelOf(ci) {
+  return current.choiceLabels ? current.choiceLabels[ci] : String.fromCharCode(65 + ci);
+}
+
+// 正解の表示用テキスト（選択肢に記号が含まれていない科目は記号を付ける）
+function answerText(q) {
+  return (current.choiceLabels ? labelOf(q.answer) + " " : "") + q.choices[q.answer];
 }
 
 function markAnswer(q, chosen) {
@@ -557,7 +657,13 @@ function markAnswer(q, chosen) {
   } else {
     card.classList.add("answered-wrong");
     fb.className = "feedback wrong";
-    fb.textContent = "✗ 不正解。正解は「" + q.choices[correct] + "」";
+    fb.textContent = "✗ 不正解。正解は「" + answerText(q) + "」";
+  }
+  if (q.exp) {
+    const ex = document.createElement("div");
+    ex.className = "q-exp";
+    ex.textContent = "💡 " + q.exp;
+    fb.appendChild(ex);
   }
   return isCorrect;
 }
@@ -610,7 +716,7 @@ function showResult(justFinished) {
       if (!q) return;
       const div = document.createElement("div");
       div.className = "wrong-item";
-      div.innerHTML = `<div class="wi-q">${q.text}</div><div class="wi-a">正解：${q.choices[q.answer]}</div>`;
+      div.innerHTML = `<div class="wi-q">${q.text}</div><div class="wi-a">正解：${answerText(q)}</div>`;
       wi.appendChild(div);
     });
     wl.style.display = "block";
