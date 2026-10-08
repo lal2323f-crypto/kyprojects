@@ -423,7 +423,7 @@ const SUBJECTS = [
     tab: "英語スタサプ",
     eyebrow: "英語",
     icon: "A",
-    meta: "仮定法・分詞・分詞構文",
+    meta: "仮定法・分詞・分詞構文・関係詞",
     title: "英語スタサプ",
     desc: "解く単元を選んでください",
     children: [
@@ -606,6 +606,44 @@ const SUBJECTS = [
           {"id": "l14-25", "cat": "スタンダード【3】", "context": "下線部について、英文内での意味としてもっとも適切なものを選びなさい。", "text": "<u>Looked</u> at through the telescope, the planet was red.", "choices": ["見たので", "見ながら", "見ると", "見られたので"], "answer": 2, "exp": "惑星は「見られる」側なので過去分詞。「望遠鏡で見ると赤かった」という時・条件の意味。"},
           {"id": "l14-26", "cat": "スタンダード【3】", "context": "下線部について、英文内での意味としてもっとも適切なものを選びなさい。", "text": "My uncle studied day and night, <u>passing</u> the bar exam.", "choices": ["〜に合格した", "〜に合格したので", "〜に合格している", "〜に合格するだろう"], "answer": 0, "exp": "文の後ろに置かれた分詞構文で「そして〜した」という結果を表す。→「昼も夜も勉強して、司法試験に合格した」。"},
           {"id": "l14-27", "cat": "スタンダード【3】", "context": "下線部について、英文内での意味としてもっとも適切なものを選びなさい。", "text": "<u>Moving</u> here just recently, I'm not familiar with this neighborhood.", "choices": ["引っ越すと", "引っ越しながら", "引っ越すなら", "引っ越したので"], "answer": 3, "exp": "「最近引っ越してきたので、この辺りに詳しくない」という理由を表す分詞構文。"}
+        ]
+      },
+      {
+        id: "eng-2g2",
+        tab: "2学期-2",
+        eyebrow: "英語スタサプ",
+        icon: "2-2",
+        meta: "分詞・分詞構文・関係詞",
+        title: "2学期-2",
+        desc: "分詞・分詞構文・関係詞の確認問題。",
+        recordKey: "midterm2_eng_2g2",
+        choiceLabels: ["①", "②", "③", "④"],
+        questions: [
+          {"id": "g22-1", "cat": "分詞", "context": "見出しにあう適切な表現を選びなさい。", "text": "働く男性", "choices": ["a working man", "a worked man"], "answer": 0, "exp": "男性は自分で「働く」（能動）ので現在分詞 working。"},
+          {"id": "g22-2", "cat": "分詞", "context": "見出しにあう適切な表現を選びなさい。", "text": "紙に包んだ箱", "choices": ["a box wrapping in paper", "a box wrapped in paper"], "answer": 1, "exp": "箱は「包まれた」（受け身）側なので過去分詞 wrapped。in paper のように語句が付くと名詞の後ろに置く。"},
+          {"id": "g22-3", "cat": "分詞", "context": "見出しにあう適切な表現を選びなさい。", "text": "割れたグラス", "choices": ["the broken glass", "the glass broken"], "answer": 0, "exp": "グラスは「割られた」側なので過去分詞 broken。分詞1語だけなら名詞の前に置く。"},
+          {"id": "g22-4", "cat": "分詞", "context": "見出しにあう適切な表現を選びなさい。", "text": "彼女によって割られたグラス", "choices": ["the broken glass by her", "the glass broken by her"], "answer": 1, "exp": "broken by her と語句が付いてかたまりになるので、名詞の後ろに置く。"},
+          {"id": "g22-5", "cat": "分詞", "context": "見出しにあう適切な表現を選びなさい。", "text": "目を閉じたままで", "choices": ["with your eyes closing", "with your eyes closed"], "answer": 1, "exp": "with＋O＋分詞。目は「閉じられる」側なので過去分詞 closed。"},
+          {"id": "g22-6", "cat": "分詞", "context": "見出しにあう適切な表現を選びなさい。", "text": "その知らせは私たちには驚きだった", "choices": ["The news was surprising to us.", "The news was surprised to us."], "answer": 0, "exp": "知らせは人を「驚かせる」側なので surprising。"},
+          {"id": "g22-7", "cat": "分詞", "context": "見出しにあう適切な表現を選びなさい。", "text": "私たちはその知らせに驚いた", "choices": ["We were surprising at the news.", "We were surprised at the news."], "answer": 1, "exp": "私たちは「驚かされた」側なので surprised。be surprised at 〜「〜に驚く」。"},
+          {"id": "g22-8", "cat": "分詞", "text": "Kenta heard his name (　　) from behind.", "choices": ["calling", "called"], "answer": 1, "exp": "hear O＋分詞。名前は「呼ばれる」側なので過去分詞 called。"},
+          {"id": "g22-9", "cat": "分詞", "text": "I can't read a book with you (　　) there.", "choices": ["standing", "stood"], "answer": 0, "exp": "with＋O＋分詞。あなたが自分で「立っている」（能動）ので現在分詞 standing。"},
+          {"id": "g22-10", "cat": "分詞", "text": "Judy sat on the sofa with her leg (　　).", "choices": ["crossing", "crossed"], "answer": 1, "exp": "with＋O＋分詞。脚は「組まれる」側なので過去分詞 crossed。"},
+          {"id": "g22-11", "cat": "分詞構文", "context": "見出しにあう適切な表現を選びなさい。", "text": "〜を考慮すると", "choices": ["Considering〜", "Considered〜"], "answer": 0, "exp": "considering 〜 ＝「〜を考慮すると」（慣用的な分詞構文）。"},
+          {"id": "g22-12", "cat": "分詞構文", "context": "見出しにあう適切な表現を選びなさい。", "text": "一般的に言うと", "choices": ["Generally speaking〜", "Generally spoken〜"], "answer": 0, "exp": "generally speaking ＝「一般的に言うと」（慣用的な分詞構文）。"},
+          {"id": "g22-13", "cat": "分詞構文", "text": "(　　) from the way he speaks, he is very honest.", "choices": ["Judged", "Judging"], "answer": 1, "exp": "judging from 〜 ＝「〜から判断すると」。"},
+          {"id": "g22-14", "cat": "分詞構文", "text": "It (　　) Sunday, the bank was closed.", "choices": ["being", "was", "been", "having been"], "answer": 0, "exp": "従属節の主語 it と主節の主語 the bank が違うので it を残す独立分詞構文 → It being Sunday「日曜日だったので」。"},
+          {"id": "g22-15", "cat": "分詞構文", "context": "次の英文を分詞構文に変えたものを選びなさい。", "text": "When it is seen from a distance, the hill looks like a man's face.", "choices": ["It seen from a distance, the hill looks like a man's face.", "When seen from a distance, the hill looks like a man's face.", "Seeing from a distance, the hill looks like a man's face.", "Seen from a distance, the hill looks like a man's face."], "answer": 3, "exp": "it（＝the hill）は「見られる」側なので（Being）Seen。主語が主節と同じなので消す。②のように意味をはっきりさせるため接続詞を残す言い方もあるが、接続詞と主語を消した基本の分詞構文は④。"},
+          {"id": "g22-16", "cat": "分詞構文", "context": "次の英文を分詞構文に変えたものを選びなさい。", "text": "When our company is compared with that company, our company gives longer holidays.", "choices": ["Comparing with that company, our company gives longer holidays.", "Our company compared with that company, our company gives longer holidays.", "Compared with that company, our company gives longer holidays.", "Having compared with that company, our company gives longer holidays."], "answer": 2, "exp": "our company は「比べられる」側なので Compared。主語は主節と同じなので消す。compared with 〜「〜と比べると」。"},
+          {"id": "g22-17", "cat": "分詞構文", "text": "(　　) what to do, I asked my teacher for advice.", "choices": ["Knowing not", "Not knowing", "Not known", "Being not known"], "answer": 1, "exp": "分詞構文の否定は not を分詞の前に置く → Not knowing「どうすればいいかわからなかったので」。"},
+          {"id": "g22-18", "cat": "関係詞", "text": "We will have lunch in the restaurant (　　) you talked about.", "choices": ["where", "which", "when", "why"], "answer": 1, "exp": "talked about の about の目的語がないので関係代名詞 which。where だと about の後ろが空いたままになる。"},
+          {"id": "g22-19", "cat": "関係詞", "text": "The girl (　　) umbrella was stolen felt very sad.", "choices": ["who", "whom", "whose", "which"], "answer": 2, "exp": "「彼女の傘」と所有を表すので whose＋名詞。"},
+          {"id": "g22-20", "cat": "関係詞", "text": "That was the reason (　　) my uncle moved to Singapore.", "choices": ["when", "why", "which", "how"], "answer": 1, "exp": "先行詞が the reason（理由）で、後ろが完全な文なので関係副詞 why。"},
+          {"id": "g22-21", "cat": "関係詞", "text": "Julia has a lot of friends (　　) she can trust.", "choices": ["what", "which", "whose", "whom"], "answer": 3, "exp": "先行詞は人（friends）で、trust の目的語がないので目的格の whom。"},
+          {"id": "g22-22", "cat": "関係詞", "text": "This is the park (　　) I first met her.", "choices": ["where", "which", "when", "whose"], "answer": 0, "exp": "先行詞が場所（the park）で、後ろが完全な文（I first met her）なので関係副詞 where。"},
+          {"id": "g22-23", "cat": "関係詞", "text": "I'd like a tie (　　) matches this red shirt.", "choices": ["how", "what", "who", "that"], "answer": 3, "exp": "先行詞が物（a tie）で、matches の主語がないので主格の関係代名詞 that（which も可）。"},
+          {"id": "g22-24", "cat": "関係詞", "text": "Could you show me (　　) opened the box?", "choices": ["the way you", "how to", "the way to", "the way how"], "answer": 0, "exp": "「あなたが箱を開けた方法」→ the way＋S＋V。the way how とは言わない（the way か how のどちらか一方だけ使う）。"},
+          {"id": "g22-25", "cat": "関係詞", "text": "(　　) break this law are punished.", "choices": ["They who", "Those who", "That which", "Those which"], "answer": 1, "exp": "those who 〜 ＝「〜する人々」。動詞 are（複数）とも合う。"}
         ]
       }
     ]
