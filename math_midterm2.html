@@ -653,10 +653,19 @@ const SUBJECTS = [
     tab: "地理",
     eyebrow: "地理",
     icon: "地",
-    meta: "西アジアスライド問題①〜④",
+    meta: "西アジアスライド",
     title: "地理",
     desc: "解く単元を選んでください",
     children: [
+      {
+        id: "geo-wa",
+        tab: "西アジアスライド",
+        eyebrow: "地理 ・ 地誌03 西アジア",
+        icon: "🐪",
+        meta: "西アジアスライド問題①〜④",
+        title: "西アジアスライド",
+        desc: "解く問題を選んでください",
+        children: [
       {
         id: "geo-wa1",
         tab: "西アジアスライド問題①",
@@ -837,6 +846,8 @@ const SUBJECTS = [
           {"id": "wa-128", "cat": "まとめ", "text": "西アジアのまとめで、イスラーム教の精神とオイルマネーについて述べられていることはどれか。", "choices": ["イスラーム教では寄付が禁止されている", "「分配」の精神とオイルマネーの還元がある一方、女性の社会進出などの制限も課題", "オイルマネーはすべて外国に流れている", "女性の社会進出に関する課題はまったくない"], "answer": 1, "exp": "まとめ：イスラーム教の「分配」の精神＆オイルマネーの還元。一方で制限（女性の社会進出など）も課題。"}
         ]
       }
+        ]
+      }
     ]
   }
 ];
@@ -873,11 +884,11 @@ function countQuestions(n) {
   return n.children ? n.children.reduce((t, c) => t + countQuestions(c), 0) : n.questions.length;
 }
 
-function renderMenu(group) {
+function renderMenu(group, parent) {
   const items = group ? group.children : SUBJECTS;
   document.getElementById("hero-back").classList.toggle("hidden", !group);
-  document.getElementById("hero-back").textContent = "‹ 科目一覧";
-  document.getElementById("hero-eyebrow").textContent = group ? "3年2学期中間テスト" : "3年 2学期";
+  document.getElementById("hero-back").textContent = "‹ " + (parent ? parent.tab : "科目一覧");
+  document.getElementById("hero-eyebrow").textContent = group ? "3年2学期中間テスト" + (parent ? " ・ " + parent.tab : "") : "3年 2学期";
   document.getElementById("hero-title").textContent = group ? group.title : "3年2学期中間テスト";
   document.getElementById("hero-sub").textContent = group
     ? `${group.children.length}単元 ・ 全${countQuestions(group)}問`
@@ -926,7 +937,7 @@ function route() {
     document.getElementById("topbar-eyebrow").textContent = f.parent ? "3年2学期中間テスト ・ " + f.parent.tab : "3年2学期中間テスト";
     selectSubject(f.node);
   } else {
-    renderMenu(f && f.node.children ? f.node : null);
+    renderMenu(f && f.node.children ? f.node : null, f && f.node.children ? f.parent : null);
   }
   window.scrollTo(0, 0);
 }
