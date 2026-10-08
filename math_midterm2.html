@@ -423,7 +423,7 @@ const SUBJECTS = [
     tab: "英語スタサプ",
     eyebrow: "英語",
     icon: "A",
-    meta: "仮定法（第21講・第22講・第16講）",
+    meta: "仮定法（第21講・第22講・第16講・第17講）",
     title: "英語スタサプ",
     desc: "解く単元を選んでください",
     children: [
@@ -496,6 +496,34 @@ const SUBJECTS = [
           {"id": "l16-s3-3", "cat": "第16講【3】", "text": "I might have given up halfway (　　) your encouraging words.", "choices": ["if it were", "should", "but", "without"], "answer": 3, "exp": "without 〜 ＝「〜がなければ／なかったら」。if節の代わりになる。"},
           {"id": "l16-s3-4", "cat": "第16講【3】", "text": "I don't expect calls today. If someone (　　) me, tell them I'm away.", "choices": ["will call", "called", "should call", "had called"], "answer": 2, "exp": "「電話は来ないと思うが、万一来たら」なので If S should 〜。"},
           {"id": "l16-s3-5", "cat": "第16講【3】", "text": "(　　) for that safety rope, he would have fallen to his death.", "choices": ["If it had not been", "Not", "Without", "If it were not"], "answer": 0, "exp": "主節が would have fallen（過去の話）なので If it had not been for 〜。③の Without は後ろに for を付けない（Without that safety rope なら正しい）。"}
+        ]
+      },
+      {
+        id: "eng-l17",
+        tab: "第17講　仮定法②",
+        eyebrow: "英語スタサプ ・ 高1・高2スタンダードレベル英語",
+        icon: "If",
+        meta: "【1】〜【3】（倒置・仮定法現在・混合仮定法など）",
+        title: "第17講　仮定法②",
+        desc: "高1・高2スタンダードレベル英語＜文法・読解編＞ 第17講 復習テスト【1】〜【3】。空所に入る最も適切な語（句）を選びましょう。",
+        recordKey: "midterm2_eng_l17",
+        choiceLabels: ["①", "②", "③", "④"],
+        questions: [
+          {"id": "l17-s1-1", "cat": "第17講【1】", "text": "(　　) she call me, tell her I'm working from home this week.", "choices": ["Were", "When", "Was", "Should"], "answer": 3, "exp": "If she should call me の if を省略した倒置 → Should she call me。call が原形なのがヒント（When なら calls になる）。"},
+          {"id": "l17-s1-2", "cat": "第17講【1】", "text": "(　　) been for his explanation, I couldn't have understood the rules of English grammar.", "choices": ["Were it not", "Should it not", "Had it not", "Was it not"], "answer": 2, "exp": "If it had not been for 〜 の if を省略した倒置 → Had it not been for 〜。been と主節 couldn't have understood がヒント。"},
+          {"id": "l17-s1-3", "cat": "第17講【1】", "text": "A British person (　　) pronounce this word like that.", "choices": ["had not", "would not", "was not", "were not"], "answer": 1, "exp": "主語 A British person に「イギリス人なら」という仮定の意味がこもっている。→ would not pronounce「イギリス人ならそんなふうには発音しないだろう」。"},
+          {"id": "l17-s1-4", "cat": "第17講【1】", "text": "He is honest. (　　) to tell a lie, I would be very surprised.", "choices": ["If he hadn't", "Should he be", "If he", "Were he"], "answer": 3, "exp": "If he were to tell a lie の if を省略した倒置 → Were he to tell a lie「仮に彼がうそをつくとしたら」。"},
+          {"id": "l17-s1-5", "cat": "第17講【1】", "text": "(　　) see her dance, you would think of her as a professional dancer.", "choices": ["To", "If", "Had you", "Should you"], "answer": 0, "exp": "不定詞 To see her dance（彼女が踊るのを見れば）が if節の代わり。②④は主語 you がないと文にならない。"},
+          {"id": "l17-s2-1", "cat": "第17講【2】", "text": "My cousin insisted that I (　　) him to the winter festival tomorrow.", "choices": ["take", "would take", "took", "had taken"], "answer": 0, "exp": "insist（要求する）のような要求・提案の動詞に続く that節では、動詞は原形（または should＋原形）。時制の一致もしない。→ take"},
+          {"id": "l17-s2-2", "cat": "第17講【2】", "text": "She suggested (　　) before 11 p.m.", "choices": ["me to sleep", "to me sleep", "I should sleep", "I have slept"], "answer": 2, "exp": "suggest は「suggest (that) S (should) 原形」の形。suggest 人 to 〜 の形はとらない。→ I should sleep"},
+          {"id": "l17-s2-3", "cat": "第17講【2】", "text": "The boss ordered (　　) the job done by next Wednesday.", "choices": ["that their getting", "they get", "they got", "them to getting"], "answer": 1, "exp": "order (that) S (should) 原形 → they get。get the job done ＝「仕事を終わらせる」。"},
+          {"id": "l17-s2-4", "cat": "第17講【2】", "text": "The police demanded the criminal (　　) his gun.", "choices": ["dropped", "drop", "on dropping", "him to dropping"], "answer": 1, "exp": "demand (that) S (should) 原形。that が省略されている → the criminal drop。"},
+          {"id": "l17-s2-5", "cat": "第17講【2】", "text": "He proposed (　　) someone for advice.", "choices": ["to me we asked", "our asking to me", "to me to our asking", "to me we should ask"], "answer": 3, "exp": "propose (to 人) (that) S should 原形 で「（人に）〜しようと提案する」。→ to me we should ask"},
+          {"id": "l17-s3-1", "cat": "第17講【3】", "text": "(　　) cold yesterday, I would be enjoying the sleepover now.", "choices": ["Were I caught", "Were to catch", "Had I not caught", "Should I catch"], "answer": 2, "exp": "yesterday（過去）の仮定は If I had not caught → 倒置で Had I not caught。主節は now（現在）なので would be の混合仮定法。"},
+          {"id": "l17-s3-2", "cat": "第17講【3】", "text": "She wishes she (　　) a glass of water now.", "choices": ["will drink", "could drink", "had drunk", "should drink"], "answer": 1, "exp": "wish＋仮定法過去 で「（今）〜できたらいいのに」。now があるので could drink。"},
+          {"id": "l17-s3-3", "cat": "第17講【3】", "text": "It is about time we (　　) our pet bird some food.", "choices": ["give", "gave", "had given", "were given"], "answer": 1, "exp": "It is about time＋S＋過去形 で「そろそろ〜する時間だ」。→ gave"},
+          {"id": "l17-s3-4", "cat": "第17講【3】", "text": "I would freeze to death (　　) this thick coat!", "choices": ["otherwise", "had it not been", "but for", "weren't it for"], "answer": 2, "exp": "But for 〜 ＝「〜がなければ」。倒置なら Were it not for が正しく、weren't it for とは言わない。"},
+          {"id": "l17-s3-5", "cat": "第17講【3】", "text": "If I (　　) born again, I would travel around the world.", "choices": ["will be", "had been", "was to be", "were to be"], "answer": 3, "exp": "If S were to 〜「仮に〜するとしたら」。be born なので were to be born。主語 I でも were を使う。"}
         ]
       }
     ]
