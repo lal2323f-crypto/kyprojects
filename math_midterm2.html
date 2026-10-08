@@ -423,7 +423,7 @@ const SUBJECTS = [
     tab: "英語スタサプ",
     eyebrow: "英語",
     icon: "A",
-    meta: "仮定法（第21講・第22講・第16講・第17講）",
+    meta: "仮定法・分詞（第21講・第22講・第16講・第17講・高3スタンダード）",
     title: "英語スタサプ",
     desc: "解く単元を選んでください",
     children: [
@@ -524,6 +524,48 @@ const SUBJECTS = [
           {"id": "l17-s3-3", "cat": "第17講【3】", "text": "It is about time we (　　) our pet bird some food.", "choices": ["give", "gave", "had given", "were given"], "answer": 1, "exp": "It is about time＋S＋過去形 で「そろそろ〜する時間だ」。→ gave"},
           {"id": "l17-s3-4", "cat": "第17講【3】", "text": "I would freeze to death (　　) this thick coat!", "choices": ["otherwise", "had it not been", "but for", "weren't it for"], "answer": 2, "exp": "But for 〜 ＝「〜がなければ」。倒置なら Were it not for が正しく、weren't it for とは言わない。"},
           {"id": "l17-s3-5", "cat": "第17講【3】", "text": "If I (　　) born again, I would travel around the world.", "choices": ["will be", "had been", "was to be", "were to be"], "answer": 3, "exp": "If S were to 〜「仮に〜するとしたら」。be born なので were to be born。主語 I でも were を使う。"}
+        ]
+      },
+      {
+        id: "eng-h3-std",
+        tab: "高3 スタンダード",
+        eyebrow: "英語スタサプ ・ 高3スタンダードレベル英語〜文法編〜",
+        icon: "高3",
+        meta: "第3講・第4講（仮定法）＋ 第10講・第11講（分詞・分詞構文）",
+        title: "高3 スタンダード",
+        desc: "高3スタンダードレベル英語〜文法編〜 第3講・第4講・第10講・第11講の復習テスト。",
+        recordKey: "midterm2_eng_h3_std",
+        choiceLabels: ["1", "2", "3", "4", "5"],
+        questions: [
+          {"id": "h3-1", "cat": "第3講(1)", "text": "If you had prepared for the exam, you (　　) have passed it.", "choices": ["can", "could", "need to", "will"], "answer": 1, "exp": "if節が had prepared（仮定法過去完了）なので、主節は助動詞の過去形＋have＋過去分詞。→ could have passed"},
+          {"id": "h3-2", "cat": "第3講(2)", "text": "If I had worked harder in my twenties, I (　　) much richer now.", "choices": ["am", "would be", "will be", "would have", "would"], "answer": 1, "exp": "if節は in my twenties（過去）、主節は now（現在）の混合仮定法。主節は would＋原形 → would be。"},
+          {"id": "h3-3", "cat": "第3講(3)", "text": "If you (　　) have any other questions, please do not hesitate to contact us.", "choices": ["should", "will", "could", "must"], "answer": 0, "exp": "If S should 〜「万一〜したら」。主節は please 〜 の命令文でもよい。"},
+          {"id": "h3-4", "cat": "第3講(4)", "text": "If the sun (　　) to rise in the west, I would not change my mind.", "choices": ["is", "were", "are", "be"], "answer": 1, "exp": "If S were to 〜「仮に〜するとしたら」（ありえない仮定）。主節は would not change。"},
+          {"id": "h3-5", "cat": "第3講(5)", "text": "Had Nixon not been politically destroyed by Watergate, he (　　) to renew bombing in 1975 to forestall South Vietnamese defeat.", "choices": ["might try", "might be tried", "might have tried", "might have been tried"], "answer": 2, "exp": "Had Nixon not been 〜 は If Nixon had not been 〜 の倒置（仮定法過去完了）。in 1975 の過去の話で、彼が「試みた」の能動なので might have tried。"},
+          {"id": "h3-6", "cat": "第3講(6)", "text": "(　　) you need any help, just let me know.", "choices": ["Could", "Had", "Should", "Would"], "answer": 2, "exp": "If you should need any help の if を省略した倒置 → Should you need。need が原形なのがヒント。"},
+          {"id": "h3-7", "cat": "第3講(7)", "text": "(　　) an earthquake to occur, we would have to take immediate action.", "choices": ["If", "Should", "Unless", "Were"], "answer": 3, "exp": "If an earthquake were to occur の if を省略した倒置 → Were an earthquake to occur。to occur がヒント。"},
+          {"id": "h3-8", "cat": "第4講(1)", "text": "Without Chinese influence, Japanese culture (　　) what it is today.", "choices": ["are not", "had not been", "were not", "would not be"], "answer": 3, "exp": "Without 〜「〜がなければ」が if節の代わり。今の話なので主節は would＋原形 → would not be。"},
+          {"id": "h3-9", "cat": "第4講(2)", "text": "I was very tired. Otherwise, I (　　) to the party with you last night.", "choices": ["had gone", "went", "would go", "would have gone"], "answer": 3, "exp": "Otherwise ＝「そうでなければ（疲れていなかったら）」。last night の過去の話なので would have gone。"},
+          {"id": "h3-10", "cat": "第4講(3)", "text": "I wish New York (　　) closer to Osaka.", "choices": ["is", "will be", "are", "were"], "answer": 3, "exp": "I wish＋仮定法過去 で「（今）〜ならいいのに」。be動詞は were。"},
+          {"id": "h3-11", "cat": "第4講(4)", "text": "John says last night's concert was fabulous. I wish I (　　) there with him then.", "choices": ["could gone", "had been", "should go", "were"], "answer": 1, "exp": "last night／then の過去のことへの願望は I wish＋過去完了。→ had been"},
+          {"id": "h3-12", "cat": "第4講(5)", "context": "下線部に最も近い意味を表すものを選びなさい。", "text": "<u>But for</u> your help, I would not have succeeded.", "choices": ["Owing to", "Due to", "With", "Without"], "answer": 3, "exp": "But for 〜 ＝ Without 〜 ＝「〜がなければ／なかったら」。Owing to／Due to は「〜のおかげで・〜のせいで」で意味が違う。"},
+          {"id": "h3-13", "cat": "第4講(6)", "text": "I do not know how I would relieve my stress, (　　) for music.", "choices": ["other than", "unless", "were it not", "without"], "answer": 2, "exp": "If it were not for music の if を省略した倒置 → were it not for music「音楽がなければ」。without なら for は不要。"},
+          {"id": "h3-14", "cat": "第4講(7)", "text": "It is high time you (　　) to bed.", "choices": ["gone", "to go", "are going", "went"], "answer": 3, "exp": "It is high time＋S＋過去形 で「とっくに〜する時間だ」。→ went"},
+          {"id": "h3-15", "cat": "第10講(1)", "context": "見出しの英文と下線部の文法的用法が最も近いものを1つ選びなさい。", "text": "“Hello,” said Tom, <u>smiling</u>.", "choices": ["The girl, <u>closing</u> her eyes, listened to the music.", "He succeeded in <u>solving</u> the difficult problem.", "I saw many people <u>passing</u> by.", "It is from my pen pal <u>living</u> in England."], "answer": 0, "exp": "見出しの smiling は「ほほえみながら」という分詞構文（付帯状況）。1も「目を閉じながら」の分詞構文。2は動名詞、3は知覚動詞 see O ＋ 〜ing の補語、4は名詞 pen pal を修飾する分詞。"},
+          {"id": "h3-16", "cat": "第10講(2)", "text": "The colorful cell phones (　　) at the store are popular among young people.", "choices": ["are sold", "sell", "sold", "to have sold"], "answer": 2, "exp": "cell phones は「売られている」ので過去分詞 sold が後ろから名詞を修飾する。文の動詞は are popular なので are sold は入らない。"},
+          {"id": "h3-17", "cat": "第10講(3)", "text": "The game was (　　), but I was disappointed at the result.", "choices": ["exciting", "excited", "boring", "bored"], "answer": 0, "exp": "主語 The game は人をわくわくさせる側なので exciting。but（でも結果にはがっかり）とつながるので、boring ではなく exciting。"},
+          {"id": "h3-18", "cat": "第10講(4)", "text": "I'm really (　　) about the coming vacation. We're going to Hawaii!", "choices": ["excitement", "excite", "exciting", "excited"], "answer": 3, "exp": "主語 I は「わくわくさせられている」側なので過去分詞 excited。be excited about 〜「〜にわくわくしている」。"},
+          {"id": "h3-19", "cat": "第10講(5)", "text": "Ted seemed (　　) to hear the story.", "choices": ["frightened", "frightening", "frighten", "frightens"], "answer": 0, "exp": "Ted は話を聞いて「怖がらされた」側なので過去分詞 frightened。seem＋形容詞（分詞）の形。"},
+          {"id": "h3-20", "cat": "第10講(6)", "text": "My brother is sitting on the sofa (　　) his eyes closed.", "choices": ["in", "with", "at", "of"], "answer": 1, "exp": "with＋O＋過去分詞 で「Oを〜した状態で」（付帯状況）。with his eyes closed「目を閉じて」。"},
+          {"id": "h3-21", "cat": "第10講(7)", "text": "He lay on the sofa with his (　　) and soon fell asleep.", "choices": ["arms folded", "arms folding", "fold arms", "folding arms"], "answer": 0, "exp": "with＋O＋分詞。腕は「組まれる」側なので過去分詞 → with his arms folded「腕を組んで」。"},
+          {"id": "h3-22", "cat": "第10講(8)", "text": "Kitty sat on a chair with her legs (　　).", "choices": ["to cross", "crossing", "crossed", "crosses"], "answer": 2, "exp": "with＋O＋過去分詞。脚は「組まれる」側なので crossed → with her legs crossed「脚を組んで」。"},
+          {"id": "h3-23", "cat": "第11講(1)", "text": "(　　) the hotel room, John was amazed to see how spacious it was.", "choices": ["Entering", "Entered", "To enter", "To have entered"], "answer": 0, "exp": "John が部屋に「入る」（能動）ので現在分詞の分詞構文 → Entering「部屋に入ると」。"},
+          {"id": "h3-24", "cat": "第11講(2)", "text": "(　　) from here, the cars look like small matchboxes.", "choices": ["Seeing", "Seen", "Having seen", "To see"], "answer": 1, "exp": "主語 the cars は「見られる」側なので過去分詞の分詞構文 → Seen from here「ここから見ると」。"},
+          {"id": "h3-25", "cat": "第11講(3)", "text": "The lights went out suddenly, (　　) everyone in the auditorium.", "choices": ["in surprise", "surprised", "surprising", "surprisingly"], "answer": 2, "exp": "「そして会場の全員を驚かせた」という分詞構文（結果）。everyone を目的語にとるので能動の surprising。"},
+          {"id": "h3-26", "cat": "第11講(4)", "text": "The audience gave the young singer a standing ovation. Deeply (　　), she expressed her thanks.", "choices": ["move", "moved", "moving", "to move"], "answer": 1, "exp": "主語 she は「感動させられた」側なので過去分詞の分詞構文 → Deeply moved「深く感動して」。"},
+          {"id": "h3-27", "cat": "第11講(5)", "text": "The Bank of New York, (　　) in 1784, is one of the oldest companies in the United States.", "choices": ["to be found", "it was founded", "founding", "founded"], "answer": 3, "exp": "銀行は「設立された」側なので過去分詞 founded（found「設立する」の過去分詞）。1は find（見つける）の形で意味が合わず、2は接続詞なしで文を2つつなぐことになるので不可。"},
+          {"id": "h3-28", "cat": "第11講(6)", "text": "Ken's been sitting by the phone all day (　　) for her to call.", "choices": ["wait", "waited", "waiting", "have waited"], "answer": 2, "exp": "「〜しながら座っている」という付帯状況の分詞構文。Ken が「待つ」（能動）ので waiting。"},
+          {"id": "h3-29", "cat": "第11講(7)", "text": "All things (　　), Ted did well.", "choices": ["consider", "be considering", "considered", "being considering"], "answer": 2, "exp": "All things considered ＝「すべてを考慮すると」という慣用的な独立分詞構文。things は「考慮される」側なので過去分詞。"}
         ]
       }
     ]
@@ -687,7 +729,7 @@ function renderQuiz() {
     q.choices.forEach((c, ci) => {
       html += `<button class="choice-btn" id="btn-${q.id}-${ci}"
         onclick="selectAnswer('${q.id}', ${ci})">
-        <span class="choice-label">${labelOf(ci)}</span>${c}</button>`;
+        <span class="choice-label">${labelOf(ci)}</span><span>${c}</span></button>`;
     });
     html += `</div><div class="feedback" id="fb-${q.id}"></div>`;
     card.innerHTML = html;
@@ -702,7 +744,7 @@ function labelOf(ci) {
 
 // 正解の表示用テキスト（選択肢に記号が含まれていない科目は記号を付ける）
 function answerText(q) {
-  return (current.choiceLabels ? labelOf(q.answer) + " " : "") + q.choices[q.answer];
+  return (current.choiceLabels ? labelOf(q.answer) + " " : "") + q.choices[q.answer].replace(/<[^>]+>/g, "");
 }
 
 function markAnswer(q, chosen) {
