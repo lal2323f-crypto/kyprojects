@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>2学期中間 練習テスト（鶴亀算・仕事算・旅人算）</title>
+<title>3年2学期中間テスト</title>
 <style>
   :root {
     --bg: #f7f9fc;
@@ -182,15 +182,40 @@
   .choice-btn { background: var(--card); }
   .q-context { background: var(--bg); }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  .tabs {
+    max-width: 720px; margin: 0 auto 20px; display: flex; gap: 6px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    position: sticky; top: 0; z-index: 10; background: var(--bg);
+    padding: 8px 0; border-bottom: 2px solid var(--border);
+  }
+  .tab-btn {
+    flex-shrink: 0; padding: 9px 18px; border-radius: 99px;
+    border: 1.5px solid var(--border); background: var(--card); color: var(--subtext);
+    font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .tab-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .tab-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .subject-head { max-width: 720px; margin: 0 auto 14px; }
+  .subject-head h2 { font-size: 18px; font-weight: 800; }
+  .subject-head p { font-size: 13px; color: var(--subtext); margin-top: 4px; }
+  .progress-wrap { max-width: 720px; margin-left: auto; margin-right: auto; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="subject-label">数的推理</div>
-  <h1>2学期中間 練習テスト（鶴亀算・仕事算・旅人算）</h1>
-  <p>選択肢を選ぶと、その場で採点されます。出題順は毎回ランダムです。</p>
+  <div class="subject-label">3年 2学期</div>
+  <h1>3年2学期中間テスト</h1>
+  <p>科目のタブを選ぶと、その科目の問題を解けます。選択肢を選ぶとその場で採点され、出題順は毎回ランダムです。</p>
 </header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<div class="subject-head">
+  <h2 id="subject-title"></h2>
+  <p id="subject-desc"></p>
+</div>
 
 <div class="progress-wrap">
   <span class="progress-text" id="prog-text">0 / 0</span>
@@ -216,7 +241,7 @@
 <div class="quiz-section" id="quiz"></div>
 
 <div id="record-section">
-  <h3>成長記録</h3>
+  <h3 id="record-title">成長記録</h3>
   <table id="record-table">
     <thead>
       <tr><th>回</th><th>日付</th><th>正解数</th><th>正答率</th><th>前回比</th></tr>
@@ -230,42 +255,51 @@
 
 <script>
 // =====================
-// 問題データ
+// 科目データ
+// 科目を追加するときは SUBJECTS に { id, tab, title, desc, recordKey, questions } を足す
 // =====================
-const QUESTIONS_MASTER = [
-  {"id": "tk-ex", "cat": "鶴亀算", "context": null, "text": "1個200円の柿と1個120円のりんごが合わせて13個ある。合計金額は2200円である。りんごは何個あるか。", "choices": ["A：1個", "B：3個", "C：5個", "D：7個", "E：9個", "F：11個", "G：13個", "H：A〜Gのいずれでもない"], "answer": 2},
-  {"id": "tk-q1", "cat": "鶴亀算", "context": null, "text": "1個60円のレモンと1個80円のりんごを合わせて16個買ったところ、代金の合計は1040円であった。りんごは何個買ったか。", "choices": ["A：2個", "B：3個", "C：4個", "D：8個", "E：10個", "F：12個", "G：13個", "H：A〜Gのいずれでもない"], "answer": 2},
-  {"id": "tk-q2", "cat": "鶴亀算", "context": null, "text": "1本60円の鉛筆と1本90円のサインペンを合わせて18本買い、1500円出したら240円おつりがあった。鉛筆は何本買ったか。", "choices": ["A：12本", "B：13本", "C：14本", "D：15本", "E：16本", "F：17本", "G：18本", "H：A〜Gのいずれでもない"], "answer": 0},
-  {"id": "tk-q3", "cat": "鶴亀算", "context": null, "text": "ある公園の入場料は、大人250円、子ども120円である。昨日の入場料は大人と子ども合わせて98人で、入場料の合計は18000円であった。昨日の大人の入場者数は何人か。", "choices": ["A：26人", "B：28人", "C：30人", "D：36人", "E：42人", "F：48人", "G：52人", "H：A〜Gのいずれでもない"], "answer": 5},
-  {"id": "tk-q4", "cat": "鶴亀算", "context": null, "text": "ネット販売で1個700円のキーホルダーと、1個400円のストラップを合わせて8個買ったところ、送料500円込みで4600円であった。ストラップは何個買ったか。", "choices": ["A：1個", "B：2個", "C：3個", "D：4個", "E：5個", "F：6個", "G：7個", "H：A〜Gのいずれでもない"], "answer": 4},
-  {"id": "tk-q5", "cat": "鶴亀算", "context": null, "text": "600枚のクッキーを、15枚用の箱と25枚用の箱に詰め合わせたところ、合計で30箱できて余りが10枚となった。15枚用の箱は何箱だったことになるか。", "choices": ["A：12箱", "B：13箱", "C：14箱", "D：15箱", "E：16箱", "F：17箱", "G：18箱", "H：A〜Gのいずれでもない"], "answer": 4},
-  {"id": "tk-q6", "cat": "鶴亀算", "context": null, "text": "ギフト用に、1個300円の洋梨と1個200円の柿を合わせて20個詰め合わせてもらったところ、箱代の200円を含めて5000円となった。柿は何個詰めたことになるか。", "choices": ["A：7個", "B：8個", "C：9個", "D：10個", "E：11個", "F：12個", "G：13個", "H：A〜Gのいずれでもない"], "answer": 5},
-  {"id": "tk-q7", "cat": "鶴亀算", "context": null, "text": "プリントを何人かの生徒に配布するのに、1人9枚ずつ配布すると34枚足りない。また、1人6枚ずつ配布すると14枚余る。プリントは何枚あるか。", "choices": ["A：100枚", "B：110枚", "C：120枚", "D：130枚", "E：140枚", "F：150枚", "G：160枚", "H：A〜Gのいずれでもない"], "answer": 1},
-  {"id": "tk-q8", "cat": "鶴亀算", "context": null, "text": "ボールペン1本の値段は、鉛筆1本の値段より30円高い。鉛筆とボールペンを5本ずつ買うつもりだったが、全商品1割引きだったので、ちょうどボールペンを1本多く買えた。もとの鉛筆1本の値段はいくらか。", "choices": ["A：90円", "B：100円", "C：110円", "D：120円", "E：130円", "F：140円", "G：150円", "H：A〜Gのいずれでもない"], "answer": 3},
-  {"id": "wk-ex1", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事をAさん1人で行うと15日で終わり、Bさん1人で行うと30日で終わる。AさんとBさんの2人で仕事をすると、何日で終わるか。", "choices": ["A：7日", "B：8日", "C：9日", "D：10日", "E：11日", "F：13日", "G：15日", "H：A〜Gのいずれでもない"], "answer": 3},
-  {"id": "wk-ex2", "cat": "仕事算・水槽算", "context": null, "text": "空のプールを満水にしたい。給水装置Aだけでは2.5時間、給水装置Bだけでは5時間かかる。2つの給水装置を使う場合、満水になるまでの時間を求めよ。", "choices": ["A：65分", "B：80分", "C：90分", "D：95分", "E：100分", "F：115分", "G：140分", "H：A〜Gのいずれでもない"], "answer": 4},
-  {"id": "wk-q1", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事を仕上げるのに、Aさんが1人ですれば9日かかり、Bさんが1人ですれば18日かかる。この仕事をAさんとBさんの2人ですれば何日かかるか。", "choices": ["A：2日", "B：3日", "C：4日", "D：5日", "E：6日", "F：7日", "G：8日", "H：A〜Gのいずれでもない"], "answer": 4},
-  {"id": "wk-q2", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事を仕上げるのに、Aさんが1人ですれば4日かかり、AさんとBさんの2人ですれば3日かかる。この仕事をBさんが1人ですれば何日かかるか。", "choices": ["A：6日", "B：7日", "C：8日", "D：10日", "E：12日", "F：16日", "G：20日", "H：A〜Gのいずれでもない"], "answer": 4},
-  {"id": "wk-q3", "cat": "仕事算・水槽算", "context": null, "text": "ある水槽には、AとBの2つの注水管がある。注水管Aだけで注水すれば、満水になるまで30分かかり、注水管Bだけで注水すれば、満水になるまで20分かかる。注水管Aと注水管Bの2つを同時に使うと、満水になるまで何分かかるか。", "choices": ["A：10分", "B：12分", "C：14分", "D：16分", "E：18分", "F：20分", "G：22分", "H：A〜Gのいずれでもない"], "answer": 1},
-  {"id": "wk-q4", "cat": "仕事算・水槽算", "context": null, "text": "ある宿題をAさんが1人ですると9時間、Bさんが1人ですると18時間かかる。2人が一緒にすると、どれだけの時間で宿題が完了するか。", "choices": ["A：4時間", "B：4時間30分", "C：5時間", "D：5時間30分", "E：6時間", "F：7時間", "G：8時間", "H：A〜Gのいずれでもない"], "answer": 4},
-  {"id": "wk-q5-1", "cat": "仕事算・水槽算", "context": "空の水槽を満水にするのにポンプS1台で12分、ポンプT1台で8分かかる。", "text": "ポンプS3台とポンプT3台を使う場合、満水になるまでの時間を求めよ。", "choices": ["A：1分20秒", "B：1分24秒", "C：1分26秒", "D：1分30秒", "E：1分32秒", "F：1分35秒", "G：1分36秒", "H：A〜Gのいずれでもない"], "answer": 6},
-  {"id": "wk-q5-2", "cat": "仕事算・水槽算", "context": "空の水槽を満水にするのにポンプS1台で12分、ポンプT1台で8分かかる。", "text": "水槽から水を排水するポンプUは、1台で水槽を空にするのに24分かかる。ポンプS、ポンプT、ポンプUそれぞれ1台を同時に使用するとき、空の水槽が満水になるまでの時間を求めよ。", "choices": ["A：4分30秒", "B：5分", "C：5分30秒", "D：6分", "E：6分30秒", "F：7分", "G：7分30秒", "H：A〜Gのいずれでもない"], "answer": 3},
-  {"id": "wk-q6", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事を仕上げるのに、Aさんは12日、Bさんは8日かかる。また、Aさん、Bさん、Cさんの3人が一緒にこの仕事をすると4日かかる。この仕事を仕上げるのに、Cさん1人では何日かかるか。", "choices": ["A：20日", "B：21日", "C：22日", "D：23日", "E：24日", "F：25日", "G：26日", "H：A〜Gのいずれでもない"], "answer": 4},
-  {"id": "tb-ex1", "cat": "旅人算", "context": null, "text": "弟が歩いて家を出てから6分後に兄が走って弟を追いかけた。弟の歩く速さは90m/分、兄の走る速さは120m/分である。兄は何分後に弟に追いつくか。", "choices": ["A：14分後", "B：15分後", "C：16分後", "D：17分後", "E：18分後", "F：19分後", "G：20分後", "H：A〜Gのいずれでもない"], "answer": 4},
-  {"id": "tb-ex2", "cat": "旅人算", "context": null, "text": "1周7.2kmのサイクリングコースがある。サイクリングコース上のA地点をスタート地点として、PさんとQさんが自転車で走った。Pさんは280m/分、Qさんは200m/分で走るものとする。2人がA地点を同時に出発して逆向きに走ったとき、2人が最初に出会うのはスタートしてから何分後か。", "choices": ["A：14分後", "B：15分後", "C：16分後", "D：17分後", "E：18分後", "F：19分後", "G：20分後", "H：A〜Gのいずれでもない"], "answer": 1},
-  {"id": "tb-q1-1", "cat": "旅人算", "context": "A地点とB地点は10km離れている。Pの速さは8km/時、Qの速さは12km/時である。", "text": "PはA地点からB地点へと、QはB地点からA地点へと向かう。P、Qが同時に出発したとき、2人は出発してから何分後に出会うか。", "choices": ["A：20分後", "B：25分後", "C：28分後", "D：30分後", "E：34分後", "F：40分後", "G：42分後", "H：A〜Gのいずれでもない"], "answer": 3},
-  {"id": "tb-q1-2", "cat": "旅人算", "context": "A地点とB地点は10km離れている。Pの速さは8km/時、Qの速さは12km/時である。", "text": "PはA地点からB地点へと向かい、QはPが出発してから15分後にA地点からB地点へと向かった。QがPに追いつくのはQが出発してから何分後か。", "choices": ["A：15分後", "B：18分後", "C：21分後", "D：24分後", "E：30分後", "F：45分後", "G：48分後", "H：A〜Gのいずれでもない"], "answer": 4},
-  {"id": "tb-q2", "cat": "旅人算", "context": null, "text": "11時にバスがS駅を出発して40km離れたT駅へ向かった。同じ時刻に別のバスがT駅を出発してS駅へと向かった。2台のバスの速さはどちらも700m/分である。11時6分の2台のバスの距離は何kmか。", "choices": ["A：20.5km", "B：21.8km", "C：24.6km", "D：28.2km", "E：30.3km", "F：31.6km", "G：33.9km", "H：A〜Gのいずれでもない"], "answer": 5},
-  {"id": "tb-q3", "cat": "旅人算", "context": null, "text": "姉は64km/時で、妹は46km/時で同時に、同じ地点から同じ方向へ車を運転し始めた。40分後に2人は何km離れているか。", "choices": ["A：6km", "B：8km", "C：10km", "D：12km", "E：14km", "F：16km", "G：18km", "H：A〜Gのいずれでもない"], "answer": 3},
-  {"id": "tb-q4", "cat": "旅人算", "context": null, "text": "A町とB町は4km離れていて、PさんはA町を自転車に乗って時速12kmで、QさんはB町から歩いて時速4kmで同時に出発すると、2人が出会うのは何分後か。", "choices": ["A：14分後", "B：15分後", "C：16分後", "D：17分後", "E：18分後", "F：19分後", "G：20分後", "H：A〜Gのいずれでもない"], "answer": 1},
-  {"id": "tb-q5", "cat": "旅人算", "context": null, "text": "Pさんの歩く速さは分速70m、Qさんの歩く速さは分速50mである。2人が同じ場所を出発して、2.4km離れた場所で折り返す。2人が出会うのは、出発した場所から何km離れたところか。", "choices": ["A：1.2km", "B：1.4km", "C：1.6km", "D：1.8km", "E：2km", "F：2.2km", "G：2.4km", "H：A〜Gのいずれでもない"], "answer": 4},
-  {"id": "tb-q6", "cat": "旅人算", "context": null, "text": "Pさんの歩く速さは分速70m、Qさんの歩く速さは分速50mである。Pさんが午後5時に学校を出発して12分後にQさんが追いかけた。Pさんは学校から2.4km離れたところでQさんからの電話で連絡を受けて引き返した。2人が出会うのは何時何分か。", "choices": ["A：5時33分", "B：5時40分", "C：5時43分", "D：5時45分", "E：5時48分", "F：5時53分", "G：5時55分", "H：A〜Gのいずれでもない"], "answer": 3}
+const SUBJECTS = [
+  {
+    id: "math1-spi",
+    tab: "数I SPI",
+    title: "数I SPI（鶴亀算・仕事算・旅人算）",
+    desc: "鶴亀算・仕事算/水槽算・旅人算の練習問題です。",
+    recordKey: "midterm2QuizRecords",
+    questions: [
+      {"id": "tk-ex", "cat": "鶴亀算", "context": null, "text": "1個200円の柿と1個120円のりんごが合わせて13個ある。合計金額は2200円である。りんごは何個あるか。", "choices": ["A：1個", "B：3個", "C：5個", "D：7個", "E：9個", "F：11個", "G：13個", "H：A〜Gのいずれでもない"], "answer": 2},
+      {"id": "tk-q1", "cat": "鶴亀算", "context": null, "text": "1個60円のレモンと1個80円のりんごを合わせて16個買ったところ、代金の合計は1040円であった。りんごは何個買ったか。", "choices": ["A：2個", "B：3個", "C：4個", "D：8個", "E：10個", "F：12個", "G：13個", "H：A〜Gのいずれでもない"], "answer": 2},
+      {"id": "tk-q2", "cat": "鶴亀算", "context": null, "text": "1本60円の鉛筆と1本90円のサインペンを合わせて18本買い、1500円出したら240円おつりがあった。鉛筆は何本買ったか。", "choices": ["A：12本", "B：13本", "C：14本", "D：15本", "E：16本", "F：17本", "G：18本", "H：A〜Gのいずれでもない"], "answer": 0},
+      {"id": "tk-q3", "cat": "鶴亀算", "context": null, "text": "ある公園の入場料は、大人250円、子ども120円である。昨日の入場料は大人と子ども合わせて98人で、入場料の合計は18000円であった。昨日の大人の入場者数は何人か。", "choices": ["A：26人", "B：28人", "C：30人", "D：36人", "E：42人", "F：48人", "G：52人", "H：A〜Gのいずれでもない"], "answer": 5},
+      {"id": "tk-q4", "cat": "鶴亀算", "context": null, "text": "ネット販売で1個700円のキーホルダーと、1個400円のストラップを合わせて8個買ったところ、送料500円込みで4600円であった。ストラップは何個買ったか。", "choices": ["A：1個", "B：2個", "C：3個", "D：4個", "E：5個", "F：6個", "G：7個", "H：A〜Gのいずれでもない"], "answer": 4},
+      {"id": "tk-q5", "cat": "鶴亀算", "context": null, "text": "600枚のクッキーを、15枚用の箱と25枚用の箱に詰め合わせたところ、合計で30箱できて余りが10枚となった。15枚用の箱は何箱だったことになるか。", "choices": ["A：12箱", "B：13箱", "C：14箱", "D：15箱", "E：16箱", "F：17箱", "G：18箱", "H：A〜Gのいずれでもない"], "answer": 4},
+      {"id": "tk-q6", "cat": "鶴亀算", "context": null, "text": "ギフト用に、1個300円の洋梨と1個200円の柿を合わせて20個詰め合わせてもらったところ、箱代の200円を含めて5000円となった。柿は何個詰めたことになるか。", "choices": ["A：7個", "B：8個", "C：9個", "D：10個", "E：11個", "F：12個", "G：13個", "H：A〜Gのいずれでもない"], "answer": 5},
+      {"id": "tk-q7", "cat": "鶴亀算", "context": null, "text": "プリントを何人かの生徒に配布するのに、1人9枚ずつ配布すると34枚足りない。また、1人6枚ずつ配布すると14枚余る。プリントは何枚あるか。", "choices": ["A：100枚", "B：110枚", "C：120枚", "D：130枚", "E：140枚", "F：150枚", "G：160枚", "H：A〜Gのいずれでもない"], "answer": 1},
+      {"id": "tk-q8", "cat": "鶴亀算", "context": null, "text": "ボールペン1本の値段は、鉛筆1本の値段より30円高い。鉛筆とボールペンを5本ずつ買うつもりだったが、全商品1割引きだったので、ちょうどボールペンを1本多く買えた。もとの鉛筆1本の値段はいくらか。", "choices": ["A：90円", "B：100円", "C：110円", "D：120円", "E：130円", "F：140円", "G：150円", "H：A〜Gのいずれでもない"], "answer": 3},
+      {"id": "wk-ex1", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事をAさん1人で行うと15日で終わり、Bさん1人で行うと30日で終わる。AさんとBさんの2人で仕事をすると、何日で終わるか。", "choices": ["A：7日", "B：8日", "C：9日", "D：10日", "E：11日", "F：13日", "G：15日", "H：A〜Gのいずれでもない"], "answer": 3},
+      {"id": "wk-ex2", "cat": "仕事算・水槽算", "context": null, "text": "空のプールを満水にしたい。給水装置Aだけでは2.5時間、給水装置Bだけでは5時間かかる。2つの給水装置を使う場合、満水になるまでの時間を求めよ。", "choices": ["A：65分", "B：80分", "C：90分", "D：95分", "E：100分", "F：115分", "G：140分", "H：A〜Gのいずれでもない"], "answer": 4},
+      {"id": "wk-q1", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事を仕上げるのに、Aさんが1人ですれば9日かかり、Bさんが1人ですれば18日かかる。この仕事をAさんとBさんの2人ですれば何日かかるか。", "choices": ["A：2日", "B：3日", "C：4日", "D：5日", "E：6日", "F：7日", "G：8日", "H：A〜Gのいずれでもない"], "answer": 4},
+      {"id": "wk-q2", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事を仕上げるのに、Aさんが1人ですれば4日かかり、AさんとBさんの2人ですれば3日かかる。この仕事をBさんが1人ですれば何日かかるか。", "choices": ["A：6日", "B：7日", "C：8日", "D：10日", "E：12日", "F：16日", "G：20日", "H：A〜Gのいずれでもない"], "answer": 4},
+      {"id": "wk-q3", "cat": "仕事算・水槽算", "context": null, "text": "ある水槽には、AとBの2つの注水管がある。注水管Aだけで注水すれば、満水になるまで30分かかり、注水管Bだけで注水すれば、満水になるまで20分かかる。注水管Aと注水管Bの2つを同時に使うと、満水になるまで何分かかるか。", "choices": ["A：10分", "B：12分", "C：14分", "D：16分", "E：18分", "F：20分", "G：22分", "H：A〜Gのいずれでもない"], "answer": 1},
+      {"id": "wk-q4", "cat": "仕事算・水槽算", "context": null, "text": "ある宿題をAさんが1人ですると9時間、Bさんが1人ですると18時間かかる。2人が一緒にすると、どれだけの時間で宿題が完了するか。", "choices": ["A：4時間", "B：4時間30分", "C：5時間", "D：5時間30分", "E：6時間", "F：7時間", "G：8時間", "H：A〜Gのいずれでもない"], "answer": 4},
+      {"id": "wk-q5-1", "cat": "仕事算・水槽算", "context": "空の水槽を満水にするのにポンプS1台で12分、ポンプT1台で8分かかる。", "text": "ポンプS3台とポンプT3台を使う場合、満水になるまでの時間を求めよ。", "choices": ["A：1分20秒", "B：1分24秒", "C：1分26秒", "D：1分30秒", "E：1分32秒", "F：1分35秒", "G：1分36秒", "H：A〜Gのいずれでもない"], "answer": 6},
+      {"id": "wk-q5-2", "cat": "仕事算・水槽算", "context": "空の水槽を満水にするのにポンプS1台で12分、ポンプT1台で8分かかる。", "text": "水槽から水を排水するポンプUは、1台で水槽を空にするのに24分かかる。ポンプS、ポンプT、ポンプUそれぞれ1台を同時に使用するとき、空の水槽が満水になるまでの時間を求めよ。", "choices": ["A：4分30秒", "B：5分", "C：5分30秒", "D：6分", "E：6分30秒", "F：7分", "G：7分30秒", "H：A〜Gのいずれでもない"], "answer": 3},
+      {"id": "wk-q6", "cat": "仕事算・水槽算", "context": null, "text": "ある仕事を仕上げるのに、Aさんは12日、Bさんは8日かかる。また、Aさん、Bさん、Cさんの3人が一緒にこの仕事をすると4日かかる。この仕事を仕上げるのに、Cさん1人では何日かかるか。", "choices": ["A：20日", "B：21日", "C：22日", "D：23日", "E：24日", "F：25日", "G：26日", "H：A〜Gのいずれでもない"], "answer": 4},
+      {"id": "tb-ex1", "cat": "旅人算", "context": null, "text": "弟が歩いて家を出てから6分後に兄が走って弟を追いかけた。弟の歩く速さは90m/分、兄の走る速さは120m/分である。兄は何分後に弟に追いつくか。", "choices": ["A：14分後", "B：15分後", "C：16分後", "D：17分後", "E：18分後", "F：19分後", "G：20分後", "H：A〜Gのいずれでもない"], "answer": 4},
+      {"id": "tb-ex2", "cat": "旅人算", "context": null, "text": "1周7.2kmのサイクリングコースがある。サイクリングコース上のA地点をスタート地点として、PさんとQさんが自転車で走った。Pさんは280m/分、Qさんは200m/分で走るものとする。2人がA地点を同時に出発して逆向きに走ったとき、2人が最初に出会うのはスタートしてから何分後か。", "choices": ["A：14分後", "B：15分後", "C：16分後", "D：17分後", "E：18分後", "F：19分後", "G：20分後", "H：A〜Gのいずれでもない"], "answer": 1},
+      {"id": "tb-q1-1", "cat": "旅人算", "context": "A地点とB地点は10km離れている。Pの速さは8km/時、Qの速さは12km/時である。", "text": "PはA地点からB地点へと、QはB地点からA地点へと向かう。P、Qが同時に出発したとき、2人は出発してから何分後に出会うか。", "choices": ["A：20分後", "B：25分後", "C：28分後", "D：30分後", "E：34分後", "F：40分後", "G：42分後", "H：A〜Gのいずれでもない"], "answer": 3},
+      {"id": "tb-q1-2", "cat": "旅人算", "context": "A地点とB地点は10km離れている。Pの速さは8km/時、Qの速さは12km/時である。", "text": "PはA地点からB地点へと向かい、QはPが出発してから15分後にA地点からB地点へと向かった。QがPに追いつくのはQが出発してから何分後か。", "choices": ["A：15分後", "B：18分後", "C：21分後", "D：24分後", "E：30分後", "F：45分後", "G：48分後", "H：A〜Gのいずれでもない"], "answer": 4},
+      {"id": "tb-q2", "cat": "旅人算", "context": null, "text": "11時にバスがS駅を出発して40km離れたT駅へ向かった。同じ時刻に別のバスがT駅を出発してS駅へと向かった。2台のバスの速さはどちらも700m/分である。11時6分の2台のバスの距離は何kmか。", "choices": ["A：20.5km", "B：21.8km", "C：24.6km", "D：28.2km", "E：30.3km", "F：31.6km", "G：33.9km", "H：A〜Gのいずれでもない"], "answer": 5},
+      {"id": "tb-q3", "cat": "旅人算", "context": null, "text": "姉は64km/時で、妹は46km/時で同時に、同じ地点から同じ方向へ車を運転し始めた。40分後に2人は何km離れているか。", "choices": ["A：6km", "B：8km", "C：10km", "D：12km", "E：14km", "F：16km", "G：18km", "H：A〜Gのいずれでもない"], "answer": 3},
+      {"id": "tb-q4", "cat": "旅人算", "context": null, "text": "A町とB町は4km離れていて、PさんはA町を自転車に乗って時速12kmで、QさんはB町から歩いて時速4kmで同時に出発すると、2人が出会うのは何分後か。", "choices": ["A：14分後", "B：15分後", "C：16分後", "D：17分後", "E：18分後", "F：19分後", "G：20分後", "H：A〜Gのいずれでもない"], "answer": 1},
+      {"id": "tb-q5", "cat": "旅人算", "context": null, "text": "Pさんの歩く速さは分速70m、Qさんの歩く速さは分速50mである。2人が同じ場所を出発して、2.4km離れた場所で折り返す。2人が出会うのは、出発した場所から何km離れたところか。", "choices": ["A：1.2km", "B：1.4km", "C：1.6km", "D：1.8km", "E：2km", "F：2.2km", "G：2.4km", "H：A〜Gのいずれでもない"], "answer": 4},
+      {"id": "tb-q6", "cat": "旅人算", "context": null, "text": "Pさんの歩く速さは分速70m、Qさんの歩く速さは分速50mである。Pさんが午後5時に学校を出発して12分後にQさんが追いかけた。Pさんは学校から2.4km離れたところでQさんからの電話で連絡を受けて引き返した。2人が出会うのは何時何分か。", "choices": ["A：5時33分", "B：5時40分", "C：5時43分", "D：5時45分", "E：5時48分", "F：5時53分", "G：5時55分", "H：A〜Gのいずれでもない"], "answer": 3}
+    ]
+  }
 ];
 
-let questions = [];
-let answered = {};
-let wrongIds = new Set();
-let isAllMode = true; // 全問モードかどうか
+// 科目ごとの解答状態（タブを切り替えても途中経過を保持）
+const states = {};
+let current = null;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -276,39 +310,76 @@ function shuffle(arr) {
   return a;
 }
 
-function init(qList) {
-  questions = qList;
-  answered = {};
-  document.getElementById("prog-bar").style.width = "0%";
-  document.getElementById("prog-text").textContent = "0 / " + qList.length;
-  document.getElementById("cheer-text").textContent = "がんばって！";
-  renderQuiz();
+function st() { return states[current.id]; }
+
+function renderTabs() {
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = "";
+  SUBJECTS.forEach(s => {
+    const b = document.createElement("button");
+    b.className = "tab-btn" + (current && current.id === s.id ? " active" : "");
+    b.textContent = s.tab;
+    b.onclick = () => selectSubject(s.id, true);
+    nav.appendChild(b);
+  });
 }
 
-function restartAll() {
+function selectSubject(id, pushHash) {
+  current = SUBJECTS.find(s => s.id === id) || SUBJECTS[0];
+  if (pushHash && location.hash !== "#" + current.id) history.replaceState(null, "", "#" + current.id);
+  renderTabs();
+  document.getElementById("subject-title").textContent = current.title;
+  document.getElementById("subject-desc").textContent = current.desc;
+  document.getElementById("record-title").textContent = "成長記録（" + current.tab + "）";
+  if (!states[current.id]) {
+    states[current.id] = { questions: [], answered: {}, wrongIds: new Set(), isAllMode: true };
+    restartAll(true);
+  } else {
+    renderQuiz();
+    updateProgress();
+    showResult(false);
+  }
+  renderRecord();
+}
+
+function init(qList) {
+  const s = st();
+  s.questions = qList;
+  s.answered = {};
+  renderQuiz();
+  updateProgress();
+}
+
+function hideResult() {
   document.getElementById("result-box").style.display = "none";
   document.getElementById("wrong-list").style.display = "none";
-  wrongIds = new Set();
-  isAllMode = true;
-  init(shuffle([...QUESTIONS_MASTER]));
-  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function restartAll(noScroll) {
+  const s = st();
+  hideResult();
+  s.wrongIds = new Set();
+  s.isAllMode = true;
+  init(shuffle(current.questions));
+  if (!noScroll) window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function restartWrong() {
-  if (wrongIds.size === 0) { alert("間違えた問題はありません！"); return; }
-  const wrongQs = QUESTIONS_MASTER.filter(q => wrongIds.has(q.id));
-  document.getElementById("result-box").style.display = "none";
-  document.getElementById("wrong-list").style.display = "none";
-  wrongIds = new Set();
-  isAllMode = false;
+  const s = st();
+  if (s.wrongIds.size === 0) { alert("間違えた問題はありません！"); return; }
+  const wrongQs = current.questions.filter(q => s.wrongIds.has(q.id));
+  hideResult();
+  s.wrongIds = new Set();
+  s.isAllMode = false;
   init(shuffle(wrongQs));
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function renderQuiz() {
+  const s = st();
   const container = document.getElementById("quiz");
   container.innerHTML = "";
-  questions.forEach((q, idx) => {
+  s.questions.forEach((q, idx) => {
     const card = document.createElement("div");
     card.className = "question-card";
     card.id = "card-" + q.id;
@@ -325,21 +396,18 @@ function renderQuiz() {
     html += `</div><div class="feedback" id="fb-${q.id}"></div>`;
     card.innerHTML = html;
     container.appendChild(card);
+    if (s.answered[q.id] !== undefined) markAnswer(q, s.answered[q.id]);
   });
 }
 
-function selectAnswer(qid, chosen) {
-  if (answered[qid] !== undefined) return;
-  const q = questions.find(x => x.id === qid);
+function markAnswer(q, chosen) {
   const correct = q.answer;
-  answered[qid] = chosen;
-
-  const card = document.getElementById("card-" + qid);
-  const fb = document.getElementById("fb-" + qid);
+  const card = document.getElementById("card-" + q.id);
+  const fb = document.getElementById("fb-" + q.id);
   const isCorrect = (chosen === correct);
 
   q.choices.forEach((_, ci) => {
-    const btn = document.getElementById(`btn-${qid}-${ci}`);
+    const btn = document.getElementById(`btn-${q.id}-${ci}`);
     btn.disabled = true;
     if (ci === correct) btn.classList.add("correct");
     if (ci === chosen && !isCorrect) btn.classList.add("wrong");
@@ -353,16 +421,25 @@ function selectAnswer(qid, chosen) {
     card.classList.add("answered-wrong");
     fb.className = "feedback wrong";
     fb.textContent = "✗ 不正解。正解は「" + q.choices[correct] + "」";
-    wrongIds.add(qid);
   }
+  return isCorrect;
+}
+
+function selectAnswer(qid, chosen) {
+  const s = st();
+  if (s.answered[qid] !== undefined) return;
+  const q = s.questions.find(x => x.id === qid);
+  s.answered[qid] = chosen;
+  if (!markAnswer(q, chosen)) s.wrongIds.add(qid);
 
   updateProgress();
-  checkAllDone();
+  if (Object.keys(s.answered).length === s.questions.length) showResult(true);
 }
 
 function updateProgress() {
-  const done = Object.keys(answered).length;
-  const total = questions.length;
+  const s = st();
+  const done = Object.keys(s.answered).length;
+  const total = s.questions.length;
   document.getElementById("prog-text").textContent = done + " / " + total;
   document.getElementById("prog-bar").style.width = (total ? done / total * 100 : 0) + "%";
   let cheer = "がんばって！";
@@ -373,10 +450,13 @@ function updateProgress() {
   document.getElementById("cheer-text").textContent = cheer;
 }
 
-function checkAllDone() {
-  if (Object.keys(answered).length < questions.length) return;
-  const correctCount = questions.filter(q => answered[q.id] === q.answer).length;
-  const total = questions.length;
+// justFinished: 今まさに全問解き終えたとき true（記録保存とスクロール）
+function showResult(justFinished) {
+  const s = st();
+  hideResult();
+  if (s.questions.length === 0 || Object.keys(s.answered).length < s.questions.length) return;
+  const correctCount = s.questions.filter(q => s.answered[q.id] === q.answer).length;
+  const total = s.questions.length;
   const pct = Math.round(correctCount / total * 100);
 
   const rb = document.getElementById("result-box");
@@ -384,12 +464,12 @@ function checkAllDone() {
   document.getElementById("score-big").textContent = correctCount + "／" + total;
   document.getElementById("score-sub").textContent = "正答率 " + pct + "%";
 
-  if (wrongIds.size > 0) {
+  if (s.wrongIds.size > 0) {
     const wl = document.getElementById("wrong-list");
     const wi = document.getElementById("wrong-items");
     wi.innerHTML = "";
-    wrongIds.forEach(id => {
-      const q = QUESTIONS_MASTER.find(x => x.id === id);
+    s.wrongIds.forEach(id => {
+      const q = current.questions.find(x => x.id === id);
       if (!q) return;
       const div = document.createElement("div");
       div.className = "wrong-item";
@@ -397,34 +477,33 @@ function checkAllDone() {
       wi.appendChild(div);
     });
     wl.style.display = "block";
-    // 間違い一覧の少し上（result-boxの先頭）にスクロール
-    setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-  } else {
-    // 全問正解の場合は result-box へスクロール
-    setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
   }
 
-  if (isAllMode) saveRecord(correctCount, total, pct);
+  if (!justFinished) return;
+  setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: s.wrongIds.size > 0 ? "start" : "center" }), 50);
+  if (s.isAllMode) saveRecord(correctCount, total, pct);
+}
+
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(current.recordKey) || "[]"); } catch(e) { return []; }
 }
 
 function saveRecord(correct, total, pct) {
-  let records = [];
-  try { records = JSON.parse(localStorage.getItem("midterm2QuizRecords") || "[]"); } catch(e) {}
+  const records = loadRecords();
   records.push({ date: new Date().toLocaleDateString("ja-JP"), correct, total, pct });
-  try { localStorage.setItem("midterm2QuizRecords", JSON.stringify(records)); } catch(e) {}
+  try { localStorage.setItem(current.recordKey, JSON.stringify(records)); } catch(e) {}
   renderRecord();
 }
 
 function renderRecord() {
-  let records = [];
-  try { records = JSON.parse(localStorage.getItem("midterm2QuizRecords") || "[]"); } catch(e) {}
+  const records = loadRecords();
   const tbody = document.getElementById("record-body");
   tbody.innerHTML = "";
   records.forEach((r, i) => {
     const prev = i > 0 ? records[i - 1] : null;
     const diff = prev ? (r.pct - prev.pct) : null;
     const diffStr = diff === null ? "—" : diff > 0 ? "▲" + diff + "%" : diff < 0 ? "▼" + Math.abs(diff) + "%" : "±0%";
-    const diffColor = diff > 0 ? "color:#16a34a" : diff < 0 ? "color:#dc2626" : "";
+    const diffColor = diff > 0 ? "color:var(--correct)" : diff < 0 ? "color:var(--wrong)" : "";
     tbody.innerHTML += `<tr>
       <td>${i + 1}</td><td>${r.date}</td>
       <td>${r.correct}／${r.total}</td><td>${r.pct}%</td>
@@ -433,12 +512,13 @@ function renderRecord() {
 }
 
 function clearRecord() {
-  if (!confirm("記録をリセットしますか？")) return;
-  try { localStorage.removeItem("midterm2QuizRecords"); } catch(e) {}
+  if (!confirm("「" + current.tab + "」の記録をリセットしますか？")) return;
+  try { localStorage.removeItem(current.recordKey); } catch(e) {}
   renderRecord();
 }
 
-window.onload = () => { renderRecord(); restartAll(); };
+window.addEventListener("hashchange", () => selectSubject(location.hash.slice(1), false));
+window.onload = () => selectSubject(location.hash.slice(1), false);
 </script>
 </body>
 </html>
