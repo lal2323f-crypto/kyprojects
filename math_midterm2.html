@@ -182,35 +182,139 @@
   .choice-btn { background: var(--card); }
   .q-context { background: var(--bg); }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
-  .tabs {
-    max-width: 720px; margin: 0 auto 20px; display: flex; gap: 6px;
-    overflow-x: auto; -webkit-overflow-scrolling: touch;
-    position: sticky; top: 0; z-index: 10; background: var(--bg);
-    padding: 8px 0; border-bottom: 2px solid var(--border);
+  body { padding: 0 0 60px; }
+  .view { padding: 0 16px; }
+  .hidden { display: none !important; }
+
+  /* ===== 科目選択画面 ===== */
+  .hero {
+    position: relative; overflow: hidden; color: #fff;
+    background: linear-gradient(135deg, #0b1533 0%, #1e3a8a 55%, #4338ca 100%);
+    padding: calc(34px + env(safe-area-inset-top, 0px)) 24px 38px;
+    box-shadow: 0 10px 30px rgba(15,23,42,.25);
   }
-  .tab-btn {
-    flex-shrink: 0; padding: 9px 18px; border-radius: 99px;
-    border: 1.5px solid var(--border); background: var(--card); color: var(--subtext);
-    font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap;
-    transition: background .15s, color .15s, border-color .15s;
+  .hero::before {
+    content: ""; position: absolute; inset: 0; opacity: .14; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(120deg, #000 10%, transparent 75%);
+    -webkit-mask-image: linear-gradient(120deg, #000 10%, transparent 75%);
   }
-  .tab-btn:hover { border-color: var(--primary); color: var(--primary); }
-  .tab-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .hero::after {
+    content: ""; position: absolute; width: 260px; height: 260px; right: -80px; top: -90px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(129,140,248,.55), transparent 70%);
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700; letter-spacing: .2em; color: #c7d2fe;
+  }
+  .hero-eyebrow::before { content: ""; width: 22px; height: 2px; background: #818cf8; border-radius: 2px; }
+  header.hero { text-align: left; margin-bottom: 0; }
+  .hero h1 { font-size: 30px; font-weight: 900; letter-spacing: .02em; margin-top: 10px; line-height: 1.25; color: #fff; }
+  .hero p.hero-sub { font-size: 13px; color: #c7d2fe; margin-top: 10px; }
+
+  .menu { max-width: 720px; margin: 0 auto; padding: 28px 0 0; }
+  .menu-label {
+    font-size: 13px; font-weight: 700; color: var(--subtext); letter-spacing: .08em;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .menu-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .sel-card {
+    position: relative; display: flex; align-items: center; gap: 16px; width: 100%;
+    text-align: left; background: var(--card); color: var(--text);
+    border: 1px solid var(--border); border-radius: 18px; padding: 20px 18px 20px 22px;
+    margin-bottom: 14px; cursor: pointer; overflow: hidden;
+    box-shadow: 0 4px 16px rgba(15,23,42,.06);
+    transition: transform .18s, box-shadow .18s, border-color .18s;
+    font-family: inherit;
+  }
+  .sel-card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    background: linear-gradient(180deg, #6366f1, #2563eb);
+  }
+  .sel-card:hover { transform: translateY(-2px); border-color: #818cf8; box-shadow: 0 10px 28px rgba(67,56,202,.18); }
+  .sel-card:active { transform: scale(.98); }
+  .sel-icon {
+    flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 900; color: #fff;
+    background: linear-gradient(135deg, #4338ca, #2563eb);
+    box-shadow: 0 6px 14px rgba(67,56,202,.35);
+  }
+  .sel-body { flex: 1; min-width: 0; }
+  .sel-eyebrow { font-size: 11px; font-weight: 700; color: var(--subtext); letter-spacing: .1em; }
+  .sel-title { font-size: 20px; font-weight: 900; color: var(--primary); margin: 4px 0 6px; }
+  .sel-meta { font-size: 12.5px; color: var(--subtext); line-height: 1.6; }
+  .sel-best {
+    display: inline-block; margin-top: 8px; font-size: 11.5px; font-weight: 700;
+    color: var(--correct); background: var(--correct-light); padding: 2px 10px; border-radius: 99px;
+  }
+  .sel-arrow {
+    flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--primary-light); color: var(--primary); font-size: 18px; font-weight: 900;
+    transition: transform .18s;
+  }
+  .sel-card:hover .sel-arrow { transform: translateX(3px); }
+
+  /* ===== 問題画面 ===== */
+  .topbar {
+    position: sticky; top: 0; z-index: 10; margin: 0 -16px 18px;
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+    background: linear-gradient(135deg, #0b1533, #1e3a8a 70%, #4338ca);
+    color: #fff; box-shadow: 0 4px 16px rgba(15,23,42,.2);
+  }
+  .topbar-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .back-btn {
+    flex-shrink: 0; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.12);
+    color: #fff; font-size: 13px; font-weight: 700; padding: 7px 12px; border-radius: 99px;
+    cursor: pointer; font-family: inherit;
+  }
+  .back-btn:hover { background: rgba(255,255,255,.22); }
+  .topbar-text { min-width: 0; }
+  .topbar-eyebrow { font-size: 10.5px; color: #c7d2fe; letter-spacing: .12em; font-weight: 700; }
+  .topbar-title { font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .subject-head { max-width: 720px; margin: 0 auto 14px; }
   .subject-head h2 { font-size: 18px; font-weight: 800; }
   .subject-head p { font-size: 13px; color: var(--subtext); margin-top: 4px; }
   .progress-wrap { max-width: 720px; margin-left: auto; margin-right: auto; }
+  :root { padding-top: 0; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="subject-label">3年 2学期</div>
-  <h1>3年2学期中間テスト</h1>
-  <p>科目のタブを選ぶと、その科目の問題を解けます。選択肢を選ぶとその場で採点され、出題順は毎回ランダムです。</p>
-</header>
+<!-- 科目選択画面 -->
+<div id="menu-view">
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">3年 2学期</div>
+      <h1>3年2学期中間テスト</h1>
+      <p class="hero-sub">選択肢を選ぶとその場で採点。出題順は毎回ランダムです。</p>
+    </div>
+  </header>
+  <div class="view">
+    <div class="menu">
+      <div class="menu-label">解く科目を選んでください</div>
+      <div id="menu-list"></div>
+    </div>
+  </div>
+</div>
 
-<nav class="tabs" id="tabs"></nav>
+<!-- 問題画面 -->
+<div id="quiz-view" class="view hidden">
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <button class="back-btn" onclick="goMenu()">‹ 科目一覧</button>
+    <div class="topbar-text">
+      <div class="topbar-eyebrow">3年2学期中間テスト</div>
+      <div class="topbar-title" id="topbar-title"></div>
+    </div>
+  </div>
+</div>
 
 <div class="subject-head">
   <h2 id="subject-title"></h2>
@@ -253,15 +357,20 @@
   </div>
 </div>
 
+</div><!-- /quiz-view -->
+
 <script>
 // =====================
 // 科目データ
-// 科目を追加するときは SUBJECTS に { id, tab, title, desc, recordKey, questions } を足す
+// 科目を追加するときは SUBJECTS に { id, tab, eyebrow, icon, meta, title, desc, recordKey, questions } を足す
 // =====================
 const SUBJECTS = [
   {
     id: "math1-spi",
     tab: "数I SPI",
+    eyebrow: "数学",
+    icon: "∑",
+    meta: "鶴亀算・仕事算/水槽算・旅人算",
     title: "数I SPI（鶴亀算・仕事算・旅人算）",
     desc: "鶴亀算・仕事算/水槽算・旅人算の練習問題です。",
     recordKey: "midterm2QuizRecords",
@@ -312,22 +421,50 @@ function shuffle(arr) {
 
 function st() { return states[current.id]; }
 
-function renderTabs() {
-  const nav = document.getElementById("tabs");
-  nav.innerHTML = "";
+function esc(t) {
+  return String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function renderMenu() {
+  const list = document.getElementById("menu-list");
+  list.innerHTML = "";
   SUBJECTS.forEach(s => {
+    let records = [];
+    try { records = JSON.parse(localStorage.getItem(s.recordKey) || "[]"); } catch(e) {}
+    const best = records.length ? Math.max(...records.map(r => r.pct)) : null;
     const b = document.createElement("button");
-    b.className = "tab-btn" + (current && current.id === s.id ? " active" : "");
-    b.textContent = s.tab;
-    b.onclick = () => selectSubject(s.id, true);
-    nav.appendChild(b);
+    b.className = "sel-card";
+    b.innerHTML = `<div class="sel-icon">${esc(s.icon)}</div>
+      <div class="sel-body">
+        <div class="sel-eyebrow">${esc(s.eyebrow)}</div>
+        <div class="sel-title">${esc(s.tab)}</div>
+        <div class="sel-meta">全${s.questions.length}問 ・ ${esc(s.meta)}</div>
+        ${best === null ? "" : `<span class="sel-best">最高 ${best}%（${records.length}回挑戦）</span>`}
+      </div>
+      <div class="sel-arrow">›</div>`;
+    b.onclick = () => { location.hash = s.id; };
+    list.appendChild(b);
   });
 }
 
-function selectSubject(id, pushHash) {
-  current = SUBJECTS.find(s => s.id === id) || SUBJECTS[0];
-  if (pushHash && location.hash !== "#" + current.id) history.replaceState(null, "", "#" + current.id);
-  renderTabs();
+function goMenu() {
+  if (location.hash) history.pushState(null, "", location.pathname + location.search);
+  route();
+}
+
+// URL の #科目id で問題画面、なければ科目選択画面
+function route() {
+  const subj = SUBJECTS.find(s => s.id === location.hash.slice(1));
+  document.getElementById("menu-view").classList.toggle("hidden", !!subj);
+  document.getElementById("quiz-view").classList.toggle("hidden", !subj);
+  if (subj) selectSubject(subj.id);
+  else renderMenu();
+  window.scrollTo(0, 0);
+}
+
+function selectSubject(id) {
+  current = SUBJECTS.find(s => s.id === id);
+  document.getElementById("topbar-title").textContent = current.tab;
   document.getElementById("subject-title").textContent = current.title;
   document.getElementById("subject-desc").textContent = current.desc;
   document.getElementById("record-title").textContent = "成長記録（" + current.tab + "）";
@@ -517,8 +654,9 @@ function clearRecord() {
   renderRecord();
 }
 
-window.addEventListener("hashchange", () => selectSubject(location.hash.slice(1), false));
-window.onload = () => selectSubject(location.hash.slice(1), false);
+window.addEventListener("hashchange", route);
+window.addEventListener("popstate", route);
+window.onload = route;
 </script>
 </body>
 </html>
