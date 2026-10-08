@@ -423,7 +423,7 @@ const SUBJECTS = [
     tab: "英語スタサプ",
     eyebrow: "英語",
     icon: "A",
-    meta: "仮定法",
+    meta: "仮定法（第21講・第22講・第16講）",
     title: "英語スタサプ",
     desc: "解く単元を選んでください",
     children: [
@@ -456,6 +456,59 @@ const SUBJECTS = [
           {"id": "k1-c6-1", "cat": "Chapter 6", "text": "He plays the guitar (　　) he were a famous musician.", "ja": "彼はまるで自分が有名な音楽家であるかのようにギターを弾く。", "choices": ["if", "though", "as like", "as if"], "answer": 3, "exp": "「まるで〜であるかのように」は as if＋仮定法。as like という言い方はない。"},
           {"id": "k1-c6-2", "cat": "Chapter 6", "text": "She talks as if she (　　) there, too.", "ja": "彼女はまるで自分もそこに居合わせていたかのような口ぶりだ。", "choices": ["is", "had been", "have been", "has been"], "answer": 1, "exp": "話している（今）より前のこと「居合わせていた」なので as if＋過去完了。→ had been"},
           {"id": "k1-c6-3", "cat": "Chapter 6", "text": "He talked as though he (　　) the video.", "ja": "彼はまるでその動画を見たことがあるかのような口ぶりだった。", "choices": ["saw", "sees", "have seen", "had seen"], "answer": 3, "exp": "as though は as if と同じ意味。話した時点より前のこと「見たことがある」なので過去完了。→ had seen"}
+        ]
+      },
+      {
+        id: "eng-l22",
+        tab: "第22講　仮定法②",
+        eyebrow: "英語スタサプ ・ ベーシックレベル英語",
+        icon: "If",
+        meta: "Chapter 1〜4（If it were not for・should / were to・倒置・if の代用）",
+        title: "第22講　仮定法②",
+        desc: "ベーシックレベル英語 第22講 復習テスト（Chapter 1〜4）。空所に入る最も適切な語（句）を選びましょう。",
+        recordKey: "midterm2_eng_l22",
+        choiceLabels: ["①", "②", "③", "④"],
+        questions: [
+          {"id": "l22-c1-1", "cat": "Chapter 1", "text": "If it (　　) for chocolate, I could not enjoy my life.", "choices": ["without", "but", "were not", "had not"], "answer": 2, "exp": "If it were not for 〜 で「（今）〜がなければ」（仮定法過去）。主節も could not enjoy で現在の話。"},
+          {"id": "l22-c1-2", "cat": "Chapter 1", "text": "If it (　　) for this cook book, I couldn't have cooked the omelet.", "choices": ["were not", "without", "had not been", "but"], "answer": 2, "exp": "主節が couldn't have cooked（過去の話）なので If it had not been for 〜「（あのとき）〜がなかったら」。"},
+          {"id": "l22-c1-3", "cat": "Chapter 1", "text": "(　　) her uncle's advice, she wouldn't have passed the test.", "choices": ["If it were not", "But for", "If it had not", "With"], "answer": 1, "exp": "But for 〜 ＝「〜がなければ／なかったら」。①③は for がないので文にならない。With だと「助言があれば」で意味が合わない。"},
+          {"id": "l22-c2-1", "cat": "Chapter 2", "text": "If John (　　) me, tell him I'm busy.", "choices": ["had called", "should call", "called", "will call"], "answer": 1, "exp": "If S should 〜 で「万一〜したら」。主節は命令文（tell）でもよい。"},
+          {"id": "l22-c2-2", "cat": "Chapter 2", "text": "If you (　　) into a parallel world, what would you do?", "choices": ["had gotten", "will get", "have gotten", "were to get"], "answer": 3, "exp": "If S were to 〜 で「仮に〜するとしたら」（実現しそうにない未来の仮定）。主節は would do。"},
+          {"id": "l22-c2-3", "cat": "Chapter 2", "text": "If you (　　) my purse, please let me know.", "choices": ["found", "had found", "should find", "will find"], "answer": 2, "exp": "If S should 〜「万一〜したら」。主節が please 〜 の命令文なので should が合う。"},
+          {"id": "l22-c3-1", "cat": "Chapter 3", "text": "(　　) it not been for their help, we wouldn't have succeeded.", "choices": ["Were", "Had", "If", "If were"], "answer": 1, "exp": "If it had not been for 〜 の if を省略すると倒置して Had it not been for 〜 になる。"},
+          {"id": "l22-c3-2", "cat": "Chapter 3", "text": "(　　) any trouble happen, please send me a message.", "choices": ["If", "Were to", "Without", "Should"], "answer": 3, "exp": "If any trouble should happen の if を省略した倒置 → Should any trouble happen。happen が原形なのがヒント。"},
+          {"id": "l22-c3-3", "cat": "Chapter 3", "text": "(　　) I in his place, I would not buy two tickets.", "choices": ["Were", "Had", "If", "Were to"], "answer": 0, "exp": "If I were in his place の if を省略した倒置 → Were I in his place。"},
+          {"id": "l22-c4-1", "cat": "Chapter 4", "text": "I studied English hard; (　　), I would have failed the test.", "ja": "私は熱心に英語を勉強した。そうでなければ，私はテストに不合格だっただろう。", "choices": ["without", "still", "otherwise", "if so"], "answer": 2, "exp": "otherwise ＝「そうでなければ」。前の文の内容を受けて仮定を表す。"},
+          {"id": "l22-c4-2", "cat": "Chapter 4", "text": "A few weeks ago, I (　　) solved this question.", "ja": "数週間前なら，私はこの問題が解けなかっただろう。", "choices": ["couldn't", "couldn't have", "had", "could have"], "answer": 1, "exp": "A few weeks ago（数週間前なら）が if節の代わり。過去の仮定なので couldn't have＋過去分詞。"},
+          {"id": "l22-c4-3", "cat": "Chapter 4", "text": "To hear her speak, you (　　) her for a native Japanese.", "ja": "彼女が話すのを聞けば，あなたは彼女が生粋の日本人だと思うだろう。", "choices": ["should take", "had taken", "took", "would take"], "answer": 3, "exp": "To hear her speak（彼女が話すのを聞けば）が if節の代わり。主節は would＋原形。take A for B ＝「AをBだと思う」。"}
+        ]
+      },
+      {
+        id: "eng-l16",
+        tab: "第16講　仮定法①",
+        eyebrow: "英語スタサプ ・ 高1・高2スタンダードレベル英語",
+        icon: "If",
+        meta: "【1】〜【3】（仮定法の基本・I wish・as if・without など）",
+        title: "第16講　仮定法①",
+        desc: "高1・高2スタンダードレベル英語＜文法・読解編＞ 第16講 復習テスト【1】〜【3】。空所に入る最も適切な語（句）を選びましょう。",
+        recordKey: "midterm2_eng_l16",
+        choiceLabels: ["①", "②", "③", "④"],
+        questions: [
+          {"id": "l16-s1-1", "cat": "【1】", "text": "If I (　　) in her position, I would turn down his marriage offer.", "choices": ["am", "will be", "were", "being"], "answer": 2, "exp": "主節が would turn down なので仮定法過去。be動詞は were。"},
+          {"id": "l16-s1-2", "cat": "【1】", "text": "If they (　　) enough, they could have lost that baseball game.", "choices": ["practiced", "had not practiced", "didn't practice", "had practiced"], "answer": 1, "exp": "主節が could have lost なので仮定法過去完了。「十分練習していなかったら負けていたかも」→ had not practiced。"},
+          {"id": "l16-s1-3", "cat": "【1】", "text": "If it (　　) too windy tomorrow, I will put off climbing the mountain.", "choices": ["were", "will be", "had been", "is"], "answer": 3, "exp": "主節が will put off なので仮定法ではなく普通の条件文。条件の if節では未来のことも現在形 → is。"},
+          {"id": "l16-s1-4", "cat": "【1】", "text": "If you had set an alarm, you (　　) up at 6 a.m.", "choices": ["could have woken", "could wake", "can wake", "have been woken"], "answer": 0, "exp": "if節が had set（仮定法過去完了）なので主節は could have＋過去分詞。"},
+          {"id": "l16-s1-5", "cat": "【1】", "text": "If he felt sick, he (　　) this birthday party.", "choices": ["wouldn't have joined", "will be able to join", "would not join", "could have joined"], "answer": 2, "exp": "if節が felt（仮定法過去）なので主節は would＋原形。→ would not join"},
+          {"id": "l16-s2-1", "cat": "【2】", "text": "My father said, “I wish I (　　) abroad when I was younger.”", "choices": ["have studied", "studied", "will study", "had studied"], "answer": 3, "exp": "when I was younger（過去）のことへの願望なので I wish＋過去完了。"},
+          {"id": "l16-s2-2", "cat": "【2】", "text": "The man smiled warmly (　　) nothing had happened.", "choices": ["even if", "however", "as if", "because of"], "answer": 2, "exp": "as if＋過去完了 で「まるで（それより前に）〜したかのように」。"},
+          {"id": "l16-s2-3", "cat": "【2】", "text": "Oh, I think it's high time I (　　) a meal for my family.", "choices": ["had prepared", "will prepare", "are preparing", "prepared"], "answer": 3, "exp": "It's high time＋S＋過去形 で「とっくに〜する時間だ」。"},
+          {"id": "l16-s2-4", "cat": "【2】", "text": "The university student wishes she (　　) a roommate.", "choices": ["found", "finding", "will find", "that finds"], "answer": 0, "exp": "wish＋過去形 で「（今）〜ならいいのに」。→ found"},
+          {"id": "l16-s2-5", "cat": "【2】", "text": "I really hope (　　) that entrance exam.", "choices": ["he could pass", "he will pass", "him to have passed", "his passing"], "answer": 1, "exp": "hope は実現の可能性がある願望なので仮定法にしない。hope＋that節（that省略）で he will pass。hope は「人＋to不定詞」の形をとらない。"},
+          {"id": "l16-s3-1", "cat": "【3】", "text": "If (　　) for ads, I could enjoy this online game more.", "choices": ["it were", "it were not", "but", "it was without"], "answer": 1, "exp": "If it were not for 〜 で「（今）〜がなければ」。主節が could enjoy なので仮定法過去。"},
+          {"id": "l16-s3-2", "cat": "【3】", "text": "If the world (　　) filled with zombies, I would stand by you.", "choices": ["should have", "had", "not for", "were to be"], "answer": 3, "exp": "If S were to 〜「仮に〜するとしたら」。be filled with 〜 なので were to be filled。"},
+          {"id": "l16-s3-3", "cat": "【3】", "text": "I might have given up halfway (　　) your encouraging words.", "choices": ["if it were", "should", "but", "without"], "answer": 3, "exp": "without 〜 ＝「〜がなければ／なかったら」。if節の代わりになる。"},
+          {"id": "l16-s3-4", "cat": "【3】", "text": "I don't expect calls today. If someone (　　) me, tell them I'm away.", "choices": ["will call", "called", "should call", "had called"], "answer": 2, "exp": "「電話は来ないと思うが、万一来たら」なので If S should 〜。"},
+          {"id": "l16-s3-5", "cat": "【3】", "text": "(　　) for that safety rope, he would have fallen to his death.", "choices": ["If it had not been", "Not", "Without", "If it were not"], "answer": 0, "exp": "主節が would have fallen（過去の話）なので If it had not been for 〜。③の Without は後ろに for を付けない（Without that safety rope なら正しい）。"}
         ]
       }
     ]
