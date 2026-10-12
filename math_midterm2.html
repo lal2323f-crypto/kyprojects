@@ -222,6 +222,7 @@
     border-left: 5px solid #f59e0b; border-radius: 14px; padding: 14px 16px; margin-bottom: 22px;
     font-size: 13.5px; line-height: 1.7;
   }
+  .quiz-note { margin: 12px 0 18px; font-weight: 700; font-size: 15px; }
   .menu-note summary { font-weight: 900; font-size: 15px; cursor: pointer; color: #d97706; }
   .menu-note ol { margin: 10px 0 8px; padding-left: 1.3em; }
   .menu-note li { margin-bottom: 6px; }
@@ -342,6 +343,7 @@
 <div class="subject-head">
   <h2 id="subject-title"></h2>
   <p id="subject-desc"></p>
+  <div id="quiz-note"></div>
 </div>
 
 <div class="progress-wrap">
@@ -398,6 +400,7 @@ const SUBJECTS = [
     meta: "鶴亀算・仕事算/水槽算・旅人算",
     title: "数I SPI（鶴亀算・仕事算・旅人算）",
     desc: "鶴亀算・仕事算/水槽算・旅人算の練習問題です。",
+    note: "📌 このサイトは数I SPI の問題です。<b>基礎数学はプリントを解きましょう！</b>",
     recordKey: "midterm2QuizRecords",
     questions: [
       {"id": "tk-ex", "cat": "鶴亀算", "context": null, "text": "1個200円の柿と1個120円のりんごが合わせて13個ある。合計金額は2200円である。りんごは何個あるか。", "choices": ["A：1個", "B：3個", "C：5個", "D：7個", "E：9個", "F：11個", "G：13個", "H：A〜Gのいずれでもない"], "answer": 2},
@@ -2171,6 +2174,8 @@ function selectSubject(node) {
   document.getElementById("topbar-title").textContent = current.tab;
   document.getElementById("subject-title").textContent = current.title;
   document.getElementById("subject-desc").textContent = current.desc;
+  document.getElementById("quiz-note").innerHTML = current.note
+    ? `<div class="menu-note quiz-note">${current.note}</div>` : "";
   document.getElementById("record-title").textContent = "成長記録（" + current.tab + "）";
   if (!states[current.id]) {
     states[current.id] = { questions: [], answered: {}, wrongIds: new Set(), isAllMode: true };
