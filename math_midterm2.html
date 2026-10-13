@@ -2921,7 +2921,12 @@ function showResult(justFinished) {
   }
 
   if (!justFinished) return;
-  setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: s.wrongIds.size > 0 ? "start" : "center" }), 50);
+  // 最後の問題の正誤と解説を見せてから結果へスクロール（途中でやり直したら動かさない）
+  const answeredNow = s.answered;
+  setTimeout(() => {
+    if (st() !== s || s.answered !== answeredNow || rb.style.display === "none") return;
+    rb.scrollIntoView({ behavior: "smooth", block: s.wrongIds.size > 0 ? "start" : "center" });
+  }, 2500);
   if (s.isAllMode) saveRecord(correctCount, total, pct);
 }
 
