@@ -248,6 +248,7 @@
     content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
     background: linear-gradient(180deg, #6366f1, #2563eb);
   }
+  .sel-card.sel-soon { opacity: .5; cursor: default; }
   .sel-card:hover { transform: translateY(-2px); border-color: #818cf8; box-shadow: 0 10px 28px rgba(67,56,202,.18); }
   .sel-card:active { transform: scale(.98); }
   .sel-icon {
@@ -2447,7 +2448,7 @@ const SUBJECTS = [
     meta: "授業プリント・対策プリント",
     title: "生物",
     noteTitle: "📌 注意",
-    note: "<b>問題集（カラーノート）は自分で解きましょう！（テスト当日に提出）</b><br>範囲：pp.16-17、20-21（大問3のみ）、36-37、42（大問1のみ）、44-51<br><a class='note-link' href='bio_mock1.pdf' target='_blank' rel='noopener'>📄 生物模擬問題①（PDF・解答つき）</a><br><span style='font-size:12px'>開いたら共有ボタン →「Goodnotes」で書き込めます。解答・解説は8〜9ページ。</span>",
+    note: "<b>問題集（カラーノート）は自分で解きましょう！（テスト当日に提出）</b><br>範囲：pp.16-17、20-21（大問3のみ）、36-37、42（大問1のみ）、44-51",
     desc: "解く単元を選んでください",
     children: [
       {
@@ -2871,6 +2872,59 @@ const SUBJECTS = [
         ]
       }
         ]
+      },
+      {
+        id: "bio-mock",
+        tab: "模擬問題",
+        eyebrow: "生物 ・ 模擬問題（PDF）",
+        icon: "模",
+        meta: "模擬問題①〜⑤（PDF・Goodnotesで書き込み可）",
+        title: "生物 模擬問題",
+        noteTitle: "⚠️ ご注意ください",
+        note: "※この模擬問題は、過去問などを参考に先生の出題傾向を読み取ったうえで作成した問題です。<b>必ずしもこの問題がテストに出るわけではありません</b>のでご了承ください。<br><br>📄 押すとPDFが開きます。共有ボタン →「Goodnotes」で書き込めます（出てこないときは「“ファイル”に保存」してからGoodnotesで読み込み）。解答・解説はPDFの最後にあります。",
+        desc: "解く模擬問題を選んでください",
+        children: [
+          {
+            id: "bio-mock1",
+            tab: "模擬問題①",
+            eyebrow: "生物 ・ 模擬問題（PDF）",
+            icon: "①",
+            meta: "PDF・全9ページ（解答・解説は8〜9ページ）",
+            href: "bio_mock1.pdf"
+          },
+          {
+            id: "bio-mock2",
+            tab: "模擬問題②",
+            eyebrow: "生物 ・ 模擬問題（PDF）",
+            icon: "②",
+            meta: "準備中",
+            soon: true
+          },
+          {
+            id: "bio-mock3",
+            tab: "模擬問題③",
+            eyebrow: "生物 ・ 模擬問題（PDF）",
+            icon: "③",
+            meta: "準備中",
+            soon: true
+          },
+          {
+            id: "bio-mock4",
+            tab: "模擬問題④",
+            eyebrow: "生物 ・ 模擬問題（PDF）",
+            icon: "④",
+            meta: "準備中",
+            soon: true
+          },
+          {
+            id: "bio-mock5",
+            tab: "模擬問題⑤",
+            eyebrow: "生物 ・ 模擬問題（PDF）",
+            icon: "⑤",
+            meta: "準備中",
+            soon: true
+          }
+        ]
       }
     ]
   }
@@ -2905,7 +2959,7 @@ function findNode(id, list = SUBJECTS, parent = null) {
 }
 
 function countQuestions(n) {
-  return n.children ? n.children.reduce((t, c) => t + countQuestions(c), 0) : n.questions.length;
+  return n.children ? n.children.reduce((t, c) => t + countQuestions(c), 0) : (n.questions ? n.questions.length : 0);
 }
 
 function renderMenu(group, parent) {
@@ -2915,7 +2969,7 @@ function renderMenu(group, parent) {
   document.getElementById("hero-eyebrow").textContent = group ? "3年2学期中間テスト" + (parent ? " ・ " + parent.tab : "") : "3年 2学期";
   document.getElementById("hero-title").textContent = group ? group.title : "3年2学期中間テスト";
   document.getElementById("hero-sub").textContent = group
-    ? `${group.children.length}単元 ・ 全${countQuestions(group)}問`
+    ? (countQuestions(group) ? `${group.children.length}単元 ・ 全${countQuestions(group)}問` : `${group.children.length}回分（PDF）`)
     : "選択肢を選ぶとその場で採点。出題順は毎回ランダムです。";
   document.getElementById("menu-label").textContent = group ? "解く単元を選んでください" : "解く科目を選んでください";
   document.getElementById("menu-note").innerHTML = group && group.note
@@ -2927,8 +2981,8 @@ function renderMenu(group, parent) {
     if (s.recordKey) { try { records = JSON.parse(localStorage.getItem(s.recordKey) || "[]"); } catch(e) {} }
     const best = records.length ? Math.max(...records.map(r => r.pct)) : null;
     const meta = s.children
-      ? `${s.children.length}単元 ・ ${esc(s.meta)}`
-      : `全${s.questions.length}問 ・ ${esc(s.meta)}`;
+      ? `${countQuestions(s) ? s.children.length + "単元" : s.children.length + "回分"} ・ ${esc(s.meta)}`
+      : s.questions ? `全${s.questions.length}問 ・ ${esc(s.meta)}` : esc(s.meta);
     const b = document.createElement("button");
     b.className = "sel-card";
     b.innerHTML = `<div class="sel-icon">${esc(s.icon)}</div>
@@ -2939,7 +2993,9 @@ function renderMenu(group, parent) {
         ${best === null ? "" : `<span class="sel-best">最高 ${best}%（${records.length}回挑戦）</span>`}
       </div>
       <div class="sel-arrow">›</div>`;
-    b.onclick = () => { location.hash = s.id; };
+    if (s.soon) { b.disabled = true; b.classList.add("sel-soon"); }
+    else if (s.href) b.onclick = () => { window.open(s.href, "_blank", "noopener"); };
+    else b.onclick = () => { location.hash = s.id; };
     list.appendChild(b);
   });
 }
