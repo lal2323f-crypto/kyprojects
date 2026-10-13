@@ -354,6 +354,8 @@
   <span class="cheer" id="cheer-text">がんばって！</span>
 </div>
 
+<div class="quiz-section" id="quiz"></div>
+
 <div id="result-box">
   <h2>全問解答完了！</h2>
   <div class="score-big" id="score-big">0／0</div>
@@ -369,7 +371,6 @@
   <div id="wrong-items"></div>
 </div>
 
-<div class="quiz-section" id="quiz"></div>
 
 <div id="record-section">
   <h3 id="record-title">成長記録</h3>
@@ -2921,12 +2922,8 @@ function showResult(justFinished) {
   }
 
   if (!justFinished) return;
-  // 最後の問題の正誤と解説を見せてから結果へスクロール（途中でやり直したら動かさない）
-  const answeredNow = s.answered;
-  setTimeout(() => {
-    if (st() !== s || s.answered !== answeredNow || rb.style.display === "none") return;
-    rb.scrollIntoView({ behavior: "smooth", block: s.wrongIds.size > 0 ? "start" : "center" });
-  }, 2500);
+  // 結果は最後の問題のすぐ下に出るので、最後の問題が見える位置のまま結果まで見せる
+  setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
   if (s.isAllMode) saveRecord(correctCount, total, pct);
 }
 
