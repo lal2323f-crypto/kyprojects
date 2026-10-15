@@ -118,7 +118,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
       <h2 style="font-size:22px">全問解答完了！</h2>
       <div class="score" id="score">0／0</div>
       <div class="btns">
-        <button class="btn" id="shuffleBtn" type="button">選択肢をシャッフルしてもう一度</button>
+        <button class="btn" id="shuffleBtn" type="button">もう一度解く</button>
         <button class="btn sub" id="wrongBtn" type="button">間違えた問題のみもう一度</button>
       </div>
       <div id="wrongWrap">
@@ -276,7 +276,7 @@ $("subjects").innerHTML = SETS.map((s,i) => `<button class="subj" type="button" 
 function openSet(s){
   cur = s;
   $("barTitle").textContent = `2学期中間Iパス　${cur.name}`;
-  start(setQs(cur), false, true);
+  start(setQs(cur), true);
 }
 $("subjects").addEventListener("click", e => {
   const b = e.target.closest(".subj"); if (!b) return;
@@ -289,10 +289,10 @@ const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
 function loadHist(){ try{ return JSON.parse(localStorage.getItem(keyOf(cur))) || []; }catch(e){ return []; } }
 function saveHist(h){ try{ localStorage.setItem(keyOf(cur), JSON.stringify(h)); }catch(e){} }
 
-function start(questions, shuffleChoices, isFull){
+function start(questions, isFull){
   fullRun = isFull; recorded = false;
   deck = shuffle(questions).map(q => {
-    const order = shuffleChoices ? shuffle([0,1,2,3]) : [0,1,2,3];
+    const order = [0,1,2,3]; // 選択肢は常に ア〜エ の固定順（問題の順番だけランダム）
     return {...q, order};
   });
   answered = 0; correct = 0; wrongs = [];
@@ -364,8 +364,8 @@ function renderHist(){
 }
 
 $("backBtn").onclick = () => { $("quiz").hidden = true; $("home").hidden = false; window.scrollTo(0,0); };
-$("shuffleBtn").onclick = () => start(setQs(cur), true, true);
-$("wrongBtn").onclick = () => start(wrongs.slice(), true, false);
+$("shuffleBtn").onclick = () => start(setQs(cur), true);
+$("wrongBtn").onclick = () => start(wrongs.slice(), false);
 function askReset(){
   $("resetArea").innerHTML = `<div class="confirm">記録を全て消しますか？ <button class="reset" id="yesReset" type="button">消す</button><button class="reset" id="noReset" type="button">やめる</button></div>`;
   $("yesReset").onclick = () => { saveHist([]); renderHist(); restoreReset(); };
