@@ -1,0 +1,378 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>2学期中間Iパス</title><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>
+/* Layout: one narrow exam-booklet column; question cards stacked, sticky score bar on top */
+:root{
+  --bg:#f3f5f8; --paper:#ffffff; --fg:#1d2430; --muted:#5e6a7d; --line:#d6dce6;
+  --accent:#2f5bd3; --accent-soft:#e6edfc;
+  --ok:#1f8a4c; --ok-soft:#e3f4ea; --ng:#c8372d; --ng-soft:#fbe7e5;
+  --font-display:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  --font-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161d; --paper:#1b212b; --fg:#e7ebf2; --muted:#9aa5b8; --line:#2f3847;
+  --accent:#7c9cf5; --accent-soft:#232f4a; --ok:#4cc583; --ok-soft:#173326; --ng:#f07468; --ng-soft:#3a1f1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161d; --paper:#1b212b; --fg:#e7ebf2; --muted:#9aa5b8; --line:#2f3847;
+  --accent:#7c9cf5; --accent-soft:#232f4a; --ok:#4cc583; --ok-soft:#173326; --ng:#f07468; --ng-soft:#3a1f1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.75;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.35}
+.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--muted);font-weight:700}
+.lead{color:var(--muted);margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* home */
+.subjects{display:flex;flex-direction:column;gap:10px}
+.subj{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;
+  background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.subj:hover{border-color:var(--accent)}
+.subj b{font-family:var(--font-display);font-size:18px;display:block}
+.subj span{color:var(--muted);font-size:13px}
+.subj .go{color:var(--accent);font-size:22px;font-weight:700}
+
+/* quiz header */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;display:flex;flex-direction:column;gap:8px}
+.bar-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.back{background:none;border:none;color:var(--accent);padding:4px 0;font-weight:700}
+.bar-title{font-family:var(--font-display);font-weight:700;flex:1;min-width:0}
+.count{font-variant-numeric:tabular-nums;font-weight:700}
+.meter{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.cheer{font-size:13px;color:var(--muted)}
+
+/* question card */
+.q{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.q.ok{border-color:var(--ok)} .q.ng{border-color:var(--ng)}
+.qno{font-family:var(--font-display);font-weight:900;color:var(--accent);font-size:14px;letter-spacing:.04em}
+.qtext{margin:0}
+.items{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.items li{display:grid;grid-template-columns:1.6em 1fr;gap:4px}
+.blank{display:inline-block;min-width:3.4em;border:1.5px solid var(--fg);text-align:center;padding:0 6px;margin:0 2px;line-height:1.5;font-size:13px}
+.formula{background:var(--bg);border-radius:8px;padding:10px 12px;font-size:14px}
+.tbl{overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;min-width:100%}
+.tbl th,.tbl td{border:1px solid var(--line);padding:4px 8px;text-align:left;white-space:nowrap}
+.tbl td.r{text-align:right}
+.choices{display:flex;flex-direction:column;gap:8px}
+.ch{display:grid;grid-template-columns:2em 1fr;gap:6px;text-align:left;background:var(--paper);
+  border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;line-height:1.6}
+.ch:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.ch .lab{font-weight:700;color:var(--muted)}
+.ch:disabled{cursor:default}
+.ch.correct{border-color:var(--ok);background:var(--ok-soft)}
+.ch.wrong{border-color:var(--ng);background:var(--ng-soft)}
+.verdict{font-weight:700;font-family:var(--font-display)}
+.verdict.ok{color:var(--ok)} .verdict.ng{color:var(--ng)}
+
+/* results */
+.result{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.score{font-family:var(--font-display);font-size:44px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1}
+.score small{font-size:16px;color:var(--muted);font-weight:700;margin-left:8px}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.btn{border:none;border-radius:10px;padding:11px 16px;font-weight:700;background:var(--accent);color:var(--paper)}
+.btn.sub{background:var(--accent-soft);color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default}
+.wronglist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.wronglist li{border-left:3px solid var(--ng);padding-left:10px;font-size:14px}
+.wronglist .a{color:var(--ok);font-weight:700}
+.hist td.num{text-align:right}
+.up{color:var(--ok);font-weight:700} .down{color:var(--ng);font-weight:700}
+.reset{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:var(--muted);font-size:13px}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.src{font-size:12px;color:var(--muted);text-align:center}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}}
+</style>
+
+<div class="wrap">
+  <!-- Home -->
+  <section id="home" style="display:flex;flex-direction:column;gap:16px">
+    <div>
+      <div class="eyebrow">2学期</div>
+      <h1 style="font-size:28px;margin-top:4px">2学期中間Iパス</h1>
+    </div>
+    <p class="lead">選択肢を選ぶとその場で採点。出題順は毎回ランダムです。</p>
+    <p class="lead" style="color:var(--fg);font-weight:700">解く科目を選んでください</p>
+    <div class="subjects" id="subjects"></div>
+  </section>
+
+  <!-- Quiz -->
+  <section id="quiz" hidden style="display:flex;flex-direction:column;gap:14px">
+    <div class="bar">
+      <div class="bar-top">
+        <button class="back" id="backBtn" type="button">‹ 科目一覧</button>
+        <div class="bar-title" id="barTitle">2学期中間Iパス</div>
+        <div class="count" id="count">0 / 0</div>
+      </div>
+      <div class="meter"><i id="meter"></i></div>
+      <div class="cheer" id="cheer">がんばって！</div>
+    </div>
+    <div id="list" style="display:flex;flex-direction:column;gap:14px"></div>
+
+    <div class="result" id="result" hidden>
+      <h2 style="font-size:22px">全問解答完了！</h2>
+      <div class="score" id="score">0／0</div>
+      <div class="btns">
+        <button class="btn" id="shuffleBtn" type="button">選択肢をシャッフルしてもう一度</button>
+        <button class="btn sub" id="wrongBtn" type="button">間違えた問題のみもう一度</button>
+      </div>
+      <div id="wrongWrap">
+        <h3 style="font-size:17px;margin-bottom:8px">間違えた問題</h3>
+        <ul class="wronglist" id="wrongList"></ul>
+      </div>
+      <div>
+        <h3 style="font-size:17px;margin-bottom:8px">成長記録</h3>
+        <div class="tbl"><table class="hist">
+          <thead><tr><th>回</th><th>日付</th><th>正解数</th><th>正答率</th><th>前回比</th></tr></thead>
+          <tbody id="histBody"></tbody>
+        </table></div>
+        <div style="margin-top:10px" id="resetArea">
+          <button class="reset" id="resetBtn" type="button">記録をリセット</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="src">出典：令和7年度 ITパスポート試験 公開問題（独立行政法人情報処理推進機構）</p>
+</div>
+
+<script>
+const B = s => `<span class="blank">${s}</span>`;
+const Q = [
+{n:18,q:"IT におけるアクセシビリティに関する記述として，最も適切なものはどれか。",c:[
+"高齢者や障害者などを含め，様々な能力や特性をもつ幅広い層の人が等しく利用できるように配慮したソフトウェア製品の設計",
+"顧客データを基に顧客を識別し，コールセンターやインターネットなどの様々なチャネルを用いて顧客との関係を深める手法",
+"製品，システム，サービスなどにおいて，それらを使用する場面をイメージしたり実際に利用したりすることで得られる人の感じ方や反応",
+"特定のファイルやデータベースなどの情報資産に対し，参照や更新などの権限の認可や制限を確実にする手段"],a:0},
+{n:19,q:"仮想環境を用いた技術である AR 又は VR の活用事例のうち，VR の活用事例として，最も適切なものはどれか。",c:[
+"顔を覆うように頭部にゴーグルを装着し，そのゴーグル内に投影された仮想空間に広がる火災や地震の映像を見ながら避難方法をイメージすることによって，防災訓練が行える。",
+"家具をオンラインで購入するときに，スマートフォンのカメラを通して画面に映っている現実の自分の部屋に，購入したい家具をリアルタイムに重ねて試し置きできる。",
+"史跡などにスマートフォンを向けることによって，昔あった建物の画像や説明情報が現実の風景と重なって画面に表示される。",
+"図鑑にスマートフォンをかざすことによって，図鑑の絵や写真に重なって生物の動画が見られる。"],a:0},
+{n:20,q:"ソフトウェアライフサイクルを企画プロセス，要件定義プロセス，開発プロセス，保守プロセスに分けたとき，企画プロセスのシステム化構想の立案時にベンダー企業から収集する情報として，最も適切なものはどれか。",c:[
+"システム化計画に基づいた開発コストの見積り","システム化する業務の分野に関する情報技術動向","システム構築を進めるに当たっての発注元企業の役割","ベンダー企業の技術者が保有している技術資格"],a:1},
+{n:21,q:"基本的な機能やサービスは無償で提供し，追加の機能やサービスを有償で提供することで利益を上げるビジネスモデルを表す用語として，最も適切なものはどれか。",c:[
+"フリーウェア","フリーミアム","フリーライド","フリーランス"],a:1},
+{n:22,q:"営業部の A さんは，営業担当者10人の営業成績が一目で分かるように，各営業担当者が提出する営業見込みと実績を毎月集約してグラフ化したいと考えている。この問題を解決するために適用する技術やツールとして，最も適切なものはどれか。",c:[
+"データを学習し，分析する AI","データを自動収集し，データベースに蓄積する IoT","入力したデータを，加工して見せるオフィスツール","ビッグデータを，様々な手法で分析するデータサイエンス"],a:2},
+{n:23,q:"コーポレートガバナンスの強化に有効な施策だけを全て挙げたものはどれか。",items:[
+["a","株式公開買付けによる企業の買収"],["b","執行役員制度の導入による経営と執行の分離"],["c","独立性の高い社外取締役の選任"]],c:[
+"a，b","a，b，c","b，c","c"],a:2},
+{n:24,q:"RPA に関する記述として，最も適切なものはどれか。",c:[
+"企業の一部の業務を外部の組織に委託することによって，自社のリソースを重要な領域に集中したり，コストの最適化や業務の高効率化などを実現したりする。",
+"組立てや搬送などにハードウェアのロボットを用いることによって，工場の生産活動の自動化を実現する。",
+"システムの利用者が，主体的にシステム管理や運用を行うことによって，利用者の IT リテラシーの向上や，システムベンダーへの依存の軽減などを実現する。",
+"ホワイトカラーの定型的な事務作業を，ソフトウェアのロボットに代替させることによって，自動化や効率化を図る。"],a:3},
+{n:25,q:"ブロックチェーンを適用した事例として，最も適切なものはどれか。",c:[
+"証券会社が，取引の改ざんや不整合の発生を防止することを目的として，従来の社債に代わり電子的手段を用いたデジタル社債を発行した。",
+"商品先物取引所を運営する認可法人が，取引量を拡大することを目的として，現在およそ1秒以上要している注文受付の応答時間を，1秒未満に改善した。",
+"ビジネス路線を中心に運航する航空会社が，顧客の利便性向上と競合他社に対する競争力強化を目的として，出発1時間前まで何回でも予約の変更を可能とする新しいサービスを開始した。",
+"服飾雑貨製造会社が，自社の商品企画に活用することを目的として，過去の全ての自社商品に関する大量の画像及び社内会議の音声データをデータベースに保存し，従業員がいつでも検索できるようにした。"],a:0},
+{n:26,q:"4月1日から5月31日までに，取引①から取引⑤があった。各取引の受注，売上計上，現金回収の状況が表のとおりであるとき，この取引先に対する5月31日時点の売掛金は何万円か。ここで，4月1日時点で売掛金残高はないものとする。",
+extra:`<div class="tbl"><table><thead><tr><th>取引</th><th>日付</th><th>取引内訳</th><th>金額（万円）</th><th>備考</th></tr></thead><tbody>
+<tr><td rowspan="3">取引①</td><td>4月2日</td><td>受注</td><td class="r">800</td><td rowspan="3"></td></tr><tr><td>4月10日</td><td>売上計上</td><td class="r">800</td></tr><tr><td>4月30日</td><td>現金回収</td><td class="r">800</td></tr>
+<tr><td rowspan="3">取引②</td><td>4月5日</td><td>受注</td><td class="r">500</td><td rowspan="3"></td></tr><tr><td>4月15日</td><td>売上計上</td><td class="r">500</td></tr><tr><td>4月30日</td><td>現金回収</td><td class="r">500</td></tr>
+<tr><td rowspan="2">取引③</td><td>5月1日</td><td>受注</td><td class="r">1,300</td><td rowspan="2">6月30日<br>回収予定</td></tr><tr><td>5月10日</td><td>売上計上</td><td class="r">1,300</td></tr>
+<tr><td rowspan="2">取引④</td><td>5月6日</td><td>受注</td><td class="r">1,000</td><td rowspan="2">回収予定日未定</td></tr><tr><td>5月15日</td><td>売上計上</td><td class="r">1,000</td></tr>
+<tr><td>取引⑤</td><td>5月20日</td><td>受注</td><td class="r">400</td><td></td></tr></tbody></table></div>`,c:[
+"1,000","1,400","2,300","2,700"],a:2},
+{n:27,q:"業務と情報システムを最適にすることを目的として，業務と情報システムの現状の把握と目標とする理想像の設定から現状と理想との乖離を明確にし，目標に向けた改善活動を移行計画として定義したい。このときに用いられる手法として，最も適切なものはどれか。",c:[
+"BI (Business Intelligence)","EA (Enterprise Architecture)","MOT (Management of Technology)","SOA (Service Oriented Architecture)"],a:1},
+{n:28,q:"生成 AI に関する記述として，最も適切なものはどれか。",c:[
+"一切の学習を必要とせずに，新しいコンテンツを生成する。",
+"過去のデータから項目間の相関などを学習したモデルを用いて，現在のデータから将来の値を予測して出力する。",
+"作成したシナリオに基づいて動作するソフトウェアロボットによって，業務を自動化する。",
+"自然言語で指示された内容に従って，事前に学習したデータを基に，新しいコンテンツを生成する。"],a:3},
+{n:29,q:"企業経営の中核となる考え方を，ミッション，ビジョン，バリューの三つに分けて示す場合，ビジョンとして示すものとして，最も適切なものはどれか。",c:[
+"企業の存在意義や使命","企業の存在意義や使命をふまえた，ある時点でのありたい姿","戦略を実現するために重要となる業績管理指標","戦略を実現するために重要となる成功要因"],a:1},
+{n:30,q:"著作権に関して，次の記述中の a，b に入れる字句の適切な組合せはどれか。",
+extra:`<p class="qtext">${B("a")} は著作権法による保護の対象になるが，${B("b")} は対象にならない。</p>`,c:[
+"a：アルゴリズム　b：操作マニュアル","a：アルゴリズム　b：通信プロトコル","a：ソースプログラム　b：操作マニュアル","a：ソースプログラム　b：通信プロトコル"],a:3},
+{n:31,q:"ERP システムの説明として，適切なものはどれか。",c:[
+"企業内の個人がもつ営業に関する知識やノウハウを収集し，共有することによって，効率的，効果的な営業活動を支援するシステム",
+"経理や人事，生産，販売などの基幹業務と関連する情報を一元管理し，経営資源を最適配分することによって，効率的な経営の実現を支援するシステム",
+"原材料の調達から生産，販売に関する情報を，企業間で共有・管理することによって，ビジネスプロセスの全体最適を目指すシステム",
+"個々の顧客に関する情報や対応履歴などを管理することによって，きめ細かい顧客対応を実施し，顧客満足度の向上を支援するシステム"],a:1},
+{n:32,q:"公共交通機関での移動履歴，Web サイトでの商品検索履歴，SNS やブログで発信したデータなど，個人の活動を記録する技術，又は記録そのものを表す用語として，最も適切なものはどれか。",c:[
+"アクティビティ","トランザクション","ライフログ","レコードキーピング"],a:2},
+{n:33,q:"自動運転の水準は，一般的に“レベル1”から“レベル5”に分けられている。“条件付運転自動化”と呼ばれる“レベル3”が示す自動運転の水準に関する記述として，最も適切なものはどれか。",c:[
+"運転の主体はシステムであり，人間が運転する必要はないが，システムによる自動運転の継続が難しい場合は，人間が運転しなければならない。",
+"運転の主体はシステムであり，人間が運転する必要はないので，ハンドルやペダルなどの運転装置は不要だが，自動運転できる地域は限られる。",
+"運転の主体は人間であり，高速道路で車線を維持しながら前の自動車に付いて走る機能のように，ハンドルと加減速の操作をシステムが支援する。",
+"運転の主体は人間であり，自動ブレーキや急発進防止システムのように，前方又は後方の状況によって，システムが運転の一部を支援する。"],a:0},
+{n:34,q:"ある商品を5,000個販売したところ，売上げが6,000万円，利益が400万円となった。商品1個当たりの変動費が7,000円であるとき，利益を1,000万円以上にするためには，少なくともあと何個販売すればよいか。",c:[
+"500","1,200","6,200","7,500"],a:1},
+{n:35,q:"マーケティング戦略の策定プロセスのうち，自社製品の差別化ポイントを明確化するものはどれか。",c:[
+"セグメンテーション","ターゲティング","プロモーション","ポジショニング"],a:3},
+{n:36,q:"合意したサービス提供時間帯のうち，実際に顧客が IT サービスを利用できた時間の割合で表されるものはどれか。",c:[
+"可用性","機能性","効率性","使用性"],a:0},
+{n:37,q:"IT サービスマネジメントに関して，次の記述中の a，b に入れる字句の適切な組合せはどれか。",
+extra:`<p class="qtext">${B("a")} はサービス提供者と顧客との間で合意されたサービス品質に関する合意書である。${B("a")} の遵守状況を確認し，IT サービスの品質を維持・改善させるための活動が ${B("b")} である。</p>`,c:[
+"a：NDA　b：SCM","a：NDA　b：SLM","a：SLA　b：SCM","a：SLA　b：SLM"],a:3},
+{n:38,q:"情報セキュリティ監査の説明として，最も適切なものはどれか。",c:[
+"一定の基準に基づいて IT システムの利活用に係る検証・評価を行い，ガバナンスの適切性などに対する保証や改善のための助言を行うもの",
+"コンピュータの盗難や不正な持出しを物理的に防止し，情報セキュリティを確保するためのツール",
+"組織体の価値及び組織体への信頼を向上させるために，組織体における IT システムの利活用のあるべき姿を示す IT 戦略と方針の策定及びその実現のための活動",
+"組織の情報資産に関わるリスクマネジメントが効果的に実施されているかどうかの検証又は評価"],a:3},
+{n:39,q:"ソフトウェア開発モデルであるアジャイルモデルの特徴に関して，次の記述中の a，b に入れる字句の適切な組合せはどれか。",
+extra:`<p class="qtext">アジャイルモデルとは，要件を確定してから開発を実施するウォーターフォールモデルの ${B("a")} する形で提唱された，${B("b")} できるようにソフトウェアを開発するための手法の総称である。</p>`,c:[
+"a：課題を改善　b：開発工程で生じる種々の変更に迅速に対応","a：課題を改善　b：開発工程を順に実施","a：特徴を継承　b：開発工程で生じる種々の変更に迅速に対応","a：特徴を継承　b：開発工程を順に実施"],a:0},
+{n:40,q:"変更管理委員会が設置されているプロジェクトで変更要求が発生した場合の記述として，最も適切なものはどれか。",c:[
+"変更管理委員会では，プロジェクトに関わるステークホルダ以外の第三者によって変更要求が審議される。",
+"変更管理委員会は，コストの増加や期日の延期を理由に変更要求を却下してよい。",
+"変更管理委員会は，スコープに変更が発生しない範囲で変更要求を受け付けなければならない。",
+"変更要求は，全てプロジェクトマネージャが承認した後に変更管理委員会で審議される。"],a:1},
+{n:41,q:"システム開発プロジェクトで使用される技法のうち，スケジュール作成に用いる技法として，適切なものだけを全て挙げたものはどれか。",items:[
+["a","DFD (Data Flow Diagram)"],["b","回帰分析"],["c","クリティカルパス法"],["d","プレシデンスダイアグラム法"]],c:[
+"a，b","a，d","b，c","c，d"],a:3},
+{n:42,q:"床下にネットワーク配線などのために一定の高さの空間をとり，容易に取り外しが可能なパネルを床板として並べたものはどれか。",c:[
+"フリーアクセスフロア","フリーアドレス","フリースペース","フリースポット"],a:0},
+{n:43,q:"営業部門の営業員が出張する際の出張旅費の手続に関して，組織間でけん制を日常的に実施している状況の記述として，最も適切なものはどれか。",c:[
+"営業員が出張後に経理部門に提出した旅費精算の書類と証票類について，経理担当者が適切な内容であることを審査し，経理課長が承認する。",
+"営業員が出張後に旅費の精算を行い，上長が承認を行う。経理部門では承認済みであるので支払を行う。",
+"営業員は出張の事前申請を行って上長の承認を得た後に，切符や宿泊施設の手配を旅行会社に依頼する。",
+"会計年度における営業部門の旅費精算の書類と証票類から，監査人がサンプリングして，営業員の処理内容の適切性を確認する。"],a:0},
+{n:44,q:"システム開発の早い段階で，目に見える形で利用者の要求が確認できるように確認用のソフトウェアを作成するソフトウェア開発モデルとして，最も適切なものはどれか。",c:[
+"アジャイル","ウォーターフォール","スパイラル","プロトタイピング"],a:3},
+{n:45,q:"計画時の予算が2,000万円で，40日間で100本のプログラムを作成するプロジェクトがある。プロジェクトが20日経過した時点で全体の40%である40本のプログラムが完成し，1,000万円のコストが掛かった。プロジェクトの指標を次の評価式で算出する場合，プロジェクトの指標として適切な組合せはどれか。ここで，各プログラムの作成に必要な日数及びコストは全て同一で，プロジェクト期間中は常に同じ量の作業が実施されるものとする。",
+extra:`<div class="formula">〔評価式〕<br>スケジュール（%）：<br>　（完成したプログラム本数÷評価時点での完成見込みプログラム本数）×100<br>コスト（%）：<br>　（完成したプログラムに掛かったコスト<br>　　÷完成したプログラム分として計画したコスト）×100</div>`,c:[
+"スケジュール（%）：80　コスト（%）：125","スケジュール（%）：80　コスト（%）：100","スケジュール（%）：90　コスト（%）：125","スケジュール（%）：90　コスト（%）：100"],a:0},
+{n:46,q:"開発が完了したソフトウェアを本番環境にインストールする手順を明確にし，それを実施する工程として，適切なものはどれか。",c:[
+"ソフトウェア統合","ソフトウェア導入","妥当性確認","利用者教育"],a:1},
+{n:47,q:"利用者が銀行の ATM のパネルを操作して入金処理を行う。この操作の要件を定義するときに，ソフトウェア開発の品質特性である使用性を考慮すべきインタフェースとして，最も適切なものはどれか。",c:[
+"OS とパネルのインタフェース","ソフトウェア間のインタフェース","ハードウェアと OS のインタフェース","利用者とパネルのインタフェース"],a:3},
+{n:48,q:"顧客から委託されたシステム開発プロジェクトのスコープの対象として，適切なものだけを全て挙げたものはどれか。",items:[
+["a","プロジェクトで作成する成果物"],["b","プロジェクトで使用する市販のスケジュール管理ツール"],["c","プロジェクトの要求事項を顧客が記載した文書"]],c:[
+"a","a，b","b，c","c"],a:0},
+{n:49,q:"クラウドサービスを提供する A 社では，操作に関する質問に対して，サービスデスクのオペレーターが電話で対応するだけでなく，ホームページ上に FAQ を公開している。サービスデスクの受付時間は午前9時から午後6時までである。このたびサービスデスクのサービスレベルを向上させるために，顧客向けのチャットボットを導入することにした。チャットボット導入の効果として，最も適切なものはどれか。",c:[
+"オペレーターのチャットのスキルが向上する。","オペレーターの電話対応のスキルが向上する。","問合せの受付時間を拡大することが可能になる。","ホームページ上に掲載している FAQ の内容が充実する。"],a:2},
+{n:50,q:"チャットボットの説明として，最も適切なものはどれか。",c:[
+"質問に対して，ソフトウェアがリアルタイムで自動応答する仕組み",
+"センサーを搭載した機器や制御装置が直接インターネットにつながり，お互いに情報をやり取りする仕組み",
+"人間に代わって荷物を運ぶなどの作業を行う機械的な仕組み",
+"ルール化された定型的な操作を人間の代わりにソフトウェアが自動で行う仕組み"],a:0}
+];
+
+const LABELS = ["ア","イ","ウ","エ"];
+const SETS = [
+  {id:"all", name:"全部", from:18, to:50},
+  {id:"s1",  name:"パート1", from:18, to:27},
+  {id:"s2",  name:"パート2", from:28, to:38},
+  {id:"s3",  name:"パート3", from:39, to:50}
+];
+let cur = SETS[0];
+const setQs = s => Q.filter(q => q.n >= s.from && q.n <= s.to);
+const keyOf = s => "ipass_midterm2_history_" + s.id;
+const $ = id => document.getElementById(id);
+let deck = [], answered = 0, correct = 0, wrongs = [], fullRun = true, recorded = false;
+
+$("subjects").innerHTML = SETS.map((s,i) => `<button class="subj" type="button" data-set="${i}">
+  <div><b>${s.name}</b><span>問${s.from}〜問${s.to}（${setQs(s).length}問）</span></div><div class="go">›</div></button>`).join("");
+$("subjects").addEventListener("click", e => {
+  const b = e.target.closest(".subj"); if (!b) return;
+  cur = SETS[+b.dataset.set];
+  $("barTitle").textContent = `2学期中間Iパス　${cur.name}`;
+  start(setQs(cur), false, true);
+});
+
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+
+function loadHist(){ try{ return JSON.parse(localStorage.getItem(keyOf(cur))) || []; }catch(e){ return []; } }
+function saveHist(h){ try{ localStorage.setItem(keyOf(cur), JSON.stringify(h)); }catch(e){} }
+
+function start(questions, shuffleChoices, isFull){
+  fullRun = isFull; recorded = false;
+  deck = shuffle(questions).map(q => {
+    const order = shuffleChoices ? shuffle([0,1,2,3]) : [0,1,2,3];
+    return {...q, order};
+  });
+  answered = 0; correct = 0; wrongs = [];
+  $("home").hidden = true; $("quiz").hidden = false; $("result").hidden = true;
+  render(); updateBar(); window.scrollTo(0,0);
+}
+
+function render(){
+  const list = $("list"); list.innerHTML = "";
+  deck.forEach((q, qi) => {
+    const card = document.createElement("article");
+    card.className = "q";
+    let html = `<div class="qno">問${q.n}</div><p class="qtext">${esc(q.q)}</p>`;
+    if (q.items) html += `<ul class="items">${q.items.map(([k,t])=>`<li><span>${k}</span><span>${esc(t)}</span></li>`).join("")}</ul>`;
+    if (q.extra) html += q.extra;
+    html += `<div class="choices">${q.order.map((ci,pos)=>`<button type="button" class="ch" id="q${q.n}c${ci}" data-qi="${qi}" data-ci="${ci}"><span class="lab">${LABELS[pos]}</span><span>${esc(q.c[ci])}</span></button>`).join("")}</div><div class="verdict" hidden></div>`;
+    card.innerHTML = html;
+    list.appendChild(card);
+  });
+}
+
+$("list").addEventListener("click", e => {
+  const b = e.target.closest(".ch"); if (!b || b.disabled) return;
+  const q = deck[+b.dataset.qi], ci = +b.dataset.ci, card = b.closest(".q");
+  card.querySelectorAll(".ch").forEach(x => x.disabled = true);
+  const ok = ci === q.a;
+  const right = card.querySelector(`[data-ci="${q.a}"]`);
+  right.classList.add("correct");
+  const rightLab = right.querySelector(".lab").textContent;
+  const v = card.querySelector(".verdict"); v.hidden = false;
+  if (ok){ correct++; card.classList.add("ok"); v.className="verdict ok"; v.textContent="○ 正解！"; }
+  else { b.classList.add("wrong"); card.classList.add("ng"); v.className="verdict ng"; v.textContent=`× 不正解　正解は ${rightLab}`; wrongs.push(q); }
+  answered++; updateBar();
+  if (answered === deck.length) finish();
+});
+
+function updateBar(){
+  const t = deck.length;
+  $("count").textContent = `${correct} / ${answered}　（全${t}問）`;
+  $("meter").style.width = (t ? answered/t*100 : 0) + "%";
+  let msg = "がんばって！";
+  if (answered >= 3){ const r = correct/answered; msg = r >= .9 ? "絶好調！" : r >= .7 ? "いい調子！" : r >= .5 ? "その調子でいこう" : "落ち着いて読もう"; }
+  $("cheer").textContent = msg;
+}
+
+function finish(){
+  $("result").hidden = false;
+  const t = deck.length, pct = Math.round(correct/t*100);
+  $("score").innerHTML = `${correct}／${t}<small>${pct}%</small>`;
+  $("wrongBtn").disabled = wrongs.length === 0;
+  $("wrongWrap").hidden = wrongs.length === 0;
+  $("wrongList").innerHTML = wrongs.sort((a,b)=>a.n-b.n).map(q =>
+    `<li><b>問${q.n}</b> ${esc(q.q.length>60?q.q.slice(0,60)+"…":q.q)}<br><span class="a">正解：${esc(q.c[q.a])}</span></li>`).join("");
+  if (fullRun && !recorded){
+    const h = loadHist(); const d = new Date();
+    h.push({date:`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`, c:correct, t});
+    saveHist(h); recorded = true;
+  }
+  renderHist();
+}
+
+function renderHist(){
+  const h = loadHist();
+  $("histBody").innerHTML = h.length ? h.map((r,i)=>{
+    let diff = "—";
+    if (i>0){ const dd = r.c - h[i-1].c; diff = dd>0?`<span class="up">+${dd}</span>`:dd<0?`<span class="down">${dd}</span>`:"±0"; }
+    return `<tr><td class="num">${i+1}</td><td>${r.date}</td><td class="num">${r.c}／${r.t}</td><td class="num">${Math.round(r.c/r.t*100)}%</td><td class="num">${diff}</td></tr>`;
+  }).join("") : `<tr><td colspan="5" style="color:var(--muted)">まだ記録がありません（全問通しで解くと記録されます）</td></tr>`;
+}
+
+$("backBtn").onclick = () => { $("quiz").hidden = true; $("home").hidden = false; window.scrollTo(0,0); };
+$("shuffleBtn").onclick = () => start(setQs(cur), true, true);
+$("wrongBtn").onclick = () => start(wrongs.slice(), true, false);
+function askReset(){
+  $("resetArea").innerHTML = `<div class="confirm">記録を全て消しますか？ <button class="reset" id="yesReset" type="button">消す</button><button class="reset" id="noReset" type="button">やめる</button></div>`;
+  $("yesReset").onclick = () => { saveHist([]); renderHist(); restoreReset(); };
+  $("noReset").onclick = restoreReset;
+}
+function restoreReset(){
+  $("resetArea").innerHTML = `<button class="reset" id="resetBtn" type="button">記録をリセット</button>`;
+  $("resetBtn").onclick = askReset;
+}
+$("resetBtn").onclick = askReset;
+</script>
+
+</body></html>
