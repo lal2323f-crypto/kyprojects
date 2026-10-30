@@ -1,0 +1,3955 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>観光ビジネス</title>
+<style>
+  :root {
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --correct: #16a34a;
+    --correct-light: #dcfce7;
+    --wrong: #dc2626;
+    --wrong-light: #fee2e2;
+    --neutral: #64748b;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --subtext: #475569;
+    --radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100%;
+    padding: 20px 16px 60px;
+  }
+  header { text-align: center; margin-bottom: 24px; }
+  header .subject-label {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+  header h1 { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.3; }
+  header p { font-size: 13px; color: var(--subtext); margin-top: 6px; }
+
+  .progress-wrap {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 14px 20px;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 14px;
+  }
+  .progress-text { font-size: 14px; font-weight: 700; color: var(--primary); white-space: nowrap; }
+  .progress-bar-outer {
+    flex: 1; height: 8px; background: var(--border);
+    border-radius: 99px; overflow: hidden;
+  }
+  .progress-bar-inner {
+    height: 100%; background: var(--primary);
+    border-radius: 99px; transition: width .4s; width: 0%;
+  }
+  .cheer { font-size: 13px; color: var(--subtext); white-space: nowrap; }
+
+  .quiz-section { max-width: 720px; margin: 0 auto; }
+
+  .question-card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 22px 22px 18px;
+    margin-bottom: 18px; border-left: 4px solid var(--primary);
+  }
+  .question-card.answered-correct { border-left-color: var(--correct); }
+  .question-card.answered-wrong   { border-left-color: var(--wrong); }
+
+  .q-number {
+    font-size: 11px; font-weight: 800; letter-spacing: .1em;
+    color: var(--primary); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .question-card.answered-correct .q-number { color: var(--correct); }
+  .question-card.answered-wrong   .q-number { color: var(--wrong); }
+
+  .q-context {
+    font-size: 14px; color: var(--subtext); background: #f1f5f9;
+    border-radius: 6px; padding: 10px 14px; margin-bottom: 10px;
+    line-height: 1.75; border-left: 3px solid #cbd5e1;
+  }
+  .q-text { font-size: 15px; font-weight: 600; line-height: 1.75; margin-bottom: 16px; }
+
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; margin: 0 2px; font-size: .9em; line-height: 1.1;
+  }
+  .frac span:first-child { border-bottom: 1.5px solid currentColor; padding-bottom: 1px; }
+  .frac span:last-child  { padding-top: 1px; }
+
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 480px) { .choices { grid-template-columns: 1fr; } }
+
+  .choice-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: #fff; cursor: pointer;
+    font-size: 14px; font-weight: 500; color: var(--text);
+    text-align: left; transition: border-color .15s, background .15s, color .15s;
+    line-height: 1.5;
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--primary); background: var(--primary-light);
+  }
+  .choice-btn .choice-label {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #e2e8f0; color: var(--subtext);
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+    transition: background .15s, color .15s;
+  }
+  .choice-btn:hover:not(:disabled) .choice-label { background: var(--primary); color: #fff; }
+  .choice-btn.correct { border-color: var(--correct); background: var(--correct-light); color: var(--correct); }
+  .choice-btn.correct .choice-label { background: var(--correct); color: #fff; }
+  .choice-btn.wrong   { border-color: var(--wrong);   background: var(--wrong-light);   color: var(--wrong); }
+  .choice-btn.wrong   .choice-label { background: var(--wrong);   color: #fff; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback { margin-top: 10px; font-size: 13px; font-weight: 600; display: none; }
+  .feedback.correct { color: var(--correct); display: block; }
+  .feedback.wrong   { color: var(--wrong);   display: block; }
+
+  #result-box {
+    display: none; background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 28px 24px; margin-bottom: 24px;
+    text-align: center; max-width: 720px; margin-left: auto; margin-right: auto;
+  }
+  #result-box h2 { font-size: 20px; margin-bottom: 6px; }
+  #result-box .score-big {
+    font-size: 48px; font-weight: 900; color: var(--primary); line-height: 1.1; margin: 10px 0 6px;
+  }
+  #result-box .score-sub { font-size: 14px; color: var(--subtext); margin-bottom: 16px; }
+
+  #wrong-list { max-width: 720px; margin: 0 auto 20px; display: none; }
+  #wrong-list h3 { font-size: 15px; font-weight: 700; color: var(--wrong); margin-bottom: 10px; }
+  .wrong-item {
+    background: var(--card); border-radius: 8px; padding: 12px 16px;
+    margin-bottom: 8px; border-left: 3px solid var(--wrong);
+    font-size: 13px; line-height: 1.6;
+  }
+  .wrong-item .wi-q { font-weight: 600; margin-bottom: 4px; }
+  .wrong-item .wi-a { color: var(--correct); }
+
+  #record-section { max-width: 720px; margin: 0 auto 20px; }
+  #record-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  #record-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    background: var(--card); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  #record-table th {
+    background: var(--primary); color: #fff;
+    padding: 8px 12px; font-weight: 700; text-align: center;
+  }
+  #record-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; }
+  #record-table tr:last-child td { border-bottom: none; }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+  .btn {
+    padding: 10px 22px; border-radius: 8px; border: none;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity .15s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-danger  { background: var(--wrong); color: #fff; }
+  .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+
+  .q-cat { margin-left: 8px; font-weight: 700; letter-spacing: 0; color: var(--subtext);
+    background: var(--border); padding: 1px 8px; border-radius: 99px; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg:#0f172a; --card:#1e293b; --primary:#60a5fa; --primary-light:#1e3a5f;
+    --correct:#4ade80; --correct-light:#14532d; --wrong:#f87171; --wrong-light:#4c1d1d;
+    --border:#334155; --text:#e2e8f0; --subtext:#94a3b8; } }
+  :root[data-theme="dark"] {
+    --bg:#0f172a; --card:#1e293b; --primary:#60a5fa; --primary-light:#1e3a5f;
+    --correct:#4ade80; --correct-light:#14532d; --wrong:#f87171; --wrong-light:#4c1d1d;
+    --border:#334155; --text:#e2e8f0; --subtext:#94a3b8; }
+  .choice-btn { background: var(--card); }
+  .q-context { background: var(--bg); }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body { padding: 0 0 60px; }
+  .view { padding: 0 16px; }
+  .hidden { display: none !important; }
+
+  /* ===== 科目選択画面 ===== */
+  .hero {
+    position: relative; overflow: hidden; color: #fff;
+    background: linear-gradient(135deg, #0b1533 0%, #1e3a8a 55%, #4338ca 100%);
+    padding: calc(34px + env(safe-area-inset-top, 0px)) 24px 38px;
+    box-shadow: 0 10px 30px rgba(15,23,42,.25);
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; opacity: .14; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(120deg, #000 10%, transparent 75%);
+    -webkit-mask-image: linear-gradient(120deg, #000 10%, transparent 75%);
+  }
+  .hero::after {
+    content: ""; position: absolute; width: 260px; height: 260px; right: -80px; top: -90px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(129,140,248,.55), transparent 70%);
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700; letter-spacing: .2em; color: #c7d2fe;
+  }
+  .hero-eyebrow::before { content: ""; width: 22px; height: 2px; background: #818cf8; border-radius: 2px; }
+  header.hero { text-align: left; margin-bottom: 0; }
+  .hero h1 { font-size: 30px; font-weight: 900; letter-spacing: .02em; margin-top: 10px; line-height: 1.25; color: #fff; }
+  .hero p.hero-sub { font-size: 13px; color: #c7d2fe; margin-top: 10px; }
+
+  .menu { max-width: 720px; margin: 0 auto; padding: 28px 0 0; }
+  .q-fig { display: block; width: 100%; max-width: 560px; margin: 12px 0 4px; border-radius: 10px; background: #fff; }
+  .note-link { display: inline-block; margin-top: 6px; padding: 6px 12px; border-radius: 999px; background: var(--primary-light); color: var(--primary); font-weight: 800; text-decoration: none; }
+  .menu-note {
+    background: var(--card); color: var(--text); border: 1px solid var(--border);
+    border-left: 5px solid #f59e0b; border-radius: 14px; padding: 14px 16px; margin-bottom: 22px;
+    font-size: 13.5px; line-height: 1.7;
+  }
+  .quiz-note { margin: 12px 0 18px; font-weight: 700; font-size: 15px; }
+  .menu-note summary { font-weight: 900; font-size: 15px; cursor: pointer; color: #d97706; }
+  .menu-note ol { margin: 10px 0 8px; padding-left: 1.3em; }
+  .menu-note li { margin-bottom: 6px; }
+  .menu-note li b { color: var(--primary); }
+  .menu-note .note-foot { font-weight: 700; padding-top: 8px; border-top: 1px dashed var(--border); }
+  .menu-label {
+    font-size: 13px; font-weight: 700; color: var(--subtext); letter-spacing: .08em;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .menu-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .sel-card {
+    position: relative; display: flex; align-items: center; gap: 16px; width: 100%;
+    text-align: left; background: var(--card); color: var(--text);
+    border: 1px solid var(--border); border-radius: 18px; padding: 20px 18px 20px 22px;
+    margin-bottom: 14px; cursor: pointer; overflow: hidden;
+    box-shadow: 0 4px 16px rgba(15,23,42,.06);
+    transition: transform .18s, box-shadow .18s, border-color .18s;
+    font-family: inherit;
+  }
+  .sel-card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    background: linear-gradient(180deg, #6366f1, #2563eb);
+  }
+  .sel-card.sel-soon { opacity: .5; cursor: default; }
+  .sel-card:hover { transform: translateY(-2px); border-color: #818cf8; box-shadow: 0 10px 28px rgba(67,56,202,.18); }
+  .sel-card:active { transform: scale(.98); }
+  .sel-icon {
+    flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 900; color: #fff;
+    background: linear-gradient(135deg, #4338ca, #2563eb);
+    box-shadow: 0 6px 14px rgba(67,56,202,.35);
+  }
+  .sel-body { flex: 1; min-width: 0; }
+  .sel-eyebrow { font-size: 11px; font-weight: 700; color: var(--subtext); letter-spacing: .1em; }
+  .sel-title { font-size: 20px; font-weight: 900; color: var(--primary); margin: 4px 0 6px; }
+  .sel-meta { font-size: 12.5px; color: var(--subtext); line-height: 1.6; }
+  .sel-best {
+    display: inline-block; margin-top: 8px; font-size: 11.5px; font-weight: 700;
+    color: var(--correct); background: var(--correct-light); padding: 2px 10px; border-radius: 99px;
+  }
+  .sel-arrow {
+    flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--primary-light); color: var(--primary); font-size: 18px; font-weight: 900;
+    transition: transform .18s;
+  }
+  .sel-card:hover .sel-arrow { transform: translateX(3px); }
+
+  /* ===== 問題画面 ===== */
+  .topbar {
+    position: sticky; top: 0; z-index: 10; margin: 0 -16px 18px;
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+    background: linear-gradient(135deg, #0b1533, #1e3a8a 70%, #4338ca);
+    color: #fff; box-shadow: 0 4px 16px rgba(15,23,42,.2);
+  }
+  .topbar-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .back-btn {
+    flex-shrink: 0; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.12);
+    color: #fff; font-size: 13px; font-weight: 700; padding: 7px 12px; border-radius: 99px;
+    cursor: pointer; font-family: inherit;
+  }
+  .back-btn:hover { background: rgba(255,255,255,.22); }
+  .topbar-text { min-width: 0; }
+  .topbar-eyebrow { font-size: 10.5px; color: #c7d2fe; letter-spacing: .12em; font-weight: 700; }
+  .topbar-title { font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .subject-head { max-width: 720px; margin: 0 auto 14px; }
+  .subject-head h2 { font-size: 18px; font-weight: 800; }
+  .subject-head p { font-size: 13px; color: var(--subtext); margin-top: 4px; }
+  .progress-wrap { max-width: 720px; margin-left: auto; margin-right: auto; }
+  :root { padding-top: 0; }
+  .hero-back {
+    display: table; margin-bottom: 14px; border: 1px solid rgba(255,255,255,.35);
+    background: rgba(255,255,255,.12); color: #fff; font-size: 13px; font-weight: 700;
+    padding: 6px 12px; border-radius: 99px; cursor: pointer; font-family: inherit;
+  }
+  .hero-back:hover { background: rgba(255,255,255,.22); }
+  .q-ja { font-size: 13.5px; color: var(--subtext); margin: -8px 0 14px; line-height: 1.7; }
+  .q-exp {
+    margin-top: 8px; padding: 10px 12px; border-radius: 8px; background: var(--bg);
+    color: var(--text); font-weight: 500; line-height: 1.7; font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 科目選択画面 -->
+<div id="menu-view">
+  <header class="hero">
+    <div class="hero-inner">
+      <button class="hero-back hidden" id="hero-back" onclick="goUp()"></button>
+      <div class="hero-eyebrow" id="hero-eyebrow">第3章 観光ビジネスのマーケティング</div>
+      <h1 id="hero-title">観光ビジネス</h1>
+      <p class="hero-sub" id="hero-sub">選択肢を選ぶとその場で採点。出題順は毎回ランダムです。</p>
+    </div>
+  </header>
+  <div class="view">
+    <div class="menu">
+      <div id="menu-note"></div>
+      <div class="menu-label" id="menu-label">解く単元を選んでください</div>
+      <div id="menu-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 問題画面 -->
+<div id="quiz-view" class="view hidden">
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <button class="back-btn" id="back-btn" onclick="goUp()">‹ 単元一覧</button>
+    <div class="topbar-text">
+      <div class="topbar-eyebrow" id="topbar-eyebrow">観光ビジネス</div>
+      <div class="topbar-title" id="topbar-title"></div>
+    </div>
+  </div>
+</div>
+
+<div class="subject-head">
+  <h2 id="subject-title"></h2>
+  <p id="subject-desc"></p>
+  <div id="quiz-note"></div>
+</div>
+
+<div class="progress-wrap">
+  <span class="progress-text" id="prog-text">0 / 0</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" id="prog-bar"></div></div>
+  <span class="cheer" id="cheer-text">がんばって！</span>
+</div>
+
+<div class="quiz-section" id="quiz"></div>
+
+<div id="result-box">
+  <h2>全問解答完了！</h2>
+  <div class="score-big" id="score-big">0／0</div>
+  <div class="score-sub" id="score-sub"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="restartAll()">選択肢をシャッフルしてもう一度</button>
+    <button class="btn btn-outline" onclick="restartWrong()">間違えた問題のみもう一度</button>
+  </div>
+</div>
+
+<div id="wrong-list">
+  <h3>間違えた問題</h3>
+  <div id="wrong-items"></div>
+</div>
+
+
+<div id="record-section">
+  <h3 id="record-title">成長記録</h3>
+  <table id="record-table">
+    <thead>
+      <tr><th>回</th><th>日付</th><th>正解数</th><th>正答率</th><th>前回比</th></tr>
+    </thead>
+    <tbody id="record-body"></tbody>
+  </table>
+  <div class="btn-row" style="margin-top:12px">
+    <button class="btn btn-danger" onclick="clearRecord()">記録をリセット</button>
+  </div>
+</div>
+
+</div><!-- /quiz-view -->
+
+<script>
+// =====================
+// 科目データ
+// 問題セット: { id, tab, eyebrow, icon, meta, title, desc, recordKey, questions, choiceLabels? }
+// まとめ(単元一覧): { id, tab, eyebrow, icon, meta, title, desc, children: [問題セット...] }
+// 問題: { id, cat, context?, text, ja?, choices, answer(0始まり), exp? }
+// =====================
+const SUBJECTS = [
+ {
+  "id": "kb-1a",
+  "tab": "1節① 観光客の概念・種類・行動",
+  "eyebrow": "観光ビジネス 第3章",
+  "icon": "1①",
+  "meta": "観光客の定義・観光統計・日帰り/宿泊・インバウンド・FIT・行動パターン",
+  "title": "1節① 観光客の概念・種類・行動（p.66〜71）",
+  "desc": "教科書の内容から作った4択問題です。正しいものを選びましょう。",
+  "recordKey": "kanko_kb_1a",
+  "questions": [
+   {
+    "id": "kb-1a-1",
+    "cat": "観光客の概念",
+    "text": "国連世界観光機関（UN Tourism）は、観光客をどのように定義しているか。",
+    "choices": [
+     "どのような目的であれ旅行する人々すべて",
+     "観光を主な目的として旅行する人々",
+     "宿泊を伴う旅行をする人々",
+     "国境を越えて旅行する人々"
+    ],
+    "answer": 0,
+    "exp": "UN Tourism は「どのような目的であれ旅行する人々すべて」を観光客と定義している。"
+   },
+   {
+    "id": "kb-1a-2",
+    "cat": "観光客の概念",
+    "text": "旅行を目的別に分類したとき、帰省やスポーツ遠征、冠婚葬祭による旅行はどれにあたるか。",
+    "choices": [
+     "公用旅行",
+     "商用旅行",
+     "観光旅行",
+     "その他の旅行"
+    ],
+    "answer": 3,
+    "exp": "旅行は公用旅行・商用旅行・観光旅行・その他の旅行（帰省・スポーツ遠征・冠婚葬祭など）に分類できる。"
+   },
+   {
+    "id": "kb-1a-3",
+    "cat": "観光客の概念",
+    "text": "旅の本来の目的が仕事であっても観光客とされるのはなぜか。",
+    "choices": [
+     "仕事の後に必ず観光をするから",
+     "旅行会社を通して旅行するから",
+     "交通機関を利用し、宿泊施設に滞在し、現地で食事をするから",
+     "観光地で土産物を買うことが義務だから"
+    ],
+    "answer": 2,
+    "exp": "仕事目的でも観光客と同じように交通機関・宿泊施設・食事を利用するため。仕事のついでに観光を楽しむ人もいる。"
+   },
+   {
+    "id": "kb-1a-4",
+    "cat": "観光客の概念",
+    "text": "観光ビジネスにおいては、どのような人々をすべて「観光客」と表現しているか。",
+    "choices": [
+     "観光地に宿泊する人々",
+     "目的や形態に関係なく旅行する人々",
+     "観光施設に入場料を払う人々",
+     "旅行会社のツアーに参加する人々"
+    ],
+    "answer": 1,
+    "exp": "観光客もそれ以外の旅行客も同様の効果をもたらすため、どのような目的や形態であれ旅行する人々をすべて「観光客」と表現している。"
+   },
+   {
+    "id": "kb-1a-5",
+    "cat": "観光統計",
+    "text": "日本人の出国者数や訪日外国人の入国者数など、国際観光客数を把握する統計はどれか。",
+    "choices": [
+     "宿泊旅行統計調査",
+     "旅行・観光消費動向調査",
+     "出入国管理統計",
+     "家計調査"
+    ],
+    "answer": 2,
+    "exp": "観光統計では、延べ宿泊者数をみる宿泊旅行統計調査、国際観光客数を測る出入国管理統計、観光の消費実態を知る旅行・観光消費動向調査などがある。"
+   },
+   {
+    "id": "kb-1a-6",
+    "cat": "観光統計",
+    "text": "延べ宿泊者数をみるための観光統計はどれか。",
+    "choices": [
+     "出入国管理統計",
+     "宿泊旅行統計調査",
+     "旅行・観光消費動向調査",
+     "国勢調査"
+    ],
+    "answer": 1,
+    "exp": "延べ宿泊者数＝宿泊旅行統計調査。"
+   },
+   {
+    "id": "kb-1a-7",
+    "cat": "観光統計",
+    "text": "観光の消費実態を知るための観光統計はどれか。",
+    "choices": [
+     "旅行・観光消費動向調査",
+     "宿泊旅行統計調査",
+     "出入国管理統計",
+     "観光入込客統計"
+    ],
+    "answer": 0,
+    "exp": "消費の実態＝旅行・観光消費動向調査。"
+   },
+   {
+    "id": "kb-1a-8",
+    "cat": "観光統計",
+    "text": "すべての観光客を調べるのは難しいため、観光統計の多くで用いられている調査方法はどれか。",
+    "choices": [
+     "全員を対象にした全数調査",
+     "観光客への電話調査のみ",
+     "宿泊施設の売上だけを調べる調査",
+     "一部を対象にしたサンプル調査"
+    ],
+    "answer": 3,
+    "exp": "観光客の行動は多様で全数調査は難しいため、一部を対象にしたサンプル調査で行われる。だから調査の精度向上が課題になる。"
+   },
+   {
+    "id": "kb-1a-9",
+    "cat": "観光統計",
+    "text": "観光統計の整備で必要とされる2点の組み合わせとして正しいものはどれか。",
+    "choices": [
+     "調査費用の削減・調査回数の削減",
+     "全数調査への切り替え・民間調査の廃止",
+     "外国人観光客の調査中止・国内客の重点調査",
+     "統一された基準の策定・サンプル調査の精度の向上"
+    ],
+    "answer": 3,
+    "exp": "主体ごとに基準がばらばらだったため①統一的な基準、②サンプル調査の精度の向上、の2点が求められている。"
+   },
+   {
+    "id": "kb-1a-10",
+    "cat": "観光統計",
+    "text": "都道府県ごとの観光入込客数を比較できるようにするため、国土交通省と観光庁が策定したものはどれか。",
+    "choices": [
+     "観光立国推進基本法",
+     "観光入込客統計の共通基準",
+     "広域観光周遊ルート",
+     "訪日外国人消費動向調査"
+    ],
+    "answer": 1,
+    "exp": "都道府県が独自の基準で集計していたため比較できなかった。そこで共通基準を策定し、すべての都道府県に導入を働きかけている。"
+   },
+   {
+    "id": "kb-1a-11",
+    "cat": "観光客の種類",
+    "text": "観光地で宿泊せずに、帰宅または次の場所へ移動する観光客を何というか。",
+    "choices": [
+     "日帰り客",
+     "宿泊客",
+     "団体旅行客",
+     "アウトバウンド"
+    ],
+    "answer": 0,
+    "exp": "日帰り客＝宿泊しない。宿泊客＝観光地で宿泊する。"
+   },
+   {
+    "id": "kb-1a-12",
+    "cat": "観光客の種類",
+    "text": "宿泊客が日帰り客に比べて、より大きな観光消費をもたらす理由はどれか。",
+    "choices": [
+     "交通費が安くなるため",
+     "団体で行動するため",
+     "滞在時間が長くなるため",
+     "土産物を買わないため"
+    ],
+    "answer": 2,
+    "exp": "宿泊客は滞在時間が長くなるため、より大きな観光消費をもたらす存在である。"
+   },
+   {
+    "id": "kb-1a-13",
+    "cat": "観光客の種類",
+    "text": "観光に伴う消費のことで、交通機関や宿泊施設、飲食店や土産物店など地域経済に広く波及するものを何というか。",
+    "choices": [
+     "観光資源",
+     "観光統計",
+     "観光入込客",
+     "観光消費"
+    ],
+    "answer": 3,
+    "exp": "観光消費の拡大は地域振興において非常に重要である。"
+   },
+   {
+    "id": "kb-1a-14",
+    "cat": "観光客の種類",
+    "text": "インバウンド（inbound）の意味として正しいものはどれか。",
+    "choices": [
+     "「本国行きの」という意味で、他国から自国を訪問する旅行や観光客",
+     "「外国行きの」という意味で、自国から他国への旅行や観光客",
+     "国内の別の地域へ移動する旅行",
+     "宿泊を伴わない旅行"
+    ],
+    "answer": 0,
+    "exp": "日本ではインバウンド＝訪日外国人旅行・訪日外国人観光客。"
+   },
+   {
+    "id": "kb-1a-15",
+    "cat": "観光客の種類",
+    "text": "日本において「アウトバウンド」にあたるものはどれか。",
+    "choices": [
+     "訪日外国人旅行",
+     "日本人の海外旅行",
+     "日本人の国内旅行",
+     "外国人の日本国内での移動"
+    ],
+    "answer": 1,
+    "exp": "アウトバウンド＝「外国行きの」。日本では日本人海外旅行・日本人海外旅行者を意味する。"
+   },
+   {
+    "id": "kb-1a-16",
+    "cat": "観光客の種類",
+    "text": "インバウンドが地域に大きな効果をもたらす理由として、教科書が挙げているものはどれか。",
+    "choices": [
+     "日帰りが多く、回転率が高いため",
+     "団体旅行が多く、行動が予測しやすいため",
+     "消費意欲が高く、宿泊を伴うことが多いため",
+     "日本人観光客より滞在時間が短いため"
+    ],
+    "answer": 2,
+    "exp": "インバウンドは消費意欲が高く、宿泊を伴うことが多い。"
+   },
+   {
+    "id": "kb-1a-17",
+    "cat": "観光客の種類",
+    "text": "個人手配で海外旅行をする人々のことを何というか。",
+    "choices": [
+     "DMO",
+     "OTA",
+     "KBF",
+     "FIT（個人自由旅行）"
+    ],
+    "answer": 3,
+    "exp": "FIT は Free Independent Traveler の略。旅行者自らが旅行を計画し個人手配で海外旅行をする観光客やその形態。"
+   },
+   {
+    "id": "kb-1a-18",
+    "cat": "観光客の種類",
+    "text": "団体旅行客について、教科書が挙げている課題はどれか。",
+    "choices": [
+     "滞在時間が長く、行動範囲が広すぎる",
+     "客単価が高く、予約が取りにくい",
+     "客単価が低く、決まったルートしか行動しない",
+     "人数が少なく、送客が不安定"
+    ],
+    "answer": 2,
+    "exp": "団体旅行は一定の客数を確保し送客してくれるが、客単価が低く、決まったルートしか行動しないという課題がある。"
+   },
+   {
+    "id": "kb-1a-19",
+    "cat": "観光客の種類",
+    "text": "個人旅行客の特徴として正しいものはどれか。",
+    "choices": [
+     "団体客と比べて滞在時間が長く、行動範囲が広く、客単価が高い",
+     "団体客と比べて滞在時間が短く、客単価が低い",
+     "決まったルートしか行動しない",
+     "旅行会社を必ず通して旅行する"
+    ],
+    "answer": 0,
+    "exp": "インターネットの普及で個人手配が簡単になり、個人旅行客は増加している。"
+   },
+   {
+    "id": "kb-1a-20",
+    "cat": "観光客の種類",
+    "text": "近年、社員旅行や修学旅行などの団体旅行客が減少傾向にある理由として正しいものはどれか。",
+    "choices": [
+     "交通機関の運賃の値下げ",
+     "職場の人間関係の変化や少子化",
+     "旅行会社の増加",
+     "観光地の減少"
+    ],
+    "answer": 1,
+    "exp": "社員旅行は職場の人間関係の変化で少なくなり、修学旅行に参加する生徒数も少子化で減少している。"
+   },
+   {
+    "id": "kb-1a-21",
+    "cat": "インバウンド観光",
+    "text": "2019年の訪日外国人観光客の観光消費額はおよそいくらか。",
+    "choices": [
+     "約1.2兆円",
+     "約11.9兆円",
+     "約4.8兆円",
+     "約48兆円"
+    ],
+    "answer": 2,
+    "exp": "約4.8兆円で、国内の観光消費額全体の約17％を占めている。"
+   },
+   {
+    "id": "kb-1a-22",
+    "cat": "インバウンド観光",
+    "text": "訪日外国人観光客の観光消費額を製品別輸出額と比べると、どの位置にあたるか。",
+    "choices": [
+     "自動車を上回る第1位",
+     "化学製品に次ぐ第2位",
+     "鉄鋼製品より下の第6位",
+     "自動車・化学製品に次ぐ第3位"
+    ],
+    "answer": 3,
+    "exp": "自動車11.9兆円・化学製品8.7兆円に次ぎ、観光4.8兆円は第3位。電子部品・自動車部品・鉄鋼製品を上回る。"
+   },
+   {
+    "id": "kb-1a-23",
+    "cat": "インバウンド観光",
+    "text": "インバウンド観光が「輸出産業の一つ」と考えられている理由はどれか。",
+    "choices": [
+     "日本の製品を海外へ運ぶから",
+     "外国人観光客が自国で稼いだお金を持ち込み、日本で新たな消費を生み出すから",
+     "日本人が海外でお金を使うから",
+     "外国人観光客が日本で働くから"
+    ],
+    "answer": 1,
+    "exp": "外国から持ち込まれたお金で消費が生まれるため、日本経済への大きな収入となり、輸出と同等の経済効果がある。"
+   },
+   {
+    "id": "kb-1a-24",
+    "cat": "観光客の行動",
+    "text": "出発地から目的地までを同一ルートで往復する行動パターンを何というか。",
+    "choices": [
+     "単一目的地型",
+     "拠点地型",
+     "周遊観光型",
+     "ラケット型"
+    ],
+    "answer": 0,
+    "exp": "単一目的地型（ピストン型）。日帰りや一泊二日などの短期旅行やテーマパーク、スポーツ観戦などがあてはまる。"
+   },
+   {
+    "id": "kb-1a-25",
+    "cat": "観光客の行動",
+    "text": "単一目的地型の別名はどれか。",
+    "choices": [
+     "ピストン型",
+     "回遊行動型",
+     "ハブ型",
+     "スター型"
+    ],
+    "answer": 0,
+    "exp": "単一目的地型はピストン型ともいう。周遊観光型は回遊行動型ともいう。"
+   },
+   {
+    "id": "kb-1a-26",
+    "cat": "観光客の行動",
+    "text": "特定の目的地を拠点として長期間滞在する行動パターンで、夏の避暑や冬のスキーなどがあてはまるのはどれか。",
+    "choices": [
+     "単一目的地型",
+     "拠点地型",
+     "周遊観光型",
+     "ピストン型"
+    ],
+    "answer": 1,
+    "exp": "拠点地型＝リゾート地での滞在型観光など。拠点から近隣の観光地へ日帰りで観光することもある。"
+   },
+   {
+    "id": "kb-1a-27",
+    "cat": "観光客の行動",
+    "text": "出発地から複数の観光地点を巡りながら、最後にまた出発地へ戻ってくる行動パターンを何というか。",
+    "choices": [
+     "拠点地型",
+     "単一目的地型",
+     "ラケット型",
+     "周遊観光型"
+    ],
+    "answer": 3,
+    "exp": "周遊観光型（回遊行動型）。観光以外に食事・休憩・土産物の購入なども組み合わせて成り立つ。"
+   },
+   {
+    "id": "kb-1a-28",
+    "cat": "観光客の行動",
+    "text": "拠点地型と周遊観光型を組み合わせた行動パターンを何というか。",
+    "choices": [
+     "ピストン型",
+     "単一目的地型",
+     "ラケット型",
+     "回遊行動型"
+    ],
+    "answer": 2,
+    "exp": "テニスラケットに見立て、柄の部分＝出発地から拠点地まで、面の部分＝拠点地から周辺への周遊を表す。"
+   },
+   {
+    "id": "kb-1a-29",
+    "cat": "観光客の行動",
+    "text": "観光客の行動パターンは、何によってさまざまに変化するとされているか。",
+    "choices": [
+     "観光客の国籍だけ",
+     "旅行会社の規模だけ",
+     "観光の目的、出発地からの距離や交通アクセス、周辺観光地の有無など",
+     "観光地の人口だけ"
+    ],
+    "answer": 2,
+    "exp": "これらをふまえ、周辺観光地と連携し共存共栄を目指すことも必要。"
+   },
+   {
+    "id": "kb-1a-30",
+    "cat": "観光客の行動",
+    "text": "観光庁が訪日外国人観光客を地方へ誘致するために2015年から進めている事業はどれか。",
+    "choices": [
+     "広域観光周遊ルート形成促進事業",
+     "恋人の聖地プロジェクト",
+     "花巻観光振興ビジョン",
+     "ナイトツアー推進事業"
+    ],
+    "answer": 0,
+    "exp": "2021年現在、11の認定ルートがあり、各ルートで計31のモデルコースが作成されている。"
+   },
+   {
+    "id": "kb-1a-31",
+    "cat": "観光客の行動",
+    "text": "「日本のてっぺん。きた北海道ルート」の「The Top of Japan−夏」というモデルコースは、札幌を拠点としたどの行動ルートになっているか。",
+    "choices": [
+     "単一目的地型",
+     "ラケット型",
+     "拠点地型",
+     "ピストン型"
+    ],
+    "answer": 1,
+    "exp": "札幌を拠点として、留萌・稚内・名寄・旭川などを巡り戻るラケット型行動ルート。"
+   }
+  ]
+ },
+ {
+  "id": "kb-1b",
+  "tab": "1節② 訪日外国人の消費と行動・体験型観光",
+  "eyebrow": "観光ビジネス 第3章",
+  "icon": "1②",
+  "meta": "国・地域別の内訳・訪問先・消費の傾向・リピーター・体験型観光",
+  "title": "1節② 訪日外国人観光客の消費と行動（p.72〜75）",
+  "desc": "教科書の内容から作った4択問題です。正しいものを選びましょう。",
+  "recordKey": "kanko_kb_1b",
+  "questions": [
+   {
+    "id": "kb-1b-1",
+    "cat": "訪日外国人の消費と行動",
+    "text": "訪日外国人観光客の国・地域別の内訳について、正しいものはどれか。",
+    "choices": [
+     "ヨーロッパやアメリカが大部分を占める",
+     "オーストラリアが最も多い",
+     "アフリカからの観光客が半分以上を占める",
+     "中国・韓国を中心に近隣アジア諸国が大部分を占める"
+    ],
+    "answer": 3,
+    "exp": "距離的に近い近隣国や地域同士の往来が活発になることは一般的。ヨーロッパやオーストラリアからは少ない。"
+   },
+   {
+    "id": "kb-1b-2",
+    "cat": "訪日外国人の消費と行動",
+    "text": "2019年の訪日外国人観光客数で、最も多い国・地域はどれか。",
+    "choices": [
+     "韓国",
+     "台湾",
+     "中国",
+     "アメリカ"
+    ],
+    "answer": 2,
+    "exp": "中国 約959万人、韓国 約558万人、台湾 約489万人の順。"
+   },
+   {
+    "id": "kb-1b-3",
+    "cat": "訪日外国人の消費と行動",
+    "text": "訪日外国人観光客の都道府県別の訪問先で、上位に入っていないものはどれか。",
+    "choices": [
+     "東京都",
+     "愛知県",
+     "大阪府",
+     "北海道"
+    ],
+    "answer": 1,
+    "exp": "東京・大阪・京都・北海道・沖縄県が上位に並ぶ。"
+   },
+   {
+    "id": "kb-1b-4",
+    "cat": "訪日外国人の消費と行動",
+    "text": "東京に次いで北海道への宿泊が多い傾向があるのはどこからの観光客か。",
+    "choices": [
+     "アジア圏の観光客",
+     "欧米豪からの観光客",
+     "アフリカからの観光客",
+     "中東からの観光客"
+    ],
+    "answer": 0,
+    "exp": "アジア圏は東京や大阪に次いで北海道への宿泊が多い。欧米豪は東京に次いで京都に宿泊することが多い。"
+   },
+   {
+    "id": "kb-1b-5",
+    "cat": "訪日外国人の消費と行動",
+    "text": "欧米豪からの観光客が、東京に次いで多く宿泊する都道府県はどれか。",
+    "choices": [
+     "北海道",
+     "沖縄県",
+     "京都府",
+     "福岡県"
+    ],
+    "answer": 2,
+    "exp": "欧米豪は東京に次いで京都、アジア圏は北海道への宿泊が多い。"
+   },
+   {
+    "id": "kb-1b-6",
+    "cat": "訪日外国人の消費と行動",
+    "text": "訪日外国人観光客の観光消費額が、客数の増加と比例して急激に伸びたのはいつ頃か。",
+    "choices": [
+     "2015〜2019年頃",
+     "2000〜2005年頃",
+     "2008〜2010年頃",
+     "2020〜2022年頃"
+    ],
+    "answer": 0,
+    "exp": "特に2015〜2019年頃に急激な伸びを見せた（2019年 4兆8,135億円・3,188万人）。"
+   },
+   {
+    "id": "kb-1b-7",
+    "cat": "訪日外国人の消費と行動",
+    "text": "訪日外国人観光客一人当たりの旅行支出の内訳で、多い順に並べたものはどれか。",
+    "choices": [
+     "交通費 → 飲食費 → 宿泊費",
+     "買い物代 → 宿泊費 → 飲食費",
+     "娯楽サービス費 → 買い物代 → 交通費",
+     "飲食費 → 交通費 → 宿泊費"
+    ],
+    "answer": 1,
+    "exp": "内訳は買い物代が最も多く、宿泊費、飲食費と続いている。"
+   },
+   {
+    "id": "kb-1b-8",
+    "cat": "訪日外国人の消費と行動",
+    "text": "欧米豪の観光客の特徴として正しいものはどれか。",
+    "choices": [
+     "平均滞在日数が3日以内と短く、何度も日本を訪れる",
+     "旅行支出の多くは買い物代で、化粧品をよく買う",
+     "旅行支出は中国の三分の一程度",
+     "平均滞在日数が12日〜2週間程度と長く、旅行支出の多くは宿泊費"
+    ],
+    "answer": 3,
+    "exp": "欧米豪は一人当たりの旅行支出総額も20万円程度と高額。買い物では菓子類・衣類・酒類・民芸・工芸品を購入する傾向。"
+   },
+   {
+    "id": "kb-1b-9",
+    "cat": "訪日外国人の消費と行動",
+    "text": "中国人観光客の特徴として正しいものはどれか。",
+    "choices": [
+     "滞在7日前後で、旅行支出の多くは買い物代。化粧品・菓子類・医薬品などを購入",
+     "滞在5〜6日で、旅行支出は欧米豪の三分の一程度",
+     "滞在12日〜2週間で、旅行支出の多くは宿泊費",
+     "買い物をほとんどしない"
+    ],
+    "answer": 0,
+    "exp": "中国人は欧米豪とほぼ同額の旅行支出だが、多くは買い物代。時計・カメラ・宝石・貴金属など高額な消費をする傾向もある。"
+   },
+   {
+    "id": "kb-1b-10",
+    "cat": "訪日外国人の消費と行動",
+    "text": "韓国や台湾からの観光客の特徴として正しいものはどれか。",
+    "choices": [
+     "平均滞在日数が12日以上で、宿泊費の支出が多い",
+     "化粧品や医薬品の購入が最も多い",
+     "平均滞在日数が5〜6日と短く、旅行支出は中国の三分の一程度だが、何度も日本を訪れる",
+     "日本を一度しか訪れない人がほとんど"
+    ],
+    "answer": 2,
+    "exp": "とりわけ韓国人観光客は滞在日数が3日以内という人の割合も多い。何度も訪れるリピーターが多い。"
+   },
+   {
+    "id": "kb-1b-11",
+    "cat": "訪日外国人の消費と行動",
+    "text": "繰り返し同じ観光地を訪れる観光客を何というか。",
+    "choices": [
+     "FIT",
+     "インバウンド",
+     "ペルソナ",
+     "リピーター"
+    ],
+    "answer": 3,
+    "exp": "リピーター＝リピート客ともいう。"
+   },
+   {
+    "id": "kb-1b-12",
+    "cat": "訪日外国人の消費と行動",
+    "text": "2019年の国・地域別の外国人一人当たりの旅行支出で、表の中で最も多い国はどれか。",
+    "choices": [
+     "中国",
+     "オーストラリア",
+     "アメリカ",
+     "韓国"
+    ],
+    "answer": 1,
+    "exp": "オーストラリア 247,868円が最も多い（平均泊数12.9）。韓国は76,138円で最も少ない。"
+   },
+   {
+    "id": "kb-1b-13",
+    "cat": "体験型観光",
+    "text": "日本を訪れる外国人観光客の約何割がリピーターとなったことで、体験型観光へのシフトが加速しているか（2017年）。",
+    "choices": [
+     "約2割",
+     "約4割",
+     "約9割",
+     "約6割"
+    ],
+    "answer": 3,
+    "exp": "2016年以降「買い物」人気が下がり、2017年には約6割がリピーターとなった。"
+   },
+   {
+    "id": "kb-1b-14",
+    "cat": "体験型観光",
+    "text": "体験型観光とはどのようなものか。",
+    "choices": [
+     "その観光地でしかできない体験を組み込んだ観光形態",
+     "名所を見学することを中心とした観光形態",
+     "買い物を目的とした観光形態",
+     "日帰りで行う観光形態"
+    ],
+    "answer": 0,
+    "exp": "見学旅行に比べると消費の拡大が期待できるため、さまざまな取り組みが行われている。"
+   },
+   {
+    "id": "kb-1b-15",
+    "cat": "体験型観光",
+    "text": "体験型観光の例として、教科書に挙げられていないものはどれか。",
+    "choices": [
+     "社寺参拝に写経や座禅を加える",
+     "動物園や水族館で生き物と触れ合う",
+     "免税店での家電製品の大量購入",
+     "都市観光にその地の歴史を語るガイドツアーを組み込む"
+    ],
+    "answer": 2,
+    "exp": "大量購入（爆買い）は買い物中心の観光で、体験型観光ではない。"
+   },
+   {
+    "id": "kb-1b-16",
+    "cat": "体験型観光",
+    "text": "伝統的・正統的な文化に対して、ある特定の層に支持されて広まった文化（アニメ・漫画・ゲームなど）を何というか。",
+    "choices": [
+     "アクティビティ",
+     "サブカルチャー",
+     "ナイト・エンターテイメント",
+     "コミュニティツーリズム"
+    ],
+    "answer": 1,
+    "exp": "欧米豪の観光客は日本の伝統文化への関心が高く、近年ではサブカルチャーへの関心も高い。"
+   },
+   {
+    "id": "kb-1b-17",
+    "cat": "体験型観光",
+    "text": "スキーやスノーボードへの関心が特に高く、北海道ニセコ町や長野県白馬村などに多く訪れている観光客はどれか。",
+    "choices": [
+     "中国人観光客",
+     "韓国人観光客",
+     "オーストラリア人観光客",
+     "台湾人観光客"
+    ],
+    "answer": 2,
+    "exp": "オーストラリアは日本と季節が逆なので、日本の冬のスノーリゾートに長期滞在する人が多い。"
+   },
+   {
+    "id": "kb-1b-18",
+    "cat": "体験型観光",
+    "text": "台湾や香港の観光客に多い体験型観光の傾向はどれか。",
+    "choices": [
+     "サブカルチャーにだけ関心がある",
+     "トレッキングなど体を動かすアクティビティを好む",
+     "買い物以外にはまったく関心がない",
+     "ゆったり過ごすことに興味が高く、温泉体験や日本食などの文化体験を好む"
+    ],
+    "answer": 3,
+    "exp": "台湾・香港は温泉や日本食。東南アジアは冬の季節感や雪など母国では味わえない自然体験を楽しむ。"
+   },
+   {
+    "id": "kb-1b-19",
+    "cat": "体験型観光",
+    "text": "熱帯地域の東南アジアの観光客が楽しんでいる体験はどれか。",
+    "choices": [
+     "海水浴",
+     "冬の季節感や雪といった、母国では味わえない自然体験",
+     "買い物だけのツアー",
+     "日帰りの都市観光"
+    ],
+    "answer": 1,
+    "exp": "母国では味わえない自然体験。"
+   },
+   {
+    "id": "kb-1b-20",
+    "cat": "体験型観光",
+    "text": "中国人観光客が家電製品や化粧品などを大量に購入する行動は何と名付けられ、2015年の新語・流行語大賞を受賞したか。",
+    "choices": [
+     "爆買い",
+     "まとめ買い",
+     "衝動買い",
+     "コト消費"
+    ],
+    "answer": 0,
+    "exp": "2014年頃から目立ち、2015年の中国人一人当たりの旅行支出は28万4千円と突出して高かった。"
+   },
+   {
+    "id": "kb-1b-21",
+    "cat": "体験型観光",
+    "text": "2016年に「爆買い」が下火になった理由はどれか。",
+    "choices": [
+     "中国政府が海外購入品の輸入関税を引き上げたから",
+     "日本の免税制度が廃止されたから",
+     "円高で日本の商品が高くなったから",
+     "中国から日本への直行便がなくなったから"
+    ],
+    "answer": 0,
+    "exp": "関税引き上げに加え、リピーターが増えて買い物代の割合が減少し、体験型観光の消費へと移行しつつある。"
+   },
+   {
+    "id": "kb-1b-22",
+    "cat": "体験型観光",
+    "text": "地域の特色や文化、産業、暮らしを守りつつ、それを観光に活かす地域の観光振興を何というか。",
+    "choices": [
+     "オーバーツーリズム",
+     "マスツーリズム",
+     "ダイナミック・プライシング",
+     "コミュニティツーリズム"
+    ],
+    "answer": 3,
+    "exp": "徳島県の秘境の古民家施設や岐阜県飛騨古川の里山サイクリングなど、「何もない」田舎を観光資源にした例。"
+   },
+   {
+    "id": "kb-1b-23",
+    "cat": "体験型観光",
+    "text": "岐阜県飛騨古川で人気がある、美しい田園の里山をガイド付きで巡る体験はどれか。",
+    "choices": [
+     "スキーツアー",
+     "ナイトツアー",
+     "里山サイクリング",
+     "クルーズツアー"
+    ],
+    "answer": 2,
+    "exp": "何もない田舎の風景や暮らしを体験型観光にした例。"
+   }
+  ]
+ },
+ {
+  "id": "kb-2",
+  "tab": "2節 マーケティングの意義",
+  "eyebrow": "観光ビジネス 第3章",
+  "icon": "2",
+  "meta": "観光マーケティング・クチコミ・オーバーツーリズム・デスティネーション・ペルソナ",
+  "title": "2節 観光ビジネスにおけるマーケティングの意義（p.76〜79）",
+  "desc": "教科書の内容から作った4択問題です。正しいものを選びましょう。",
+  "recordKey": "kanko_kb_2",
+  "questions": [
+   {
+    "id": "kb-2-1",
+    "cat": "観光マーケティング",
+    "text": "マーケティングとは何をつくることか。",
+    "choices": [
+     "「安い商品」",
+     "「売れる仕組み」",
+     "「新しい工場」",
+     "「広告の文章」"
+    ],
+    "answer": 1,
+    "exp": "マーケティングとは「売れる仕組み」をつくること。"
+   },
+   {
+    "id": "kb-2-2",
+    "cat": "観光マーケティング",
+    "text": "観光ビジネスのマーケティングには、個別企業視点のマーケティングと、もう一つ何があるか。",
+    "choices": [
+     "観光地視点のマーケティング",
+     "消費者視点のマーケティング",
+     "政府視点のマーケティング",
+     "外国人視点のマーケティング"
+    ],
+    "answer": 0,
+    "exp": "観光マーケティング＝個別企業視点＋観光地視点。"
+   },
+   {
+    "id": "kb-2-3",
+    "cat": "観光マーケティング",
+    "text": "観光マーケティングの目的として正しいものはどれか。",
+    "choices": [
+     "観光客の数をできるだけ減らすこと",
+     "観光地の価格を一律にすること",
+     "魅力ある観光商品をつくり提供すること",
+     "観光統計を作成すること"
+    ],
+    "answer": 2,
+    "exp": "そのために対象を定め、イメージを決め、価値や品質とともに伝えることが重要。"
+   },
+   {
+    "id": "kb-2-4",
+    "cat": "観光マーケティング",
+    "text": "観光商品において価値や品質を保証するものとして、教科書で挙げられていないものはどれか。",
+    "choices": [
+     "ブランドや商標",
+     "クチコミ",
+     "評判",
+     "観光地の人口"
+    ],
+    "answer": 3,
+    "exp": "ブランドや商標、クチコミ、評判などが価値や品質を保証する。"
+   },
+   {
+    "id": "kb-2-5",
+    "cat": "観光マーケティング",
+    "text": "観光商品で、ブランドやクチコミが観光の動機付けに大きく影響する理由はどれか。",
+    "choices": [
+     "観光商品は価格がすべて同じだから",
+     "観光商品は何度でも試せるから",
+     "観光客は安全を気にしないから",
+     "顧客が購入前に商品を確かめたり、提供者が内容を保証したりすることが難しいから"
+    ],
+    "answer": 3,
+    "exp": "よく知らない土地で宿泊や食事をするため、身の安全や安心感を求める傾向も強い。"
+   },
+   {
+    "id": "kb-2-6",
+    "cat": "観光マーケティング",
+    "text": "商品やサービスの標識（マーク）で、文字・図形・記号・立体的形状・色彩・音などで企業や商品を表現するものを何というか。",
+    "choices": [
+     "商標",
+     "評判",
+     "ペルソナ",
+     "セグメント"
+    ],
+    "answer": 0,
+    "exp": "商標は一定の品質を保証する機能を持つ。ブランドもほぼ同義だが、企業や商品の全体的なイメージも含まれることが多い。"
+   },
+   {
+    "id": "kb-2-7",
+    "cat": "観光マーケティング",
+    "text": "旅行の宿泊先やレストランを予約するとき、クチコミサイトを参考にしている人はどのくらいいるか。",
+    "choices": [
+     "10〜20％",
+     "30〜40％",
+     "70〜80％",
+     "ほぼ100％"
+    ],
+    "answer": 2,
+    "exp": "多くの調査で70〜80％の人が参考にしているという結果が出ている。"
+   },
+   {
+    "id": "kb-2-8",
+    "cat": "持続可能な観光",
+    "text": "観光客が観光地の受け入れ可能な許容量を超えて詰めかけ、地域住民の生活や環境などに負の影響を生じる現象を何というか。",
+    "choices": [
+     "サステナブルツーリズム",
+     "オーバーツーリズム",
+     "コミュニティツーリズム",
+     "インバウンド"
+    ],
+    "answer": 1,
+    "exp": "交通機能のまひ、騒音、ごみの散乱、治安の悪化、物価の上昇などを引き起こす。"
+   },
+   {
+    "id": "kb-2-9",
+    "cat": "持続可能な観光",
+    "text": "京都市のオーバーツーリズムの事例として教科書に挙げられているものはどれか。",
+    "choices": [
+     "観光客が減って旅館が廃業した",
+     "雪が降らずスキー場が閉鎖した",
+     "公共バスが停車できないほど観光客が溢れ、舞妓さんへの追い回し行為が発生",
+     "直行便が廃止された"
+    ],
+    "answer": 2,
+    "exp": "桜と紅葉の時期には公共バスが停車できないほど観光客が溢れ、舞妓パパラッチなどの被害も発生した。"
+   },
+   {
+    "id": "kb-2-10",
+    "cat": "持続可能な観光",
+    "text": "観光地を未来永劫、子孫にまで発展させ続け、観光資源の魅力を維持しつつ観光を推進しようとする考え方を何というか。",
+    "choices": [
+     "オーバーツーリズム",
+     "マスツーリズム",
+     "ダークツーリズム",
+     "サステナブルツーリズム"
+    ],
+    "answer": 3,
+    "exp": "自然環境だけでなく、住環境や地域文化の保護や保全にも配慮した概念。"
+   },
+   {
+    "id": "kb-2-11",
+    "cat": "持続可能な観光",
+    "text": "オーバーツーリズムの影響として、教科書の内容にあてはまらないものはどれか。",
+    "choices": [
+     "交通機能がまひする",
+     "地域の物価が下がる",
+     "地域住民の反感を生む",
+     "生態系や自然環境に悪影響を与える"
+    ],
+    "answer": 1,
+    "exp": "物価は「上昇」する。"
+   },
+   {
+    "id": "kb-2-12",
+    "cat": "デスティネーション",
+    "text": "観光客が観光の目的地として訪れる地域のことを何というか。",
+    "choices": [
+     "デスティネーション",
+     "セグメント",
+     "チャネル",
+     "ポジション"
+    ],
+    "answer": 0,
+    "exp": "デスティネーション＝観光目的地。"
+   },
+   {
+    "id": "kb-2-13",
+    "cat": "デスティネーション",
+    "text": "地域全体で観光地のあり方や価値を考えるマーケティング活動を何というか。",
+    "choices": [
+     "ペルソナマーケティング",
+     "ダイナミック・プライシング",
+     "マルチブランド戦略",
+     "デスティネーション・マーケティング"
+    ],
+    "answer": 3,
+    "exp": "観光地マーケティングともいう。国では観光庁や日本政府観光局、地域では地方自治体や観光協会・商工会議所・DMOなどが中心的な役割を担う。"
+   },
+   {
+    "id": "kb-2-14",
+    "cat": "デスティネーション",
+    "text": "デスティネーションの商品としての特性について正しいものはどれか。",
+    "choices": [
+     "いつでも別の場所に移動させることができる",
+     "商品の内容を自由につくり変えられる",
+     "自然や歴史、文化などを消したりつくり変えたりできず、動かすこともできない",
+     "観光客が来なくても売ることができる"
+    ],
+    "answer": 2,
+    "exp": "動かせないので観光客に来てもらわなくてはいけない。だから「行きたい」と思わせる価値と魅力が重要。"
+   },
+   {
+    "id": "kb-2-15",
+    "cat": "デスティネーション",
+    "text": "NPO法人地域活性化支援センターが2006年から展開し、プロポーズにふさわしいスポット約140か所を認定しているプロジェクトはどれか。",
+    "choices": [
+     "日本のてっぺんプロジェクト",
+     "恋人の聖地プロジェクト",
+     "夜の水族館プロジェクト",
+     "花巻観光振興ビジョン"
+    ],
+    "answer": 1,
+    "exp": "普段の何気ない景色やスポットも、見方を変えれば魅力的な観光資源になる例。"
+   },
+   {
+    "id": "kb-2-16",
+    "cat": "デスティネーション",
+    "text": "デスティネーション・マーケティングで考えるべき二つの視点の組み合わせはどれか。",
+    "choices": [
+     "競合する観光地・地域社会との連携",
+     "価格の値下げ・広告の増加",
+     "外国人の誘致・国内客の制限",
+     "施設の建設・道路の整備"
+    ],
+    "answer": 0,
+    "exp": "競合する観光地との比較を綿密に行い、地域全体が同一の方向を目指して地域住民の参加も大切にする。"
+   },
+   {
+    "id": "kb-2-17",
+    "cat": "デスティネーション",
+    "text": "セグメント（層）やターゲットから、より具体的な架空の人物像を設定してマーケティングを行う手法を何というか。",
+    "choices": [
+     "マスマーケティング",
+     "ペルソナマーケティング",
+     "ダイレクトマーケティング",
+     "デスティネーション・マーケティング"
+    ],
+    "answer": 1,
+    "exp": "宮崎県高千穂町観光協会では「福岡子さん」というペルソナを設定し、ツアープランを策定した。"
+   }
+  ]
+ },
+ {
+  "id": "kb-3a",
+  "tab": "3節① SWOT分析・STP分析（S）",
+  "eyebrow": "観光ビジネス 第3章",
+  "icon": "3①",
+  "meta": "戦略のプロセス・SWOT・内部/外部環境・花巻市・セグメンテーション",
+  "title": "3節① SWOT分析とセグメンテーション（p.80〜83）",
+  "desc": "教科書の内容から作った4択問題です。正しいものを選びましょう。",
+  "recordKey": "kanko_kb_3a",
+  "questions": [
+   {
+    "id": "kb-3a-1",
+    "cat": "マーケティング戦略",
+    "text": "観光ビジネスのマーケティング戦略の順番として正しいものはどれか。",
+    "choices": [
+     "STP分析 → SWOT分析 → マーケティング・ミックス",
+     "マーケティング・ミックス → SWOT分析 → STP分析",
+     "SWOT分析 → マーケティング・ミックス → STP分析",
+     "SWOT分析 → STP分析 → マーケティング・ミックス"
+    ],
+    "answer": 3,
+    "exp": "何を提供できるか（SWOT）→ 誰にどんなイメージで（STP）→ どうやって提供するか（4P）。"
+   },
+   {
+    "id": "kb-3a-2",
+    "cat": "マーケティング戦略",
+    "text": "マーケティング戦略の第一段階で明らかにすることはどれか。",
+    "choices": [
+     "誰に提供するか",
+     "どうやって提供するか",
+     "何を提供できるか",
+     "いくらで提供するか"
+    ],
+    "answer": 2,
+    "exp": "第一段階は環境分析（SWOT分析）で「何を提供できるか」を明らかにする。"
+   },
+   {
+    "id": "kb-3a-3",
+    "cat": "SWOT分析",
+    "text": "SWOT分析の S・W・O・T の組み合わせとして正しいものはどれか。",
+    "choices": [
+     "強み・弱み・機会・脅威",
+     "強み・弱み・目標・脅威",
+     "戦略・弱み・機会・目標",
+     "強み・価値・機会・技術"
+    ],
+    "answer": 0,
+    "exp": "Strength・Weakness・Opportunity・Threat の頭文字。"
+   },
+   {
+    "id": "kb-3a-4",
+    "cat": "SWOT分析",
+    "text": "SWOT分析で、内部環境のプラス要因とマイナス要因の組み合わせはどれか。",
+    "choices": [
+     "機会（O）と脅威（T）",
+     "強み（S）と弱み（W）",
+     "強み（S）と機会（O）",
+     "弱み（W）と脅威（T）"
+    ],
+    "answer": 1,
+    "exp": "内部環境＝強み・弱み、外部環境＝機会・脅威。"
+   },
+   {
+    "id": "kb-3a-5",
+    "cat": "SWOT分析",
+    "text": "SWOT分析の目的として正しいものはどれか。",
+    "choices": [
+     "観光客の数を正確に数えること",
+     "商品の価格を決めること",
+     "広告の内容を決めること",
+     "戦略目標を達成する際に影響を与える内部と外部の環境要因を特定すること"
+    ],
+    "answer": 3,
+    "exp": "事業課題を明らかにし、戦略の策定に活用できる。"
+   },
+   {
+    "id": "kb-3a-6",
+    "cat": "SWOT分析",
+    "text": "SWOT分析以外の環境分析の手法で、外部環境を四つの観点から分析するものはどれか。",
+    "choices": [
+     "VRIO分析",
+     "STP分析",
+     "PEST分析",
+     "ABC分析"
+    ],
+    "answer": 2,
+    "exp": "VRIO分析＝内部の経営資源の競争優位性、PEST分析＝外部環境を4観点、ファイブ・フォース分析＝業界の競合相手など。"
+   },
+   {
+    "id": "kb-3a-7",
+    "cat": "内部環境分析",
+    "text": "内部環境分析で対象にするのはどのような要因か。",
+    "choices": [
+     "自身がコントロールできない要因",
+     "自身がコントロールできる要因",
+     "競合企業だけに関わる要因",
+     "政治や経済の動き"
+    ],
+    "answer": 1,
+    "exp": "自身がコントロールできる要因を対象に強みと弱みを検討する。"
+   },
+   {
+    "id": "kb-3a-8",
+    "cat": "内部環境分析",
+    "text": "夜間の時間帯のアクティビティやコンテンツのことを何というか。",
+    "choices": [
+     "ナイト・エンターテイメント",
+     "サブカルチャー",
+     "アクティビティ",
+     "ペルソナ"
+    ],
+    "answer": 0,
+    "exp": "日本はナイト・エンターテイメントが不足しているとされ、水族館や博物館での「ナイトツアー」などが注目されている。"
+   },
+   {
+    "id": "kb-3a-9",
+    "cat": "内部環境分析",
+    "text": "内部環境の「強み」として正しいものはどれか。",
+    "choices": [
+     "観光地や企業を取り巻く環境で、目標達成に貢献する要因",
+     "観光地や企業が自身で保有し、目標達成に貢献する資源や商品、個人の資質",
+     "目標達成の障害となる外部の要因",
+     "競合企業が保有する資源"
+    ],
+    "answer": 1,
+    "exp": "弱み＝自身が保有する要因のうち目標達成の障害となるもの。"
+   },
+   {
+    "id": "kb-3a-10",
+    "cat": "外部環境分析",
+    "text": "外部環境の四つの要因として正しい組み合わせはどれか。",
+    "choices": [
+     "自然的要因・人的要因・技術的要因・財務的要因",
+     "価格要因・商品要因・流通要因・広告要因",
+     "人口要因・地理要因・心理要因・行動要因",
+     "自然的要因・経済的要因・政治的要因・社会的要因"
+    ],
+    "answer": 3,
+    "exp": "天候・災害・立地＝自然的、為替＝経済的、政治情勢・戦争・テロ＝政治的、疫病・イベント・ブーム＝社会的。"
+   },
+   {
+    "id": "kb-3a-11",
+    "cat": "外部環境分析",
+    "text": "為替の変動は、外部環境の四つの要因のうちどれにあたるか。",
+    "choices": [
+     "自然的要因",
+     "政治的要因",
+     "経済的要因",
+     "社会的要因"
+    ],
+    "answer": 2,
+    "exp": "景気や為替の変動などは経済的要因。"
+   },
+   {
+    "id": "kb-3a-12",
+    "cat": "外部環境分析",
+    "text": "疫病のまん延やイベント・ブームの発生は、外部環境の四つの要因のうちどれにあたるか。",
+    "choices": [
+     "社会的要因",
+     "自然的要因",
+     "経済的要因",
+     "政治的要因"
+    ],
+    "answer": 0,
+    "exp": "疫病のまん延・イベント・ブームの発生＝社会的要因。"
+   },
+   {
+    "id": "kb-3a-13",
+    "cat": "外部環境分析",
+    "text": "外部環境の「機会」とはどのようなものか。",
+    "choices": [
+     "観光地や企業を取り巻く環境の中で、目標達成に貢献する要因",
+     "自身が保有する資源のうち、目標達成に貢献するもの",
+     "自身が保有する要因のうち、目標達成の障害となるもの",
+     "観光地を取り巻く環境の中で、目標達成の障害となる要因"
+    ],
+    "answer": 0,
+    "exp": "機会を見つけたら市場拡大や競争優位のチャンスとして戦略を立案する。障害となるのは「脅威」。"
+   },
+   {
+    "id": "kb-3a-14",
+    "cat": "SWOT分析の事例",
+    "text": "岩手県花巻市のSWOT分析で「花巻温泉郷がある」はどれにあたるか。",
+    "choices": [
+     "弱み（Weakness）",
+     "機会（Opportunity）",
+     "強み（Strength）",
+     "脅威（Threat）"
+    ],
+    "answer": 2,
+    "exp": "自身が保有する観光資源なので強み。"
+   },
+   {
+    "id": "kb-3a-15",
+    "cat": "SWOT分析の事例",
+    "text": "岩手県花巻市のSWOT分析で「花巻−台北・上海の直行便が就航し、中国や台湾からのインバウンドが増加」はどれにあたるか。",
+    "choices": [
+     "強み（Strength）",
+     "弱み（Weakness）",
+     "脅威（Threat）",
+     "機会（Opportunity）"
+    ],
+    "answer": 3,
+    "exp": "外部環境のプラス要因＝機会。"
+   },
+   {
+    "id": "kb-3a-16",
+    "cat": "SWOT分析の事例",
+    "text": "岩手県花巻市のSWOT分析で「団体客の減少」はどれにあたるか。",
+    "choices": [
+     "強み（Strength）",
+     "脅威（Threat）",
+     "弱み（Weakness）",
+     "機会（Opportunity）"
+    ],
+    "answer": 1,
+    "exp": "外部環境のマイナス要因＝脅威。"
+   },
+   {
+    "id": "kb-3a-17",
+    "cat": "SWOT分析の事例",
+    "text": "岩手県花巻市のSWOT分析で「観光施設や観光資源が点在」はどれにあたるか。",
+    "choices": [
+     "強み（Strength）",
+     "機会（Opportunity）",
+     "弱み（Weakness）",
+     "脅威（Threat）"
+    ],
+    "answer": 2,
+    "exp": "内部環境のマイナス要因＝弱み。分析の結果、団体客から個人客へのターゲット転換が急務と分かった。"
+   },
+   {
+    "id": "kb-3a-18",
+    "cat": "STP分析",
+    "text": "STP分析の S・T・P の組み合わせとして正しいものはどれか。",
+    "choices": [
+     "セグメンテーション・ターゲティング・ポジショニング",
+     "ストラテジー・ターゲティング・プロモーション",
+     "セグメンテーション・トレンド・プライス",
+     "サービス・ターゲティング・プロダクト"
+    ],
+    "answer": 0,
+    "exp": "マーケティング戦略の第二段階で「誰にどんなイメージで提供するか」を考える。"
+   },
+   {
+    "id": "kb-3a-19",
+    "cat": "STP分析",
+    "text": "さまざまな顧客特性で市場を細分化することを何というか。",
+    "choices": [
+     "ターゲティング",
+     "ポジショニング",
+     "プロモーション",
+     "セグメンテーション"
+    ],
+    "answer": 3,
+    "exp": "細分化された市場をセグメントという。"
+   },
+   {
+    "id": "kb-3a-20",
+    "cat": "STP分析",
+    "text": "年齢・性別・職業・学歴・所得・家族構成などの変数を何というか。",
+    "choices": [
+     "地理的変数（ジオグラフィック変数）",
+     "人口動態変数（デモグラフィック変数）",
+     "心理的変数（サイコグラフィック変数）",
+     "行動変数"
+    ],
+    "answer": 1,
+    "exp": "「学生旅行市場」「子連れの家族旅行」「20代女子旅」などの細分化。"
+   },
+   {
+    "id": "kb-3a-21",
+    "cat": "STP分析",
+    "text": "都市の経済規模・人口規模・気候・交通アクセスなどの変数を何というか。",
+    "choices": [
+     "地理的変数（ジオグラフィック変数）",
+     "人口動態変数（デモグラフィック変数）",
+     "心理的変数（サイコグラフィック変数）",
+     "価格変数"
+    ],
+    "answer": 0,
+    "exp": "「中国市場」「鉄道利用者と高速道路利用者」などの細分化。大都市圏との近さや交通アクセスの良さは大きなメリット。"
+   },
+   {
+    "id": "kb-3a-22",
+    "cat": "STP分析",
+    "text": "ライフスタイル・趣味趣向・価値観などの変数を何というか。",
+    "choices": [
+     "人口動態変数（デモグラフィック変数）",
+     "心理的変数（サイコグラフィック変数）",
+     "地理的変数（ジオグラフィック変数）",
+     "経済変数"
+    ],
+    "answer": 1,
+    "exp": "「歴史好き」「ゆったり過ごす派」などの細分化。"
+   },
+   {
+    "id": "kb-3a-23",
+    "cat": "STP分析",
+    "text": "文化や歴史のつながりが深く、同一の宗教・民族・言語などが当てはまることを何というか。",
+    "choices": [
+     "心理的近接性",
+     "地理的近接性",
+     "経済的近接性",
+     "文化的近接性"
+    ],
+    "answer": 3,
+    "exp": "心理的近接性は、何かをきっかけに特定の国や地域に特別な感情や心理的作用が働き、近しい間柄に感じられること。"
+   },
+   {
+    "id": "kb-3a-24",
+    "cat": "STP分析",
+    "text": "1890年に和歌山県串本町沖で起きた「エルトゥールル号遭難事故」をきっかけに、日本と友好関係が深まった国はどれか。",
+    "choices": [
+     "イラン",
+     "エジプト",
+     "トルコ",
+     "ギリシャ"
+    ],
+    "answer": 2,
+    "exp": "地元住民の献身的な救助が語り継がれ、トルコは親日国家となった（心理的近接性の例）。"
+   }
+  ]
+ },
+ {
+  "id": "kb-3b",
+  "tab": "3節② ターゲティング・ポジショニング・4P",
+  "eyebrow": "観光ビジネス 第3章",
+  "icon": "3②",
+  "meta": "無差別型/差別型/集中型・KBF・ポジショニング・マップ・4P・OTA",
+  "title": "3節② ターゲティング・ポジショニング・マーケティング・ミックス（p.84〜87）",
+  "desc": "教科書の内容から作った4択問題です。正しいものを選びましょう。",
+  "recordKey": "kanko_kb_3b",
+  "questions": [
+   {
+    "id": "kb-3b-1",
+    "cat": "ターゲティング",
+    "text": "細分化したセグメントの中から、マーケティングの対象とするセグメントを決めることを何というか。",
+    "choices": [
+     "セグメンテーション",
+     "ターゲティング",
+     "ポジショニング",
+     "ブランディング"
+    ],
+    "answer": 1,
+    "exp": "対象となったセグメントの消費者のことをターゲットという。"
+   },
+   {
+    "id": "kb-3b-2",
+    "cat": "ターゲティング",
+    "text": "すべてのセグメントに共通するニーズを満たすような商品を提供するターゲティングはどれか。",
+    "choices": [
+     "差別型ターゲティング",
+     "集中型ターゲティング",
+     "ペルソナ型ターゲティング",
+     "無差別型ターゲティング"
+    ],
+    "answer": 3,
+    "exp": "経営資源が豊富な観光地や大手企業が採用するが、ニーズや消費行動が多様な観光ビジネスではあまり有効ではない。"
+   },
+   {
+    "id": "kb-3b-3",
+    "cat": "ターゲティング",
+    "text": "複数のセグメントを選び、各セグメントのニーズに最適な商品やサービスを提供するターゲティングはどれか。",
+    "choices": [
+     "差別型ターゲティング",
+     "無差別型ターゲティング",
+     "集中型ターゲティング",
+     "単一型ターゲティング"
+    ],
+    "answer": 0,
+    "exp": "航空座席のファーストクラスとエコノミークラス、客室のシングルルームとツインルームなど。"
+   },
+   {
+    "id": "kb-3b-4",
+    "cat": "ターゲティング",
+    "text": "単一またはごく少数のセグメントに限定して集中的にマーケティングを行うターゲティングはどれか。",
+    "choices": [
+     "無差別型ターゲティング",
+     "差別型ターゲティング",
+     "集中型ターゲティング",
+     "拡大型ターゲティング"
+    ],
+    "answer": 2,
+    "exp": "「ペット連れ可能な宿」や「ダイビング旅行専用旅行会社」など特定の市場に特化した例。"
+   },
+   {
+    "id": "kb-3b-5",
+    "cat": "ターゲティング",
+    "text": "航空座席のファーストクラスとエコノミークラスは、どのターゲティングの例か。",
+    "choices": [
+     "無差別型ターゲティング",
+     "集中型ターゲティング",
+     "ペルソナマーケティング",
+     "差別型ターゲティング"
+    ],
+    "answer": 3,
+    "exp": "セグメントごとに一部の機能や特徴、料金設定を変える。"
+   },
+   {
+    "id": "kb-3b-6",
+    "cat": "ターゲティング",
+    "text": "「ペット連れ可能な宿」や「ダイビング旅行専用旅行会社」は、どのターゲティングの例か。",
+    "choices": [
+     "集中型ターゲティング",
+     "無差別型ターゲティング",
+     "差別型ターゲティング",
+     "マルチブランド戦略"
+    ],
+    "answer": 0,
+    "exp": "ニッチ市場や高級ブランド、コアなファンがいるセグメントで採用される。"
+   },
+   {
+    "id": "kb-3b-7",
+    "cat": "ターゲティング",
+    "text": "規模が小さい特定のセグメントのことを「ニッチ市場」というが、ニッチ（niche）とはどういう意味か。",
+    "choices": [
+     "高級",
+     "隙間",
+     "大衆",
+     "中心"
+    ],
+    "answer": 1,
+    "exp": "ニッチ＝「隙間」。"
+   },
+   {
+    "id": "kb-3b-8",
+    "cat": "ターゲティング",
+    "text": "ホテルでは一つの建物で高級志向客から低価格志向客まで対応することはほぼない。そこでMホテルグループのように、用途とグレードごとに別々のブランドでホテルを展開することを何というか。",
+    "choices": [
+     "無差別型ターゲティング",
+     "ダイナミック・プライシング",
+     "マルチブランド戦略",
+     "プロモーション・ミックス"
+    ],
+    "answer": 2,
+    "exp": "無差別型ターゲティングはホテルには不向きという事例。"
+   },
+   {
+    "id": "kb-3b-9",
+    "cat": "ポジショニング",
+    "text": "ターゲットに商品をどのように認識してもらうか、イメージを決めることを何というか。",
+    "choices": [
+     "セグメンテーション",
+     "ターゲティング",
+     "ポジショニング",
+     "チャネル政策"
+    ],
+    "answer": 2,
+    "exp": "独特なイメージを植え付け価値を認めてもらうことで、競合する商品との差別化を図り、独自のポジションを築く。"
+   },
+   {
+    "id": "kb-3b-10",
+    "cat": "ポジショニング",
+    "text": "顧客が商品を購入する際の決定要因（「安かったから」「写真がきれいだったから」など）を何というか。",
+    "choices": [
+     "価格感度",
+     "購買決定要因（KBF）",
+     "セグメント",
+     "OTA"
+    ],
+    "answer": 1,
+    "exp": "KBF＝Key Buying Factor。ポジショニングでは比重の大きい要因から、自身が強みを発揮できる価値軸を選択する。"
+   },
+   {
+    "id": "kb-3b-11",
+    "cat": "ポジショニング",
+    "text": "ポジショニングで比較する価値軸の数について、正しいものはどれか。",
+    "choices": [
+     "多ければ多いほどよいので10軸以上",
+     "1軸だけで比較する",
+     "軸は使わずに文章だけで比較する",
+     "通常は2軸のマトリックス図が用いられる"
+    ],
+    "answer": 3,
+    "exp": "比較する軸が多くなりすぎると複雑になり要点がずれることがあるため、通常は2軸。"
+   },
+   {
+    "id": "kb-3b-12",
+    "cat": "ポジショニング",
+    "text": "ポジショニング・マップ上で、競合相手がいない空いている場所のことを何というか。",
+    "choices": [
+     "空き地",
+     "隙間産業",
+     "ブルーオーシャン",
+     "ニッチ"
+    ],
+    "answer": 0,
+    "exp": "競合相手のいない空き地を探すことがポジショニングでは重要。"
+   },
+   {
+    "id": "kb-3b-13",
+    "cat": "ポジショニング",
+    "text": "パッケージツアーのポジショニング・マップで、「価格が高い」かつ「差別化商品」の位置にあるのはどれか。",
+    "choices": [
+     "学生向け格安ツアー",
+     "一般的なパッケージツアー",
+     "クルーズツアー",
+     "テーマ旅行"
+    ],
+    "answer": 2,
+    "exp": "縦軸＝価格、横軸＝大衆化商品か差別化商品か。クルーズツアーやメディカルツアーが高価格・差別化側にある。"
+   },
+   {
+    "id": "kb-3b-14",
+    "cat": "マーケティング・ミックス",
+    "text": "マーケティング戦略の第三段階で、ターゲットに「どうやって提供するか」という具体的な手段を考えることを何というか。",
+    "choices": [
+     "マーケティング・ミックス",
+     "STP分析",
+     "SWOT分析",
+     "ポジショニング"
+    ],
+    "answer": 0,
+    "exp": "四つの「P」を考えることから4P政策ともいう。"
+   },
+   {
+    "id": "kb-3b-15",
+    "cat": "マーケティング・ミックス",
+    "text": "4P政策の4つのPの組み合わせとして正しいものはどれか。",
+    "choices": [
+     "Product・Price・Plan・Promotion",
+     "Product・Price・Place・Promotion",
+     "Product・People・Place・Promotion",
+     "Plan・Price・Place・Process"
+    ],
+    "answer": 1,
+    "exp": "商品政策・価格政策・チャネル政策・プロモーション政策。"
+   },
+   {
+    "id": "kb-3b-16",
+    "cat": "マーケティング・ミックス",
+    "text": "4Pの「Place」にあたる政策はどれか。",
+    "choices": [
+     "商品政策",
+     "価格政策",
+     "プロモーション政策",
+     "チャネル政策"
+    ],
+    "answer": 3,
+    "exp": "Place＝販売経路の選定などのチャネル政策。"
+   },
+   {
+    "id": "kb-3b-17",
+    "cat": "マーケティング・ミックス",
+    "text": "4Pを別々に計画し実行するのではなく、組み合わせることでどうなるか。",
+    "choices": [
+     "費用が必ず2倍になる",
+     "マーケティングの効果を大きくすることができる",
+     "ターゲットが不要になる",
+     "価格を自由に決められなくなる"
+    ],
+    "answer": 1,
+    "exp": "4Pは組み合わせることが大切。"
+   },
+   {
+    "id": "kb-3b-18",
+    "cat": "商品政策",
+    "text": "商品政策で、観光客の雰囲気や心理など五感全体に訴えかけるように設計することが重要とされる商品はどれか。",
+    "choices": [
+     "単品商品",
+     "格安商品",
+     "限定商品",
+     "複合商品"
+    ],
+    "answer": 3,
+    "exp": "自身の強みや価値、魅力を最大限活かせる商品を企画し設計する。例：沖縄県竹富島周遊ツアー。"
+   },
+   {
+    "id": "kb-3b-19",
+    "cat": "価格政策",
+    "text": "消費者が商品の価格変動に対して示す反応の度合いを何というか。",
+    "choices": [
+     "価格感度",
+     "購買決定要因",
+     "価格競争",
+     "需要変動"
+    ],
+    "answer": 0,
+    "exp": "価格感度が高いと価格変動ですぐ購買行動に影響し、低いと価格以外の販売促進活動が必要になる。"
+   },
+   {
+    "id": "kb-3b-20",
+    "cat": "価格政策",
+    "text": "需要変動に応じて価格が変動する価格設定の方法を何というか。",
+    "choices": [
+     "マルチブランド戦略",
+     "プロモーション・ミックス",
+     "ダイナミック・プライシング",
+     "ペルソナマーケティング"
+    ],
+    "answer": 2,
+    "exp": "テーマパークで平日と日曜日、連休で入場料金が違うなど。集中しがちな需要の分散を狙う。"
+   },
+   {
+    "id": "kb-3b-21",
+    "cat": "価格政策",
+    "text": "観光ビジネスで、全く同じ観光体験をしても人によって価格への評価が異なる場合がある理由はどれか。",
+    "choices": [
+     "観光ビジネスは無形の商品が含まれるから",
+     "観光商品は必ず有形だから",
+     "価格が法律で決まっているから",
+     "観光客は価格を気にしないから"
+    ],
+    "answer": 0,
+    "exp": "無形の商品のため、価格への評価が人によって異なる。"
+   },
+   {
+    "id": "kb-3b-22",
+    "cat": "チャネル政策",
+    "text": "チャネル政策とは何か。",
+    "choices": [
+     "商品の価格を決めること",
+     "ターゲットに商品を知らせること",
+     "ターゲットが商品を購入しやすい販売チャネルを構築すること",
+     "商品を企画し設計すること"
+    ],
+    "answer": 2,
+    "exp": "販売チャネルには店舗・卸売・通信販売・訪問販売・インターネットなどがある。"
+   },
+   {
+    "id": "kb-3b-23",
+    "cat": "チャネル政策",
+    "text": "実店舗を持たず、Webサイト上の店舗で旅行商品の販売を行う旅行会社を何というか。",
+    "choices": [
+     "DMO",
+     "OTA（オンライン・トラベル・エージェント）",
+     "FIT",
+     "KBF"
+    ],
+    "answer": 1,
+    "exp": "インターネットの普及で、旅行会社を通さない直接取引やOTA部門が拡大している。"
+   },
+   {
+    "id": "kb-3b-24",
+    "cat": "チャネル政策",
+    "text": "インターネット取引（電子商取引）で、検索方法や掲載場所・リンク先などの工夫が重要になる理由はどれか。",
+    "choices": [
+     "店舗や人件費のコストが高くなるため",
+     "インターネットを使う人が少ないため",
+     "法律で掲載場所が決められているため",
+     "情報が過多になりやすく、観光客の目に留めるのが難しいため"
+    ],
+    "answer": 3,
+    "exp": "電子商取引は店舗や人件費のコストがおさえられるが、情報が過多になりやすい。"
+   },
+   {
+    "id": "kb-3b-25",
+    "cat": "プロモーション政策",
+    "text": "ターゲットに商品を知らせて購買に導くことを何というか。",
+    "choices": [
+     "チャネル政策",
+     "商品政策",
+     "プロモーション政策",
+     "価格政策"
+    ],
+    "answer": 2,
+    "exp": "方法には広告・広報・販売促進（セールス・プロモーション）・販売員活動などがある。"
+   },
+   {
+    "id": "kb-3b-26",
+    "cat": "プロモーション政策",
+    "text": "広告・広報・販売促進・販売員活動などを組み合わせたものを何というか。",
+    "choices": [
+     "マーケティング・ミックス",
+     "プロモーション・ミックス",
+     "マルチブランド戦略",
+     "ポジショニング・マップ"
+    ],
+    "answer": 1,
+    "exp": "これらを積極的に組み合わせて行っている。"
+   },
+   {
+    "id": "kb-3b-27",
+    "cat": "プロモーション政策",
+    "text": "旅行会社H社がSNSを積極的にプロモーションに活用している理由として正しいものはどれか。",
+    "choices": [
+     "SNSは若者世代で情報が拡散しやすく、写真や動画など視覚的な訴求力が強いから",
+     "SNSは高齢者だけが使っているから",
+     "SNSは費用が非常に高いから",
+     "SNSでは写真が使えないから"
+    ],
+    "answer": 0,
+    "exp": "旅好きな女性向けのSNSのコミュニティで、旅先で撮った写真を投稿してもらい魅力を発信している。"
+   }
+  ]
+ },
+ {
+  "id": "kb-all",
+  "tab": "全範囲ミックス",
+  "eyebrow": "観光ビジネス 第3章",
+  "icon": "全",
+  "meta": "1節〜3節の全問をランダムに出題",
+  "title": "全範囲ミックス（p.66〜87）",
+  "desc": "1節〜3節の全問題からランダムに出題します。",
+  "recordKey": "kanko_kb_all",
+  "questions": [
+   {
+    "id": "all-kb-1a-1",
+    "cat": "観光客の概念",
+    "text": "国連世界観光機関（UN Tourism）は、観光客をどのように定義しているか。",
+    "choices": [
+     "どのような目的であれ旅行する人々すべて",
+     "観光を主な目的として旅行する人々",
+     "宿泊を伴う旅行をする人々",
+     "国境を越えて旅行する人々"
+    ],
+    "answer": 0,
+    "exp": "UN Tourism は「どのような目的であれ旅行する人々すべて」を観光客と定義している。"
+   },
+   {
+    "id": "all-kb-1a-2",
+    "cat": "観光客の概念",
+    "text": "旅行を目的別に分類したとき、帰省やスポーツ遠征、冠婚葬祭による旅行はどれにあたるか。",
+    "choices": [
+     "公用旅行",
+     "商用旅行",
+     "観光旅行",
+     "その他の旅行"
+    ],
+    "answer": 3,
+    "exp": "旅行は公用旅行・商用旅行・観光旅行・その他の旅行（帰省・スポーツ遠征・冠婚葬祭など）に分類できる。"
+   },
+   {
+    "id": "all-kb-1a-3",
+    "cat": "観光客の概念",
+    "text": "旅の本来の目的が仕事であっても観光客とされるのはなぜか。",
+    "choices": [
+     "仕事の後に必ず観光をするから",
+     "旅行会社を通して旅行するから",
+     "交通機関を利用し、宿泊施設に滞在し、現地で食事をするから",
+     "観光地で土産物を買うことが義務だから"
+    ],
+    "answer": 2,
+    "exp": "仕事目的でも観光客と同じように交通機関・宿泊施設・食事を利用するため。仕事のついでに観光を楽しむ人もいる。"
+   },
+   {
+    "id": "all-kb-1a-4",
+    "cat": "観光客の概念",
+    "text": "観光ビジネスにおいては、どのような人々をすべて「観光客」と表現しているか。",
+    "choices": [
+     "観光地に宿泊する人々",
+     "目的や形態に関係なく旅行する人々",
+     "観光施設に入場料を払う人々",
+     "旅行会社のツアーに参加する人々"
+    ],
+    "answer": 1,
+    "exp": "観光客もそれ以外の旅行客も同様の効果をもたらすため、どのような目的や形態であれ旅行する人々をすべて「観光客」と表現している。"
+   },
+   {
+    "id": "all-kb-1a-5",
+    "cat": "観光統計",
+    "text": "日本人の出国者数や訪日外国人の入国者数など、国際観光客数を把握する統計はどれか。",
+    "choices": [
+     "宿泊旅行統計調査",
+     "旅行・観光消費動向調査",
+     "出入国管理統計",
+     "家計調査"
+    ],
+    "answer": 2,
+    "exp": "観光統計では、延べ宿泊者数をみる宿泊旅行統計調査、国際観光客数を測る出入国管理統計、観光の消費実態を知る旅行・観光消費動向調査などがある。"
+   },
+   {
+    "id": "all-kb-1a-6",
+    "cat": "観光統計",
+    "text": "延べ宿泊者数をみるための観光統計はどれか。",
+    "choices": [
+     "出入国管理統計",
+     "宿泊旅行統計調査",
+     "旅行・観光消費動向調査",
+     "国勢調査"
+    ],
+    "answer": 1,
+    "exp": "延べ宿泊者数＝宿泊旅行統計調査。"
+   },
+   {
+    "id": "all-kb-1a-7",
+    "cat": "観光統計",
+    "text": "観光の消費実態を知るための観光統計はどれか。",
+    "choices": [
+     "旅行・観光消費動向調査",
+     "宿泊旅行統計調査",
+     "出入国管理統計",
+     "観光入込客統計"
+    ],
+    "answer": 0,
+    "exp": "消費の実態＝旅行・観光消費動向調査。"
+   },
+   {
+    "id": "all-kb-1a-8",
+    "cat": "観光統計",
+    "text": "すべての観光客を調べるのは難しいため、観光統計の多くで用いられている調査方法はどれか。",
+    "choices": [
+     "全員を対象にした全数調査",
+     "観光客への電話調査のみ",
+     "宿泊施設の売上だけを調べる調査",
+     "一部を対象にしたサンプル調査"
+    ],
+    "answer": 3,
+    "exp": "観光客の行動は多様で全数調査は難しいため、一部を対象にしたサンプル調査で行われる。だから調査の精度向上が課題になる。"
+   },
+   {
+    "id": "all-kb-1a-9",
+    "cat": "観光統計",
+    "text": "観光統計の整備で必要とされる2点の組み合わせとして正しいものはどれか。",
+    "choices": [
+     "調査費用の削減・調査回数の削減",
+     "全数調査への切り替え・民間調査の廃止",
+     "外国人観光客の調査中止・国内客の重点調査",
+     "統一された基準の策定・サンプル調査の精度の向上"
+    ],
+    "answer": 3,
+    "exp": "主体ごとに基準がばらばらだったため①統一的な基準、②サンプル調査の精度の向上、の2点が求められている。"
+   },
+   {
+    "id": "all-kb-1a-10",
+    "cat": "観光統計",
+    "text": "都道府県ごとの観光入込客数を比較できるようにするため、国土交通省と観光庁が策定したものはどれか。",
+    "choices": [
+     "観光立国推進基本法",
+     "観光入込客統計の共通基準",
+     "広域観光周遊ルート",
+     "訪日外国人消費動向調査"
+    ],
+    "answer": 1,
+    "exp": "都道府県が独自の基準で集計していたため比較できなかった。そこで共通基準を策定し、すべての都道府県に導入を働きかけている。"
+   },
+   {
+    "id": "all-kb-1a-11",
+    "cat": "観光客の種類",
+    "text": "観光地で宿泊せずに、帰宅または次の場所へ移動する観光客を何というか。",
+    "choices": [
+     "日帰り客",
+     "宿泊客",
+     "団体旅行客",
+     "アウトバウンド"
+    ],
+    "answer": 0,
+    "exp": "日帰り客＝宿泊しない。宿泊客＝観光地で宿泊する。"
+   },
+   {
+    "id": "all-kb-1a-12",
+    "cat": "観光客の種類",
+    "text": "宿泊客が日帰り客に比べて、より大きな観光消費をもたらす理由はどれか。",
+    "choices": [
+     "交通費が安くなるため",
+     "団体で行動するため",
+     "滞在時間が長くなるため",
+     "土産物を買わないため"
+    ],
+    "answer": 2,
+    "exp": "宿泊客は滞在時間が長くなるため、より大きな観光消費をもたらす存在である。"
+   },
+   {
+    "id": "all-kb-1a-13",
+    "cat": "観光客の種類",
+    "text": "観光に伴う消費のことで、交通機関や宿泊施設、飲食店や土産物店など地域経済に広く波及するものを何というか。",
+    "choices": [
+     "観光資源",
+     "観光統計",
+     "観光入込客",
+     "観光消費"
+    ],
+    "answer": 3,
+    "exp": "観光消費の拡大は地域振興において非常に重要である。"
+   },
+   {
+    "id": "all-kb-1a-14",
+    "cat": "観光客の種類",
+    "text": "インバウンド（inbound）の意味として正しいものはどれか。",
+    "choices": [
+     "「本国行きの」という意味で、他国から自国を訪問する旅行や観光客",
+     "「外国行きの」という意味で、自国から他国への旅行や観光客",
+     "国内の別の地域へ移動する旅行",
+     "宿泊を伴わない旅行"
+    ],
+    "answer": 0,
+    "exp": "日本ではインバウンド＝訪日外国人旅行・訪日外国人観光客。"
+   },
+   {
+    "id": "all-kb-1a-15",
+    "cat": "観光客の種類",
+    "text": "日本において「アウトバウンド」にあたるものはどれか。",
+    "choices": [
+     "訪日外国人旅行",
+     "日本人の海外旅行",
+     "日本人の国内旅行",
+     "外国人の日本国内での移動"
+    ],
+    "answer": 1,
+    "exp": "アウトバウンド＝「外国行きの」。日本では日本人海外旅行・日本人海外旅行者を意味する。"
+   },
+   {
+    "id": "all-kb-1a-16",
+    "cat": "観光客の種類",
+    "text": "インバウンドが地域に大きな効果をもたらす理由として、教科書が挙げているものはどれか。",
+    "choices": [
+     "日帰りが多く、回転率が高いため",
+     "団体旅行が多く、行動が予測しやすいため",
+     "消費意欲が高く、宿泊を伴うことが多いため",
+     "日本人観光客より滞在時間が短いため"
+    ],
+    "answer": 2,
+    "exp": "インバウンドは消費意欲が高く、宿泊を伴うことが多い。"
+   },
+   {
+    "id": "all-kb-1a-17",
+    "cat": "観光客の種類",
+    "text": "個人手配で海外旅行をする人々のことを何というか。",
+    "choices": [
+     "DMO",
+     "OTA",
+     "KBF",
+     "FIT（個人自由旅行）"
+    ],
+    "answer": 3,
+    "exp": "FIT は Free Independent Traveler の略。旅行者自らが旅行を計画し個人手配で海外旅行をする観光客やその形態。"
+   },
+   {
+    "id": "all-kb-1a-18",
+    "cat": "観光客の種類",
+    "text": "団体旅行客について、教科書が挙げている課題はどれか。",
+    "choices": [
+     "滞在時間が長く、行動範囲が広すぎる",
+     "客単価が高く、予約が取りにくい",
+     "客単価が低く、決まったルートしか行動しない",
+     "人数が少なく、送客が不安定"
+    ],
+    "answer": 2,
+    "exp": "団体旅行は一定の客数を確保し送客してくれるが、客単価が低く、決まったルートしか行動しないという課題がある。"
+   },
+   {
+    "id": "all-kb-1a-19",
+    "cat": "観光客の種類",
+    "text": "個人旅行客の特徴として正しいものはどれか。",
+    "choices": [
+     "団体客と比べて滞在時間が長く、行動範囲が広く、客単価が高い",
+     "団体客と比べて滞在時間が短く、客単価が低い",
+     "決まったルートしか行動しない",
+     "旅行会社を必ず通して旅行する"
+    ],
+    "answer": 0,
+    "exp": "インターネットの普及で個人手配が簡単になり、個人旅行客は増加している。"
+   },
+   {
+    "id": "all-kb-1a-20",
+    "cat": "観光客の種類",
+    "text": "近年、社員旅行や修学旅行などの団体旅行客が減少傾向にある理由として正しいものはどれか。",
+    "choices": [
+     "交通機関の運賃の値下げ",
+     "職場の人間関係の変化や少子化",
+     "旅行会社の増加",
+     "観光地の減少"
+    ],
+    "answer": 1,
+    "exp": "社員旅行は職場の人間関係の変化で少なくなり、修学旅行に参加する生徒数も少子化で減少している。"
+   },
+   {
+    "id": "all-kb-1a-21",
+    "cat": "インバウンド観光",
+    "text": "2019年の訪日外国人観光客の観光消費額はおよそいくらか。",
+    "choices": [
+     "約1.2兆円",
+     "約11.9兆円",
+     "約4.8兆円",
+     "約48兆円"
+    ],
+    "answer": 2,
+    "exp": "約4.8兆円で、国内の観光消費額全体の約17％を占めている。"
+   },
+   {
+    "id": "all-kb-1a-22",
+    "cat": "インバウンド観光",
+    "text": "訪日外国人観光客の観光消費額を製品別輸出額と比べると、どの位置にあたるか。",
+    "choices": [
+     "自動車を上回る第1位",
+     "化学製品に次ぐ第2位",
+     "鉄鋼製品より下の第6位",
+     "自動車・化学製品に次ぐ第3位"
+    ],
+    "answer": 3,
+    "exp": "自動車11.9兆円・化学製品8.7兆円に次ぎ、観光4.8兆円は第3位。電子部品・自動車部品・鉄鋼製品を上回る。"
+   },
+   {
+    "id": "all-kb-1a-23",
+    "cat": "インバウンド観光",
+    "text": "インバウンド観光が「輸出産業の一つ」と考えられている理由はどれか。",
+    "choices": [
+     "日本の製品を海外へ運ぶから",
+     "外国人観光客が自国で稼いだお金を持ち込み、日本で新たな消費を生み出すから",
+     "日本人が海外でお金を使うから",
+     "外国人観光客が日本で働くから"
+    ],
+    "answer": 1,
+    "exp": "外国から持ち込まれたお金で消費が生まれるため、日本経済への大きな収入となり、輸出と同等の経済効果がある。"
+   },
+   {
+    "id": "all-kb-1a-24",
+    "cat": "観光客の行動",
+    "text": "出発地から目的地までを同一ルートで往復する行動パターンを何というか。",
+    "choices": [
+     "単一目的地型",
+     "拠点地型",
+     "周遊観光型",
+     "ラケット型"
+    ],
+    "answer": 0,
+    "exp": "単一目的地型（ピストン型）。日帰りや一泊二日などの短期旅行やテーマパーク、スポーツ観戦などがあてはまる。"
+   },
+   {
+    "id": "all-kb-1a-25",
+    "cat": "観光客の行動",
+    "text": "単一目的地型の別名はどれか。",
+    "choices": [
+     "ピストン型",
+     "回遊行動型",
+     "ハブ型",
+     "スター型"
+    ],
+    "answer": 0,
+    "exp": "単一目的地型はピストン型ともいう。周遊観光型は回遊行動型ともいう。"
+   },
+   {
+    "id": "all-kb-1a-26",
+    "cat": "観光客の行動",
+    "text": "特定の目的地を拠点として長期間滞在する行動パターンで、夏の避暑や冬のスキーなどがあてはまるのはどれか。",
+    "choices": [
+     "単一目的地型",
+     "拠点地型",
+     "周遊観光型",
+     "ピストン型"
+    ],
+    "answer": 1,
+    "exp": "拠点地型＝リゾート地での滞在型観光など。拠点から近隣の観光地へ日帰りで観光することもある。"
+   },
+   {
+    "id": "all-kb-1a-27",
+    "cat": "観光客の行動",
+    "text": "出発地から複数の観光地点を巡りながら、最後にまた出発地へ戻ってくる行動パターンを何というか。",
+    "choices": [
+     "拠点地型",
+     "単一目的地型",
+     "ラケット型",
+     "周遊観光型"
+    ],
+    "answer": 3,
+    "exp": "周遊観光型（回遊行動型）。観光以外に食事・休憩・土産物の購入なども組み合わせて成り立つ。"
+   },
+   {
+    "id": "all-kb-1a-28",
+    "cat": "観光客の行動",
+    "text": "拠点地型と周遊観光型を組み合わせた行動パターンを何というか。",
+    "choices": [
+     "ピストン型",
+     "単一目的地型",
+     "ラケット型",
+     "回遊行動型"
+    ],
+    "answer": 2,
+    "exp": "テニスラケットに見立て、柄の部分＝出発地から拠点地まで、面の部分＝拠点地から周辺への周遊を表す。"
+   },
+   {
+    "id": "all-kb-1a-29",
+    "cat": "観光客の行動",
+    "text": "観光客の行動パターンは、何によってさまざまに変化するとされているか。",
+    "choices": [
+     "観光客の国籍だけ",
+     "旅行会社の規模だけ",
+     "観光の目的、出発地からの距離や交通アクセス、周辺観光地の有無など",
+     "観光地の人口だけ"
+    ],
+    "answer": 2,
+    "exp": "これらをふまえ、周辺観光地と連携し共存共栄を目指すことも必要。"
+   },
+   {
+    "id": "all-kb-1a-30",
+    "cat": "観光客の行動",
+    "text": "観光庁が訪日外国人観光客を地方へ誘致するために2015年から進めている事業はどれか。",
+    "choices": [
+     "広域観光周遊ルート形成促進事業",
+     "恋人の聖地プロジェクト",
+     "花巻観光振興ビジョン",
+     "ナイトツアー推進事業"
+    ],
+    "answer": 0,
+    "exp": "2021年現在、11の認定ルートがあり、各ルートで計31のモデルコースが作成されている。"
+   },
+   {
+    "id": "all-kb-1a-31",
+    "cat": "観光客の行動",
+    "text": "「日本のてっぺん。きた北海道ルート」の「The Top of Japan−夏」というモデルコースは、札幌を拠点としたどの行動ルートになっているか。",
+    "choices": [
+     "単一目的地型",
+     "ラケット型",
+     "拠点地型",
+     "ピストン型"
+    ],
+    "answer": 1,
+    "exp": "札幌を拠点として、留萌・稚内・名寄・旭川などを巡り戻るラケット型行動ルート。"
+   },
+   {
+    "id": "all-kb-1b-1",
+    "cat": "訪日外国人の消費と行動",
+    "text": "訪日外国人観光客の国・地域別の内訳について、正しいものはどれか。",
+    "choices": [
+     "ヨーロッパやアメリカが大部分を占める",
+     "オーストラリアが最も多い",
+     "アフリカからの観光客が半分以上を占める",
+     "中国・韓国を中心に近隣アジア諸国が大部分を占める"
+    ],
+    "answer": 3,
+    "exp": "距離的に近い近隣国や地域同士の往来が活発になることは一般的。ヨーロッパやオーストラリアからは少ない。"
+   },
+   {
+    "id": "all-kb-1b-2",
+    "cat": "訪日外国人の消費と行動",
+    "text": "2019年の訪日外国人観光客数で、最も多い国・地域はどれか。",
+    "choices": [
+     "韓国",
+     "台湾",
+     "中国",
+     "アメリカ"
+    ],
+    "answer": 2,
+    "exp": "中国 約959万人、韓国 約558万人、台湾 約489万人の順。"
+   },
+   {
+    "id": "all-kb-1b-3",
+    "cat": "訪日外国人の消費と行動",
+    "text": "訪日外国人観光客の都道府県別の訪問先で、上位に入っていないものはどれか。",
+    "choices": [
+     "東京都",
+     "愛知県",
+     "大阪府",
+     "北海道"
+    ],
+    "answer": 1,
+    "exp": "東京・大阪・京都・北海道・沖縄県が上位に並ぶ。"
+   },
+   {
+    "id": "all-kb-1b-4",
+    "cat": "訪日外国人の消費と行動",
+    "text": "東京に次いで北海道への宿泊が多い傾向があるのはどこからの観光客か。",
+    "choices": [
+     "アジア圏の観光客",
+     "欧米豪からの観光客",
+     "アフリカからの観光客",
+     "中東からの観光客"
+    ],
+    "answer": 0,
+    "exp": "アジア圏は東京や大阪に次いで北海道への宿泊が多い。欧米豪は東京に次いで京都に宿泊することが多い。"
+   },
+   {
+    "id": "all-kb-1b-5",
+    "cat": "訪日外国人の消費と行動",
+    "text": "欧米豪からの観光客が、東京に次いで多く宿泊する都道府県はどれか。",
+    "choices": [
+     "北海道",
+     "沖縄県",
+     "京都府",
+     "福岡県"
+    ],
+    "answer": 2,
+    "exp": "欧米豪は東京に次いで京都、アジア圏は北海道への宿泊が多い。"
+   },
+   {
+    "id": "all-kb-1b-6",
+    "cat": "訪日外国人の消費と行動",
+    "text": "訪日外国人観光客の観光消費額が、客数の増加と比例して急激に伸びたのはいつ頃か。",
+    "choices": [
+     "2015〜2019年頃",
+     "2000〜2005年頃",
+     "2008〜2010年頃",
+     "2020〜2022年頃"
+    ],
+    "answer": 0,
+    "exp": "特に2015〜2019年頃に急激な伸びを見せた（2019年 4兆8,135億円・3,188万人）。"
+   },
+   {
+    "id": "all-kb-1b-7",
+    "cat": "訪日外国人の消費と行動",
+    "text": "訪日外国人観光客一人当たりの旅行支出の内訳で、多い順に並べたものはどれか。",
+    "choices": [
+     "交通費 → 飲食費 → 宿泊費",
+     "買い物代 → 宿泊費 → 飲食費",
+     "娯楽サービス費 → 買い物代 → 交通費",
+     "飲食費 → 交通費 → 宿泊費"
+    ],
+    "answer": 1,
+    "exp": "内訳は買い物代が最も多く、宿泊費、飲食費と続いている。"
+   },
+   {
+    "id": "all-kb-1b-8",
+    "cat": "訪日外国人の消費と行動",
+    "text": "欧米豪の観光客の特徴として正しいものはどれか。",
+    "choices": [
+     "平均滞在日数が3日以内と短く、何度も日本を訪れる",
+     "旅行支出の多くは買い物代で、化粧品をよく買う",
+     "旅行支出は中国の三分の一程度",
+     "平均滞在日数が12日〜2週間程度と長く、旅行支出の多くは宿泊費"
+    ],
+    "answer": 3,
+    "exp": "欧米豪は一人当たりの旅行支出総額も20万円程度と高額。買い物では菓子類・衣類・酒類・民芸・工芸品を購入する傾向。"
+   },
+   {
+    "id": "all-kb-1b-9",
+    "cat": "訪日外国人の消費と行動",
+    "text": "中国人観光客の特徴として正しいものはどれか。",
+    "choices": [
+     "滞在7日前後で、旅行支出の多くは買い物代。化粧品・菓子類・医薬品などを購入",
+     "滞在5〜6日で、旅行支出は欧米豪の三分の一程度",
+     "滞在12日〜2週間で、旅行支出の多くは宿泊費",
+     "買い物をほとんどしない"
+    ],
+    "answer": 0,
+    "exp": "中国人は欧米豪とほぼ同額の旅行支出だが、多くは買い物代。時計・カメラ・宝石・貴金属など高額な消費をする傾向もある。"
+   },
+   {
+    "id": "all-kb-1b-10",
+    "cat": "訪日外国人の消費と行動",
+    "text": "韓国や台湾からの観光客の特徴として正しいものはどれか。",
+    "choices": [
+     "平均滞在日数が12日以上で、宿泊費の支出が多い",
+     "化粧品や医薬品の購入が最も多い",
+     "平均滞在日数が5〜6日と短く、旅行支出は中国の三分の一程度だが、何度も日本を訪れる",
+     "日本を一度しか訪れない人がほとんど"
+    ],
+    "answer": 2,
+    "exp": "とりわけ韓国人観光客は滞在日数が3日以内という人の割合も多い。何度も訪れるリピーターが多い。"
+   },
+   {
+    "id": "all-kb-1b-11",
+    "cat": "訪日外国人の消費と行動",
+    "text": "繰り返し同じ観光地を訪れる観光客を何というか。",
+    "choices": [
+     "FIT",
+     "インバウンド",
+     "ペルソナ",
+     "リピーター"
+    ],
+    "answer": 3,
+    "exp": "リピーター＝リピート客ともいう。"
+   },
+   {
+    "id": "all-kb-1b-12",
+    "cat": "訪日外国人の消費と行動",
+    "text": "2019年の国・地域別の外国人一人当たりの旅行支出で、表の中で最も多い国はどれか。",
+    "choices": [
+     "中国",
+     "オーストラリア",
+     "アメリカ",
+     "韓国"
+    ],
+    "answer": 1,
+    "exp": "オーストラリア 247,868円が最も多い（平均泊数12.9）。韓国は76,138円で最も少ない。"
+   },
+   {
+    "id": "all-kb-1b-13",
+    "cat": "体験型観光",
+    "text": "日本を訪れる外国人観光客の約何割がリピーターとなったことで、体験型観光へのシフトが加速しているか（2017年）。",
+    "choices": [
+     "約2割",
+     "約4割",
+     "約9割",
+     "約6割"
+    ],
+    "answer": 3,
+    "exp": "2016年以降「買い物」人気が下がり、2017年には約6割がリピーターとなった。"
+   },
+   {
+    "id": "all-kb-1b-14",
+    "cat": "体験型観光",
+    "text": "体験型観光とはどのようなものか。",
+    "choices": [
+     "その観光地でしかできない体験を組み込んだ観光形態",
+     "名所を見学することを中心とした観光形態",
+     "買い物を目的とした観光形態",
+     "日帰りで行う観光形態"
+    ],
+    "answer": 0,
+    "exp": "見学旅行に比べると消費の拡大が期待できるため、さまざまな取り組みが行われている。"
+   },
+   {
+    "id": "all-kb-1b-15",
+    "cat": "体験型観光",
+    "text": "体験型観光の例として、教科書に挙げられていないものはどれか。",
+    "choices": [
+     "社寺参拝に写経や座禅を加える",
+     "動物園や水族館で生き物と触れ合う",
+     "免税店での家電製品の大量購入",
+     "都市観光にその地の歴史を語るガイドツアーを組み込む"
+    ],
+    "answer": 2,
+    "exp": "大量購入（爆買い）は買い物中心の観光で、体験型観光ではない。"
+   },
+   {
+    "id": "all-kb-1b-16",
+    "cat": "体験型観光",
+    "text": "伝統的・正統的な文化に対して、ある特定の層に支持されて広まった文化（アニメ・漫画・ゲームなど）を何というか。",
+    "choices": [
+     "アクティビティ",
+     "サブカルチャー",
+     "ナイト・エンターテイメント",
+     "コミュニティツーリズム"
+    ],
+    "answer": 1,
+    "exp": "欧米豪の観光客は日本の伝統文化への関心が高く、近年ではサブカルチャーへの関心も高い。"
+   },
+   {
+    "id": "all-kb-1b-17",
+    "cat": "体験型観光",
+    "text": "スキーやスノーボードへの関心が特に高く、北海道ニセコ町や長野県白馬村などに多く訪れている観光客はどれか。",
+    "choices": [
+     "中国人観光客",
+     "韓国人観光客",
+     "オーストラリア人観光客",
+     "台湾人観光客"
+    ],
+    "answer": 2,
+    "exp": "オーストラリアは日本と季節が逆なので、日本の冬のスノーリゾートに長期滞在する人が多い。"
+   },
+   {
+    "id": "all-kb-1b-18",
+    "cat": "体験型観光",
+    "text": "台湾や香港の観光客に多い体験型観光の傾向はどれか。",
+    "choices": [
+     "サブカルチャーにだけ関心がある",
+     "トレッキングなど体を動かすアクティビティを好む",
+     "買い物以外にはまったく関心がない",
+     "ゆったり過ごすことに興味が高く、温泉体験や日本食などの文化体験を好む"
+    ],
+    "answer": 3,
+    "exp": "台湾・香港は温泉や日本食。東南アジアは冬の季節感や雪など母国では味わえない自然体験を楽しむ。"
+   },
+   {
+    "id": "all-kb-1b-19",
+    "cat": "体験型観光",
+    "text": "熱帯地域の東南アジアの観光客が楽しんでいる体験はどれか。",
+    "choices": [
+     "海水浴",
+     "冬の季節感や雪といった、母国では味わえない自然体験",
+     "買い物だけのツアー",
+     "日帰りの都市観光"
+    ],
+    "answer": 1,
+    "exp": "母国では味わえない自然体験。"
+   },
+   {
+    "id": "all-kb-1b-20",
+    "cat": "体験型観光",
+    "text": "中国人観光客が家電製品や化粧品などを大量に購入する行動は何と名付けられ、2015年の新語・流行語大賞を受賞したか。",
+    "choices": [
+     "爆買い",
+     "まとめ買い",
+     "衝動買い",
+     "コト消費"
+    ],
+    "answer": 0,
+    "exp": "2014年頃から目立ち、2015年の中国人一人当たりの旅行支出は28万4千円と突出して高かった。"
+   },
+   {
+    "id": "all-kb-1b-21",
+    "cat": "体験型観光",
+    "text": "2016年に「爆買い」が下火になった理由はどれか。",
+    "choices": [
+     "中国政府が海外購入品の輸入関税を引き上げたから",
+     "日本の免税制度が廃止されたから",
+     "円高で日本の商品が高くなったから",
+     "中国から日本への直行便がなくなったから"
+    ],
+    "answer": 0,
+    "exp": "関税引き上げに加え、リピーターが増えて買い物代の割合が減少し、体験型観光の消費へと移行しつつある。"
+   },
+   {
+    "id": "all-kb-1b-22",
+    "cat": "体験型観光",
+    "text": "地域の特色や文化、産業、暮らしを守りつつ、それを観光に活かす地域の観光振興を何というか。",
+    "choices": [
+     "オーバーツーリズム",
+     "マスツーリズム",
+     "ダイナミック・プライシング",
+     "コミュニティツーリズム"
+    ],
+    "answer": 3,
+    "exp": "徳島県の秘境の古民家施設や岐阜県飛騨古川の里山サイクリングなど、「何もない」田舎を観光資源にした例。"
+   },
+   {
+    "id": "all-kb-1b-23",
+    "cat": "体験型観光",
+    "text": "岐阜県飛騨古川で人気がある、美しい田園の里山をガイド付きで巡る体験はどれか。",
+    "choices": [
+     "スキーツアー",
+     "ナイトツアー",
+     "里山サイクリング",
+     "クルーズツアー"
+    ],
+    "answer": 2,
+    "exp": "何もない田舎の風景や暮らしを体験型観光にした例。"
+   },
+   {
+    "id": "all-kb-2-1",
+    "cat": "観光マーケティング",
+    "text": "マーケティングとは何をつくることか。",
+    "choices": [
+     "「安い商品」",
+     "「売れる仕組み」",
+     "「新しい工場」",
+     "「広告の文章」"
+    ],
+    "answer": 1,
+    "exp": "マーケティングとは「売れる仕組み」をつくること。"
+   },
+   {
+    "id": "all-kb-2-2",
+    "cat": "観光マーケティング",
+    "text": "観光ビジネスのマーケティングには、個別企業視点のマーケティングと、もう一つ何があるか。",
+    "choices": [
+     "観光地視点のマーケティング",
+     "消費者視点のマーケティング",
+     "政府視点のマーケティング",
+     "外国人視点のマーケティング"
+    ],
+    "answer": 0,
+    "exp": "観光マーケティング＝個別企業視点＋観光地視点。"
+   },
+   {
+    "id": "all-kb-2-3",
+    "cat": "観光マーケティング",
+    "text": "観光マーケティングの目的として正しいものはどれか。",
+    "choices": [
+     "観光客の数をできるだけ減らすこと",
+     "観光地の価格を一律にすること",
+     "魅力ある観光商品をつくり提供すること",
+     "観光統計を作成すること"
+    ],
+    "answer": 2,
+    "exp": "そのために対象を定め、イメージを決め、価値や品質とともに伝えることが重要。"
+   },
+   {
+    "id": "all-kb-2-4",
+    "cat": "観光マーケティング",
+    "text": "観光商品において価値や品質を保証するものとして、教科書で挙げられていないものはどれか。",
+    "choices": [
+     "ブランドや商標",
+     "クチコミ",
+     "評判",
+     "観光地の人口"
+    ],
+    "answer": 3,
+    "exp": "ブランドや商標、クチコミ、評判などが価値や品質を保証する。"
+   },
+   {
+    "id": "all-kb-2-5",
+    "cat": "観光マーケティング",
+    "text": "観光商品で、ブランドやクチコミが観光の動機付けに大きく影響する理由はどれか。",
+    "choices": [
+     "観光商品は価格がすべて同じだから",
+     "観光商品は何度でも試せるから",
+     "観光客は安全を気にしないから",
+     "顧客が購入前に商品を確かめたり、提供者が内容を保証したりすることが難しいから"
+    ],
+    "answer": 3,
+    "exp": "よく知らない土地で宿泊や食事をするため、身の安全や安心感を求める傾向も強い。"
+   },
+   {
+    "id": "all-kb-2-6",
+    "cat": "観光マーケティング",
+    "text": "商品やサービスの標識（マーク）で、文字・図形・記号・立体的形状・色彩・音などで企業や商品を表現するものを何というか。",
+    "choices": [
+     "商標",
+     "評判",
+     "ペルソナ",
+     "セグメント"
+    ],
+    "answer": 0,
+    "exp": "商標は一定の品質を保証する機能を持つ。ブランドもほぼ同義だが、企業や商品の全体的なイメージも含まれることが多い。"
+   },
+   {
+    "id": "all-kb-2-7",
+    "cat": "観光マーケティング",
+    "text": "旅行の宿泊先やレストランを予約するとき、クチコミサイトを参考にしている人はどのくらいいるか。",
+    "choices": [
+     "10〜20％",
+     "30〜40％",
+     "70〜80％",
+     "ほぼ100％"
+    ],
+    "answer": 2,
+    "exp": "多くの調査で70〜80％の人が参考にしているという結果が出ている。"
+   },
+   {
+    "id": "all-kb-2-8",
+    "cat": "持続可能な観光",
+    "text": "観光客が観光地の受け入れ可能な許容量を超えて詰めかけ、地域住民の生活や環境などに負の影響を生じる現象を何というか。",
+    "choices": [
+     "サステナブルツーリズム",
+     "オーバーツーリズム",
+     "コミュニティツーリズム",
+     "インバウンド"
+    ],
+    "answer": 1,
+    "exp": "交通機能のまひ、騒音、ごみの散乱、治安の悪化、物価の上昇などを引き起こす。"
+   },
+   {
+    "id": "all-kb-2-9",
+    "cat": "持続可能な観光",
+    "text": "京都市のオーバーツーリズムの事例として教科書に挙げられているものはどれか。",
+    "choices": [
+     "観光客が減って旅館が廃業した",
+     "雪が降らずスキー場が閉鎖した",
+     "公共バスが停車できないほど観光客が溢れ、舞妓さんへの追い回し行為が発生",
+     "直行便が廃止された"
+    ],
+    "answer": 2,
+    "exp": "桜と紅葉の時期には公共バスが停車できないほど観光客が溢れ、舞妓パパラッチなどの被害も発生した。"
+   },
+   {
+    "id": "all-kb-2-10",
+    "cat": "持続可能な観光",
+    "text": "観光地を未来永劫、子孫にまで発展させ続け、観光資源の魅力を維持しつつ観光を推進しようとする考え方を何というか。",
+    "choices": [
+     "オーバーツーリズム",
+     "マスツーリズム",
+     "ダークツーリズム",
+     "サステナブルツーリズム"
+    ],
+    "answer": 3,
+    "exp": "自然環境だけでなく、住環境や地域文化の保護や保全にも配慮した概念。"
+   },
+   {
+    "id": "all-kb-2-11",
+    "cat": "持続可能な観光",
+    "text": "オーバーツーリズムの影響として、教科書の内容にあてはまらないものはどれか。",
+    "choices": [
+     "交通機能がまひする",
+     "地域の物価が下がる",
+     "地域住民の反感を生む",
+     "生態系や自然環境に悪影響を与える"
+    ],
+    "answer": 1,
+    "exp": "物価は「上昇」する。"
+   },
+   {
+    "id": "all-kb-2-12",
+    "cat": "デスティネーション",
+    "text": "観光客が観光の目的地として訪れる地域のことを何というか。",
+    "choices": [
+     "デスティネーション",
+     "セグメント",
+     "チャネル",
+     "ポジション"
+    ],
+    "answer": 0,
+    "exp": "デスティネーション＝観光目的地。"
+   },
+   {
+    "id": "all-kb-2-13",
+    "cat": "デスティネーション",
+    "text": "地域全体で観光地のあり方や価値を考えるマーケティング活動を何というか。",
+    "choices": [
+     "ペルソナマーケティング",
+     "ダイナミック・プライシング",
+     "マルチブランド戦略",
+     "デスティネーション・マーケティング"
+    ],
+    "answer": 3,
+    "exp": "観光地マーケティングともいう。国では観光庁や日本政府観光局、地域では地方自治体や観光協会・商工会議所・DMOなどが中心的な役割を担う。"
+   },
+   {
+    "id": "all-kb-2-14",
+    "cat": "デスティネーション",
+    "text": "デスティネーションの商品としての特性について正しいものはどれか。",
+    "choices": [
+     "いつでも別の場所に移動させることができる",
+     "商品の内容を自由につくり変えられる",
+     "自然や歴史、文化などを消したりつくり変えたりできず、動かすこともできない",
+     "観光客が来なくても売ることができる"
+    ],
+    "answer": 2,
+    "exp": "動かせないので観光客に来てもらわなくてはいけない。だから「行きたい」と思わせる価値と魅力が重要。"
+   },
+   {
+    "id": "all-kb-2-15",
+    "cat": "デスティネーション",
+    "text": "NPO法人地域活性化支援センターが2006年から展開し、プロポーズにふさわしいスポット約140か所を認定しているプロジェクトはどれか。",
+    "choices": [
+     "日本のてっぺんプロジェクト",
+     "恋人の聖地プロジェクト",
+     "夜の水族館プロジェクト",
+     "花巻観光振興ビジョン"
+    ],
+    "answer": 1,
+    "exp": "普段の何気ない景色やスポットも、見方を変えれば魅力的な観光資源になる例。"
+   },
+   {
+    "id": "all-kb-2-16",
+    "cat": "デスティネーション",
+    "text": "デスティネーション・マーケティングで考えるべき二つの視点の組み合わせはどれか。",
+    "choices": [
+     "競合する観光地・地域社会との連携",
+     "価格の値下げ・広告の増加",
+     "外国人の誘致・国内客の制限",
+     "施設の建設・道路の整備"
+    ],
+    "answer": 0,
+    "exp": "競合する観光地との比較を綿密に行い、地域全体が同一の方向を目指して地域住民の参加も大切にする。"
+   },
+   {
+    "id": "all-kb-2-17",
+    "cat": "デスティネーション",
+    "text": "セグメント（層）やターゲットから、より具体的な架空の人物像を設定してマーケティングを行う手法を何というか。",
+    "choices": [
+     "マスマーケティング",
+     "ペルソナマーケティング",
+     "ダイレクトマーケティング",
+     "デスティネーション・マーケティング"
+    ],
+    "answer": 1,
+    "exp": "宮崎県高千穂町観光協会では「福岡子さん」というペルソナを設定し、ツアープランを策定した。"
+   },
+   {
+    "id": "all-kb-3a-1",
+    "cat": "マーケティング戦略",
+    "text": "観光ビジネスのマーケティング戦略の順番として正しいものはどれか。",
+    "choices": [
+     "STP分析 → SWOT分析 → マーケティング・ミックス",
+     "マーケティング・ミックス → SWOT分析 → STP分析",
+     "SWOT分析 → マーケティング・ミックス → STP分析",
+     "SWOT分析 → STP分析 → マーケティング・ミックス"
+    ],
+    "answer": 3,
+    "exp": "何を提供できるか（SWOT）→ 誰にどんなイメージで（STP）→ どうやって提供するか（4P）。"
+   },
+   {
+    "id": "all-kb-3a-2",
+    "cat": "マーケティング戦略",
+    "text": "マーケティング戦略の第一段階で明らかにすることはどれか。",
+    "choices": [
+     "誰に提供するか",
+     "どうやって提供するか",
+     "何を提供できるか",
+     "いくらで提供するか"
+    ],
+    "answer": 2,
+    "exp": "第一段階は環境分析（SWOT分析）で「何を提供できるか」を明らかにする。"
+   },
+   {
+    "id": "all-kb-3a-3",
+    "cat": "SWOT分析",
+    "text": "SWOT分析の S・W・O・T の組み合わせとして正しいものはどれか。",
+    "choices": [
+     "強み・弱み・機会・脅威",
+     "強み・弱み・目標・脅威",
+     "戦略・弱み・機会・目標",
+     "強み・価値・機会・技術"
+    ],
+    "answer": 0,
+    "exp": "Strength・Weakness・Opportunity・Threat の頭文字。"
+   },
+   {
+    "id": "all-kb-3a-4",
+    "cat": "SWOT分析",
+    "text": "SWOT分析で、内部環境のプラス要因とマイナス要因の組み合わせはどれか。",
+    "choices": [
+     "機会（O）と脅威（T）",
+     "強み（S）と弱み（W）",
+     "強み（S）と機会（O）",
+     "弱み（W）と脅威（T）"
+    ],
+    "answer": 1,
+    "exp": "内部環境＝強み・弱み、外部環境＝機会・脅威。"
+   },
+   {
+    "id": "all-kb-3a-5",
+    "cat": "SWOT分析",
+    "text": "SWOT分析の目的として正しいものはどれか。",
+    "choices": [
+     "観光客の数を正確に数えること",
+     "商品の価格を決めること",
+     "広告の内容を決めること",
+     "戦略目標を達成する際に影響を与える内部と外部の環境要因を特定すること"
+    ],
+    "answer": 3,
+    "exp": "事業課題を明らかにし、戦略の策定に活用できる。"
+   },
+   {
+    "id": "all-kb-3a-6",
+    "cat": "SWOT分析",
+    "text": "SWOT分析以外の環境分析の手法で、外部環境を四つの観点から分析するものはどれか。",
+    "choices": [
+     "VRIO分析",
+     "STP分析",
+     "PEST分析",
+     "ABC分析"
+    ],
+    "answer": 2,
+    "exp": "VRIO分析＝内部の経営資源の競争優位性、PEST分析＝外部環境を4観点、ファイブ・フォース分析＝業界の競合相手など。"
+   },
+   {
+    "id": "all-kb-3a-7",
+    "cat": "内部環境分析",
+    "text": "内部環境分析で対象にするのはどのような要因か。",
+    "choices": [
+     "自身がコントロールできない要因",
+     "自身がコントロールできる要因",
+     "競合企業だけに関わる要因",
+     "政治や経済の動き"
+    ],
+    "answer": 1,
+    "exp": "自身がコントロールできる要因を対象に強みと弱みを検討する。"
+   },
+   {
+    "id": "all-kb-3a-8",
+    "cat": "内部環境分析",
+    "text": "夜間の時間帯のアクティビティやコンテンツのことを何というか。",
+    "choices": [
+     "ナイト・エンターテイメント",
+     "サブカルチャー",
+     "アクティビティ",
+     "ペルソナ"
+    ],
+    "answer": 0,
+    "exp": "日本はナイト・エンターテイメントが不足しているとされ、水族館や博物館での「ナイトツアー」などが注目されている。"
+   },
+   {
+    "id": "all-kb-3a-9",
+    "cat": "内部環境分析",
+    "text": "内部環境の「強み」として正しいものはどれか。",
+    "choices": [
+     "観光地や企業を取り巻く環境で、目標達成に貢献する要因",
+     "観光地や企業が自身で保有し、目標達成に貢献する資源や商品、個人の資質",
+     "目標達成の障害となる外部の要因",
+     "競合企業が保有する資源"
+    ],
+    "answer": 1,
+    "exp": "弱み＝自身が保有する要因のうち目標達成の障害となるもの。"
+   },
+   {
+    "id": "all-kb-3a-10",
+    "cat": "外部環境分析",
+    "text": "外部環境の四つの要因として正しい組み合わせはどれか。",
+    "choices": [
+     "自然的要因・人的要因・技術的要因・財務的要因",
+     "価格要因・商品要因・流通要因・広告要因",
+     "人口要因・地理要因・心理要因・行動要因",
+     "自然的要因・経済的要因・政治的要因・社会的要因"
+    ],
+    "answer": 3,
+    "exp": "天候・災害・立地＝自然的、為替＝経済的、政治情勢・戦争・テロ＝政治的、疫病・イベント・ブーム＝社会的。"
+   },
+   {
+    "id": "all-kb-3a-11",
+    "cat": "外部環境分析",
+    "text": "為替の変動は、外部環境の四つの要因のうちどれにあたるか。",
+    "choices": [
+     "自然的要因",
+     "政治的要因",
+     "経済的要因",
+     "社会的要因"
+    ],
+    "answer": 2,
+    "exp": "景気や為替の変動などは経済的要因。"
+   },
+   {
+    "id": "all-kb-3a-12",
+    "cat": "外部環境分析",
+    "text": "疫病のまん延やイベント・ブームの発生は、外部環境の四つの要因のうちどれにあたるか。",
+    "choices": [
+     "社会的要因",
+     "自然的要因",
+     "経済的要因",
+     "政治的要因"
+    ],
+    "answer": 0,
+    "exp": "疫病のまん延・イベント・ブームの発生＝社会的要因。"
+   },
+   {
+    "id": "all-kb-3a-13",
+    "cat": "外部環境分析",
+    "text": "外部環境の「機会」とはどのようなものか。",
+    "choices": [
+     "観光地や企業を取り巻く環境の中で、目標達成に貢献する要因",
+     "自身が保有する資源のうち、目標達成に貢献するもの",
+     "自身が保有する要因のうち、目標達成の障害となるもの",
+     "観光地を取り巻く環境の中で、目標達成の障害となる要因"
+    ],
+    "answer": 0,
+    "exp": "機会を見つけたら市場拡大や競争優位のチャンスとして戦略を立案する。障害となるのは「脅威」。"
+   },
+   {
+    "id": "all-kb-3a-14",
+    "cat": "SWOT分析の事例",
+    "text": "岩手県花巻市のSWOT分析で「花巻温泉郷がある」はどれにあたるか。",
+    "choices": [
+     "弱み（Weakness）",
+     "機会（Opportunity）",
+     "強み（Strength）",
+     "脅威（Threat）"
+    ],
+    "answer": 2,
+    "exp": "自身が保有する観光資源なので強み。"
+   },
+   {
+    "id": "all-kb-3a-15",
+    "cat": "SWOT分析の事例",
+    "text": "岩手県花巻市のSWOT分析で「花巻−台北・上海の直行便が就航し、中国や台湾からのインバウンドが増加」はどれにあたるか。",
+    "choices": [
+     "強み（Strength）",
+     "弱み（Weakness）",
+     "脅威（Threat）",
+     "機会（Opportunity）"
+    ],
+    "answer": 3,
+    "exp": "外部環境のプラス要因＝機会。"
+   },
+   {
+    "id": "all-kb-3a-16",
+    "cat": "SWOT分析の事例",
+    "text": "岩手県花巻市のSWOT分析で「団体客の減少」はどれにあたるか。",
+    "choices": [
+     "強み（Strength）",
+     "脅威（Threat）",
+     "弱み（Weakness）",
+     "機会（Opportunity）"
+    ],
+    "answer": 1,
+    "exp": "外部環境のマイナス要因＝脅威。"
+   },
+   {
+    "id": "all-kb-3a-17",
+    "cat": "SWOT分析の事例",
+    "text": "岩手県花巻市のSWOT分析で「観光施設や観光資源が点在」はどれにあたるか。",
+    "choices": [
+     "強み（Strength）",
+     "機会（Opportunity）",
+     "弱み（Weakness）",
+     "脅威（Threat）"
+    ],
+    "answer": 2,
+    "exp": "内部環境のマイナス要因＝弱み。分析の結果、団体客から個人客へのターゲット転換が急務と分かった。"
+   },
+   {
+    "id": "all-kb-3a-18",
+    "cat": "STP分析",
+    "text": "STP分析の S・T・P の組み合わせとして正しいものはどれか。",
+    "choices": [
+     "セグメンテーション・ターゲティング・ポジショニング",
+     "ストラテジー・ターゲティング・プロモーション",
+     "セグメンテーション・トレンド・プライス",
+     "サービス・ターゲティング・プロダクト"
+    ],
+    "answer": 0,
+    "exp": "マーケティング戦略の第二段階で「誰にどんなイメージで提供するか」を考える。"
+   },
+   {
+    "id": "all-kb-3a-19",
+    "cat": "STP分析",
+    "text": "さまざまな顧客特性で市場を細分化することを何というか。",
+    "choices": [
+     "ターゲティング",
+     "ポジショニング",
+     "プロモーション",
+     "セグメンテーション"
+    ],
+    "answer": 3,
+    "exp": "細分化された市場をセグメントという。"
+   },
+   {
+    "id": "all-kb-3a-20",
+    "cat": "STP分析",
+    "text": "年齢・性別・職業・学歴・所得・家族構成などの変数を何というか。",
+    "choices": [
+     "地理的変数（ジオグラフィック変数）",
+     "人口動態変数（デモグラフィック変数）",
+     "心理的変数（サイコグラフィック変数）",
+     "行動変数"
+    ],
+    "answer": 1,
+    "exp": "「学生旅行市場」「子連れの家族旅行」「20代女子旅」などの細分化。"
+   },
+   {
+    "id": "all-kb-3a-21",
+    "cat": "STP分析",
+    "text": "都市の経済規模・人口規模・気候・交通アクセスなどの変数を何というか。",
+    "choices": [
+     "地理的変数（ジオグラフィック変数）",
+     "人口動態変数（デモグラフィック変数）",
+     "心理的変数（サイコグラフィック変数）",
+     "価格変数"
+    ],
+    "answer": 0,
+    "exp": "「中国市場」「鉄道利用者と高速道路利用者」などの細分化。大都市圏との近さや交通アクセスの良さは大きなメリット。"
+   },
+   {
+    "id": "all-kb-3a-22",
+    "cat": "STP分析",
+    "text": "ライフスタイル・趣味趣向・価値観などの変数を何というか。",
+    "choices": [
+     "人口動態変数（デモグラフィック変数）",
+     "心理的変数（サイコグラフィック変数）",
+     "地理的変数（ジオグラフィック変数）",
+     "経済変数"
+    ],
+    "answer": 1,
+    "exp": "「歴史好き」「ゆったり過ごす派」などの細分化。"
+   },
+   {
+    "id": "all-kb-3a-23",
+    "cat": "STP分析",
+    "text": "文化や歴史のつながりが深く、同一の宗教・民族・言語などが当てはまることを何というか。",
+    "choices": [
+     "心理的近接性",
+     "地理的近接性",
+     "経済的近接性",
+     "文化的近接性"
+    ],
+    "answer": 3,
+    "exp": "心理的近接性は、何かをきっかけに特定の国や地域に特別な感情や心理的作用が働き、近しい間柄に感じられること。"
+   },
+   {
+    "id": "all-kb-3a-24",
+    "cat": "STP分析",
+    "text": "1890年に和歌山県串本町沖で起きた「エルトゥールル号遭難事故」をきっかけに、日本と友好関係が深まった国はどれか。",
+    "choices": [
+     "イラン",
+     "エジプト",
+     "トルコ",
+     "ギリシャ"
+    ],
+    "answer": 2,
+    "exp": "地元住民の献身的な救助が語り継がれ、トルコは親日国家となった（心理的近接性の例）。"
+   },
+   {
+    "id": "all-kb-3b-1",
+    "cat": "ターゲティング",
+    "text": "細分化したセグメントの中から、マーケティングの対象とするセグメントを決めることを何というか。",
+    "choices": [
+     "セグメンテーション",
+     "ターゲティング",
+     "ポジショニング",
+     "ブランディング"
+    ],
+    "answer": 1,
+    "exp": "対象となったセグメントの消費者のことをターゲットという。"
+   },
+   {
+    "id": "all-kb-3b-2",
+    "cat": "ターゲティング",
+    "text": "すべてのセグメントに共通するニーズを満たすような商品を提供するターゲティングはどれか。",
+    "choices": [
+     "差別型ターゲティング",
+     "集中型ターゲティング",
+     "ペルソナ型ターゲティング",
+     "無差別型ターゲティング"
+    ],
+    "answer": 3,
+    "exp": "経営資源が豊富な観光地や大手企業が採用するが、ニーズや消費行動が多様な観光ビジネスではあまり有効ではない。"
+   },
+   {
+    "id": "all-kb-3b-3",
+    "cat": "ターゲティング",
+    "text": "複数のセグメントを選び、各セグメントのニーズに最適な商品やサービスを提供するターゲティングはどれか。",
+    "choices": [
+     "差別型ターゲティング",
+     "無差別型ターゲティング",
+     "集中型ターゲティング",
+     "単一型ターゲティング"
+    ],
+    "answer": 0,
+    "exp": "航空座席のファーストクラスとエコノミークラス、客室のシングルルームとツインルームなど。"
+   },
+   {
+    "id": "all-kb-3b-4",
+    "cat": "ターゲティング",
+    "text": "単一またはごく少数のセグメントに限定して集中的にマーケティングを行うターゲティングはどれか。",
+    "choices": [
+     "無差別型ターゲティング",
+     "差別型ターゲティング",
+     "集中型ターゲティング",
+     "拡大型ターゲティング"
+    ],
+    "answer": 2,
+    "exp": "「ペット連れ可能な宿」や「ダイビング旅行専用旅行会社」など特定の市場に特化した例。"
+   },
+   {
+    "id": "all-kb-3b-5",
+    "cat": "ターゲティング",
+    "text": "航空座席のファーストクラスとエコノミークラスは、どのターゲティングの例か。",
+    "choices": [
+     "無差別型ターゲティング",
+     "集中型ターゲティング",
+     "ペルソナマーケティング",
+     "差別型ターゲティング"
+    ],
+    "answer": 3,
+    "exp": "セグメントごとに一部の機能や特徴、料金設定を変える。"
+   },
+   {
+    "id": "all-kb-3b-6",
+    "cat": "ターゲティング",
+    "text": "「ペット連れ可能な宿」や「ダイビング旅行専用旅行会社」は、どのターゲティングの例か。",
+    "choices": [
+     "集中型ターゲティング",
+     "無差別型ターゲティング",
+     "差別型ターゲティング",
+     "マルチブランド戦略"
+    ],
+    "answer": 0,
+    "exp": "ニッチ市場や高級ブランド、コアなファンがいるセグメントで採用される。"
+   },
+   {
+    "id": "all-kb-3b-7",
+    "cat": "ターゲティング",
+    "text": "規模が小さい特定のセグメントのことを「ニッチ市場」というが、ニッチ（niche）とはどういう意味か。",
+    "choices": [
+     "高級",
+     "隙間",
+     "大衆",
+     "中心"
+    ],
+    "answer": 1,
+    "exp": "ニッチ＝「隙間」。"
+   },
+   {
+    "id": "all-kb-3b-8",
+    "cat": "ターゲティング",
+    "text": "ホテルでは一つの建物で高級志向客から低価格志向客まで対応することはほぼない。そこでMホテルグループのように、用途とグレードごとに別々のブランドでホテルを展開することを何というか。",
+    "choices": [
+     "無差別型ターゲティング",
+     "ダイナミック・プライシング",
+     "マルチブランド戦略",
+     "プロモーション・ミックス"
+    ],
+    "answer": 2,
+    "exp": "無差別型ターゲティングはホテルには不向きという事例。"
+   },
+   {
+    "id": "all-kb-3b-9",
+    "cat": "ポジショニング",
+    "text": "ターゲットに商品をどのように認識してもらうか、イメージを決めることを何というか。",
+    "choices": [
+     "セグメンテーション",
+     "ターゲティング",
+     "ポジショニング",
+     "チャネル政策"
+    ],
+    "answer": 2,
+    "exp": "独特なイメージを植え付け価値を認めてもらうことで、競合する商品との差別化を図り、独自のポジションを築く。"
+   },
+   {
+    "id": "all-kb-3b-10",
+    "cat": "ポジショニング",
+    "text": "顧客が商品を購入する際の決定要因（「安かったから」「写真がきれいだったから」など）を何というか。",
+    "choices": [
+     "価格感度",
+     "購買決定要因（KBF）",
+     "セグメント",
+     "OTA"
+    ],
+    "answer": 1,
+    "exp": "KBF＝Key Buying Factor。ポジショニングでは比重の大きい要因から、自身が強みを発揮できる価値軸を選択する。"
+   },
+   {
+    "id": "all-kb-3b-11",
+    "cat": "ポジショニング",
+    "text": "ポジショニングで比較する価値軸の数について、正しいものはどれか。",
+    "choices": [
+     "多ければ多いほどよいので10軸以上",
+     "1軸だけで比較する",
+     "軸は使わずに文章だけで比較する",
+     "通常は2軸のマトリックス図が用いられる"
+    ],
+    "answer": 3,
+    "exp": "比較する軸が多くなりすぎると複雑になり要点がずれることがあるため、通常は2軸。"
+   },
+   {
+    "id": "all-kb-3b-12",
+    "cat": "ポジショニング",
+    "text": "ポジショニング・マップ上で、競合相手がいない空いている場所のことを何というか。",
+    "choices": [
+     "空き地",
+     "隙間産業",
+     "ブルーオーシャン",
+     "ニッチ"
+    ],
+    "answer": 0,
+    "exp": "競合相手のいない空き地を探すことがポジショニングでは重要。"
+   },
+   {
+    "id": "all-kb-3b-13",
+    "cat": "ポジショニング",
+    "text": "パッケージツアーのポジショニング・マップで、「価格が高い」かつ「差別化商品」の位置にあるのはどれか。",
+    "choices": [
+     "学生向け格安ツアー",
+     "一般的なパッケージツアー",
+     "クルーズツアー",
+     "テーマ旅行"
+    ],
+    "answer": 2,
+    "exp": "縦軸＝価格、横軸＝大衆化商品か差別化商品か。クルーズツアーやメディカルツアーが高価格・差別化側にある。"
+   },
+   {
+    "id": "all-kb-3b-14",
+    "cat": "マーケティング・ミックス",
+    "text": "マーケティング戦略の第三段階で、ターゲットに「どうやって提供するか」という具体的な手段を考えることを何というか。",
+    "choices": [
+     "マーケティング・ミックス",
+     "STP分析",
+     "SWOT分析",
+     "ポジショニング"
+    ],
+    "answer": 0,
+    "exp": "四つの「P」を考えることから4P政策ともいう。"
+   },
+   {
+    "id": "all-kb-3b-15",
+    "cat": "マーケティング・ミックス",
+    "text": "4P政策の4つのPの組み合わせとして正しいものはどれか。",
+    "choices": [
+     "Product・Price・Plan・Promotion",
+     "Product・Price・Place・Promotion",
+     "Product・People・Place・Promotion",
+     "Plan・Price・Place・Process"
+    ],
+    "answer": 1,
+    "exp": "商品政策・価格政策・チャネル政策・プロモーション政策。"
+   },
+   {
+    "id": "all-kb-3b-16",
+    "cat": "マーケティング・ミックス",
+    "text": "4Pの「Place」にあたる政策はどれか。",
+    "choices": [
+     "商品政策",
+     "価格政策",
+     "プロモーション政策",
+     "チャネル政策"
+    ],
+    "answer": 3,
+    "exp": "Place＝販売経路の選定などのチャネル政策。"
+   },
+   {
+    "id": "all-kb-3b-17",
+    "cat": "マーケティング・ミックス",
+    "text": "4Pを別々に計画し実行するのではなく、組み合わせることでどうなるか。",
+    "choices": [
+     "費用が必ず2倍になる",
+     "マーケティングの効果を大きくすることができる",
+     "ターゲットが不要になる",
+     "価格を自由に決められなくなる"
+    ],
+    "answer": 1,
+    "exp": "4Pは組み合わせることが大切。"
+   },
+   {
+    "id": "all-kb-3b-18",
+    "cat": "商品政策",
+    "text": "商品政策で、観光客の雰囲気や心理など五感全体に訴えかけるように設計することが重要とされる商品はどれか。",
+    "choices": [
+     "単品商品",
+     "格安商品",
+     "限定商品",
+     "複合商品"
+    ],
+    "answer": 3,
+    "exp": "自身の強みや価値、魅力を最大限活かせる商品を企画し設計する。例：沖縄県竹富島周遊ツアー。"
+   },
+   {
+    "id": "all-kb-3b-19",
+    "cat": "価格政策",
+    "text": "消費者が商品の価格変動に対して示す反応の度合いを何というか。",
+    "choices": [
+     "価格感度",
+     "購買決定要因",
+     "価格競争",
+     "需要変動"
+    ],
+    "answer": 0,
+    "exp": "価格感度が高いと価格変動ですぐ購買行動に影響し、低いと価格以外の販売促進活動が必要になる。"
+   },
+   {
+    "id": "all-kb-3b-20",
+    "cat": "価格政策",
+    "text": "需要変動に応じて価格が変動する価格設定の方法を何というか。",
+    "choices": [
+     "マルチブランド戦略",
+     "プロモーション・ミックス",
+     "ダイナミック・プライシング",
+     "ペルソナマーケティング"
+    ],
+    "answer": 2,
+    "exp": "テーマパークで平日と日曜日、連休で入場料金が違うなど。集中しがちな需要の分散を狙う。"
+   },
+   {
+    "id": "all-kb-3b-21",
+    "cat": "価格政策",
+    "text": "観光ビジネスで、全く同じ観光体験をしても人によって価格への評価が異なる場合がある理由はどれか。",
+    "choices": [
+     "観光ビジネスは無形の商品が含まれるから",
+     "観光商品は必ず有形だから",
+     "価格が法律で決まっているから",
+     "観光客は価格を気にしないから"
+    ],
+    "answer": 0,
+    "exp": "無形の商品のため、価格への評価が人によって異なる。"
+   },
+   {
+    "id": "all-kb-3b-22",
+    "cat": "チャネル政策",
+    "text": "チャネル政策とは何か。",
+    "choices": [
+     "商品の価格を決めること",
+     "ターゲットに商品を知らせること",
+     "ターゲットが商品を購入しやすい販売チャネルを構築すること",
+     "商品を企画し設計すること"
+    ],
+    "answer": 2,
+    "exp": "販売チャネルには店舗・卸売・通信販売・訪問販売・インターネットなどがある。"
+   },
+   {
+    "id": "all-kb-3b-23",
+    "cat": "チャネル政策",
+    "text": "実店舗を持たず、Webサイト上の店舗で旅行商品の販売を行う旅行会社を何というか。",
+    "choices": [
+     "DMO",
+     "OTA（オンライン・トラベル・エージェント）",
+     "FIT",
+     "KBF"
+    ],
+    "answer": 1,
+    "exp": "インターネットの普及で、旅行会社を通さない直接取引やOTA部門が拡大している。"
+   },
+   {
+    "id": "all-kb-3b-24",
+    "cat": "チャネル政策",
+    "text": "インターネット取引（電子商取引）で、検索方法や掲載場所・リンク先などの工夫が重要になる理由はどれか。",
+    "choices": [
+     "店舗や人件費のコストが高くなるため",
+     "インターネットを使う人が少ないため",
+     "法律で掲載場所が決められているため",
+     "情報が過多になりやすく、観光客の目に留めるのが難しいため"
+    ],
+    "answer": 3,
+    "exp": "電子商取引は店舗や人件費のコストがおさえられるが、情報が過多になりやすい。"
+   },
+   {
+    "id": "all-kb-3b-25",
+    "cat": "プロモーション政策",
+    "text": "ターゲットに商品を知らせて購買に導くことを何というか。",
+    "choices": [
+     "チャネル政策",
+     "商品政策",
+     "プロモーション政策",
+     "価格政策"
+    ],
+    "answer": 2,
+    "exp": "方法には広告・広報・販売促進（セールス・プロモーション）・販売員活動などがある。"
+   },
+   {
+    "id": "all-kb-3b-26",
+    "cat": "プロモーション政策",
+    "text": "広告・広報・販売促進・販売員活動などを組み合わせたものを何というか。",
+    "choices": [
+     "マーケティング・ミックス",
+     "プロモーション・ミックス",
+     "マルチブランド戦略",
+     "ポジショニング・マップ"
+    ],
+    "answer": 1,
+    "exp": "これらを積極的に組み合わせて行っている。"
+   },
+   {
+    "id": "all-kb-3b-27",
+    "cat": "プロモーション政策",
+    "text": "旅行会社H社がSNSを積極的にプロモーションに活用している理由として正しいものはどれか。",
+    "choices": [
+     "SNSは若者世代で情報が拡散しやすく、写真や動画など視覚的な訴求力が強いから",
+     "SNSは高齢者だけが使っているから",
+     "SNSは費用が非常に高いから",
+     "SNSでは写真が使えないから"
+    ],
+    "answer": 0,
+    "exp": "旅好きな女性向けのSNSのコミュニティで、旅先で撮った写真を投稿してもらい魅力を発信している。"
+   }
+  ]
+ }
+];
+
+// 科目ごとの解答状態（タブを切り替えても途中経過を保持）
+const states = {};
+let current = null;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function st() { return states[current.id]; }
+
+function esc(t) {
+  return String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+// id から項目と親を探す（親がなければトップ）
+function findNode(id, list = SUBJECTS, parent = null) {
+  for (const n of list) {
+    if (n.id === id) return { node: n, parent };
+    if (n.children) { const r = findNode(id, n.children, n); if (r) return r; }
+  }
+  return null;
+}
+
+function countQuestions(n) {
+  return n.children ? n.children.reduce((t, c) => t + countQuestions(c), 0) : (n.questions ? n.questions.length : 0);
+}
+
+function renderMenu(group, parent) {
+  const items = group ? group.children : SUBJECTS;
+  document.getElementById("hero-back").classList.toggle("hidden", !group);
+  document.getElementById("hero-back").textContent = "‹ " + (parent ? parent.tab : "単元一覧");
+  document.getElementById("hero-eyebrow").textContent = group ? "観光ビジネス" + (parent ? " ・ " + parent.tab : "") : "第3章 観光ビジネスのマーケティング";
+  document.getElementById("hero-title").textContent = group ? group.title : "観光ビジネス";
+  document.getElementById("hero-sub").textContent = group
+    ? (countQuestions(group) ? `${group.children.length}単元 ・ 全${countQuestions(group)}問` : `${group.children.length}回分（PDF）`)
+    : "選択肢を選ぶとその場で採点。出題順は毎回ランダムです。";
+  document.getElementById("menu-label").textContent = group ? "解く単元を選んでください" : "解く単元を選んでください";
+  document.getElementById("menu-note").innerHTML = group && group.note
+    ? `<details class="menu-note" open><summary>${group.noteTitle || "📌 このサイトだけでは補えない部分"}</summary>${group.note}</details>` : "";
+  const list = document.getElementById("menu-list");
+  list.innerHTML = "";
+  items.forEach(s => {
+    let records = [];
+    if (s.recordKey) { try { records = JSON.parse(localStorage.getItem(s.recordKey) || "[]"); } catch(e) {} }
+    const best = records.length ? Math.max(...records.map(r => r.pct)) : null;
+    const meta = s.children
+      ? `${countQuestions(s) ? s.children.length + "単元" : s.children.length + "回分"} ・ ${esc(s.meta)}`
+      : s.questions ? `全${s.questions.length}問 ・ ${esc(s.meta)}` : esc(s.meta);
+    const b = document.createElement("button");
+    b.className = "sel-card";
+    b.innerHTML = `<div class="sel-icon">${esc(s.icon)}</div>
+      <div class="sel-body">
+        <div class="sel-eyebrow">${esc(s.eyebrow)}</div>
+        <div class="sel-title">${esc(s.tab)}</div>
+        <div class="sel-meta">${meta}</div>
+        ${best === null ? "" : `<span class="sel-best">最高 ${best}%（${records.length}回挑戦）</span>`}
+      </div>
+      <div class="sel-arrow">›</div>`;
+    if (s.soon) { b.disabled = true; b.classList.add("sel-soon"); }
+    else if (s.href) b.onclick = () => { window.open(s.href, "_blank", "noopener"); };
+    else b.onclick = () => { location.hash = s.id; };
+    list.appendChild(b);
+  });
+}
+
+// ひとつ上の画面へ（単元 → 単元一覧 → 科目一覧）
+function goUp() {
+  const f = findNode(location.hash.slice(1));
+  const url = location.pathname + location.search + (f && f.parent ? "#" + f.parent.id : "");
+  history.pushState(null, "", url);
+  route();
+}
+
+// URL の #id が問題セットなら問題画面、まとめなら単元一覧、なければ科目一覧
+function route() {
+  const f = findNode(location.hash.slice(1));
+  const isQuiz = !!(f && f.node.questions);
+  document.getElementById("menu-view").classList.toggle("hidden", isQuiz);
+  document.getElementById("quiz-view").classList.toggle("hidden", !isQuiz);
+  if (isQuiz) {
+    document.getElementById("back-btn").textContent = "‹ " + (f.parent ? f.parent.tab : "単元一覧");
+    document.getElementById("topbar-eyebrow").textContent = f.parent ? "観光ビジネス ・ " + f.parent.tab : "観光ビジネス";
+    selectSubject(f.node);
+  } else {
+    renderMenu(f && f.node.children ? f.node : null, f && f.node.children ? f.parent : null);
+  }
+  window.scrollTo(0, 0);
+}
+
+function selectSubject(node) {
+  current = node;
+  document.getElementById("topbar-title").textContent = current.tab;
+  document.getElementById("subject-title").textContent = current.title;
+  document.getElementById("subject-desc").textContent = current.desc;
+  document.getElementById("quiz-note").innerHTML = current.note
+    ? `<div class="menu-note quiz-note">${current.note}</div>` : "";
+  document.getElementById("record-title").textContent = "成長記録（" + current.tab + "）";
+  if (!states[current.id]) {
+    states[current.id] = { questions: [], answered: {}, wrongIds: new Set(), isAllMode: true };
+    restartAll(true);
+  } else {
+    renderQuiz();
+    updateProgress();
+    showResult(false);
+  }
+  renderRecord();
+}
+
+function init(qList) {
+  const s = st();
+  s.questions = qList;
+  s.answered = {};
+  renderQuiz();
+  updateProgress();
+}
+
+function hideResult() {
+  document.getElementById("result-box").style.display = "none";
+  document.getElementById("wrong-list").style.display = "none";
+}
+
+function restartAll(noScroll) {
+  const s = st();
+  hideResult();
+  s.wrongIds = new Set();
+  s.isAllMode = true;
+  init(shuffle(current.questions));
+  if (!noScroll) window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function restartWrong() {
+  const s = st();
+  if (s.wrongIds.size === 0) { alert("間違えた問題はありません！"); return; }
+  const wrongQs = current.questions.filter(q => s.wrongIds.has(q.id));
+  hideResult();
+  s.wrongIds = new Set();
+  s.isAllMode = false;
+  init(shuffle(wrongQs));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderQuiz() {
+  const s = st();
+  const container = document.getElementById("quiz");
+  container.innerHTML = "";
+  s.questions.forEach((q, idx) => {
+    const card = document.createElement("div");
+    card.className = "question-card";
+    card.id = "card-" + q.id;
+
+    let html = `<div class="q-number">問 ${idx + 1}<span class="q-cat">${q.cat}</span></div>`;
+    if (q.context) html += `<div class="q-context">${q.context}</div>`;
+    html += `<div class="q-text">${q.text}</div>`;
+    if (q.ja) html += `<div class="q-ja">${q.ja}</div>`;
+    html += `<div class="choices" id="choices-${q.id}">`;
+    q.choices.forEach((c, ci) => {
+      html += `<button class="choice-btn" id="btn-${q.id}-${ci}"
+        onclick="selectAnswer('${q.id}', ${ci})">
+        <span class="choice-label">${labelOf(ci)}</span><span>${c}</span></button>`;
+    });
+    html += `</div><div class="feedback" id="fb-${q.id}"></div>`;
+    card.innerHTML = html;
+    container.appendChild(card);
+    if (s.answered[q.id] !== undefined) markAnswer(q, s.answered[q.id]);
+  });
+}
+
+function labelOf(ci) {
+  return current.choiceLabels ? current.choiceLabels[ci] : String.fromCharCode(65 + ci);
+}
+
+// 正解の表示用テキスト（選択肢に記号が含まれていない科目は記号を付ける）
+function answerText(q) {
+  return (current.choiceLabels ? labelOf(q.answer) + " " : "") + q.choices[q.answer].replace(/<[^>]+>/g, "");
+}
+
+function markAnswer(q, chosen) {
+  const correct = q.answer;
+  const card = document.getElementById("card-" + q.id);
+  const fb = document.getElementById("fb-" + q.id);
+  const isCorrect = (chosen === correct);
+
+  q.choices.forEach((_, ci) => {
+    const btn = document.getElementById(`btn-${q.id}-${ci}`);
+    btn.disabled = true;
+    if (ci === correct) btn.classList.add("correct");
+    if (ci === chosen && !isCorrect) btn.classList.add("wrong");
+  });
+
+  if (isCorrect) {
+    card.classList.add("answered-correct");
+    fb.className = "feedback correct";
+    fb.textContent = "✓ 正解！";
+  } else {
+    card.classList.add("answered-wrong");
+    fb.className = "feedback wrong";
+    fb.textContent = "✗ 不正解。正解は「" + answerText(q) + "」";
+  }
+  if (q.exp) {
+    const ex = document.createElement("div");
+    ex.className = "q-exp";
+    ex.textContent = "💡 " + q.exp;
+    fb.appendChild(ex);
+  }
+  return isCorrect;
+}
+
+function selectAnswer(qid, chosen) {
+  const s = st();
+  if (s.answered[qid] !== undefined) return;
+  const q = s.questions.find(x => x.id === qid);
+  s.answered[qid] = chosen;
+  if (!markAnswer(q, chosen)) s.wrongIds.add(qid);
+
+  updateProgress();
+  if (Object.keys(s.answered).length === s.questions.length) showResult(true);
+}
+
+function updateProgress() {
+  const s = st();
+  const done = Object.keys(s.answered).length;
+  const total = s.questions.length;
+  document.getElementById("prog-text").textContent = done + " / " + total;
+  document.getElementById("prog-bar").style.width = (total ? done / total * 100 : 0) + "%";
+  let cheer = "がんばって！";
+  if (done === total && total > 0) cheer = "全問解答完了！";
+  else if (done / total >= 0.8) cheer = "もう少し！";
+  else if (done / total >= 0.5) cheer = "折り返し！";
+  else if (done / total >= 0.2) cheer = "いい調子！";
+  document.getElementById("cheer-text").textContent = cheer;
+}
+
+// justFinished: 今まさに全問解き終えたとき true（記録保存とスクロール）
+function showResult(justFinished) {
+  const s = st();
+  hideResult();
+  if (s.questions.length === 0 || Object.keys(s.answered).length < s.questions.length) return;
+  const correctCount = s.questions.filter(q => s.answered[q.id] === q.answer).length;
+  const total = s.questions.length;
+  const pct = Math.round(correctCount / total * 100);
+
+  const rb = document.getElementById("result-box");
+  rb.style.display = "block";
+  document.getElementById("score-big").textContent = correctCount + "／" + total;
+  document.getElementById("score-sub").textContent = "正答率 " + pct + "%";
+
+  if (s.wrongIds.size > 0) {
+    const wl = document.getElementById("wrong-list");
+    const wi = document.getElementById("wrong-items");
+    wi.innerHTML = "";
+    s.wrongIds.forEach(id => {
+      const q = current.questions.find(x => x.id === id);
+      if (!q) return;
+      const div = document.createElement("div");
+      div.className = "wrong-item";
+      div.innerHTML = `<div class="wi-q">${q.text}</div><div class="wi-a">正解：${answerText(q)}</div>`;
+      wi.appendChild(div);
+    });
+    wl.style.display = "block";
+  }
+
+  if (!justFinished) return;
+  // 結果は最後の問題のすぐ下に出るので、最後の問題が見える位置のまま結果まで見せる
+  setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
+  if (s.isAllMode) saveRecord(correctCount, total, pct);
+}
+
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(current.recordKey) || "[]"); } catch(e) { return []; }
+}
+
+function saveRecord(correct, total, pct) {
+  const records = loadRecords();
+  records.push({ date: new Date().toLocaleDateString("ja-JP"), correct, total, pct });
+  try { localStorage.setItem(current.recordKey, JSON.stringify(records)); } catch(e) {}
+  renderRecord();
+}
+
+function renderRecord() {
+  const records = loadRecords();
+  const tbody = document.getElementById("record-body");
+  tbody.innerHTML = "";
+  records.forEach((r, i) => {
+    const prev = i > 0 ? records[i - 1] : null;
+    const diff = prev ? (r.pct - prev.pct) : null;
+    const diffStr = diff === null ? "—" : diff > 0 ? "▲" + diff + "%" : diff < 0 ? "▼" + Math.abs(diff) + "%" : "±0%";
+    const diffColor = diff > 0 ? "color:var(--correct)" : diff < 0 ? "color:var(--wrong)" : "";
+    tbody.innerHTML += `<tr>
+      <td>${i + 1}</td><td>${r.date}</td>
+      <td>${r.correct}／${r.total}</td><td>${r.pct}%</td>
+      <td style="${diffColor}">${diffStr}</td></tr>`;
+  });
+}
+
+function clearRecord() {
+  if (!confirm("「" + current.tab + "」の記録をリセットしますか？")) return;
+  try { localStorage.removeItem(current.recordKey); } catch(e) {}
+  renderRecord();
+}
+
+window.addEventListener("hashchange", route);
+window.addEventListener("popstate", route);
+window.onload = route;
+</script>
+</body>
+</html>
