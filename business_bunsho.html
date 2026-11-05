@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ビジネス文書筆記</title>
+<style>
+  :root {
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --correct: #16a34a;
+    --correct-light: #dcfce7;
+    --wrong: #dc2626;
+    --wrong-light: #fee2e2;
+    --neutral: #64748b;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --subtext: #475569;
+    --radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100%;
+    padding: 20px 16px 60px;
+  }
+  header { text-align: center; margin-bottom: 24px; }
+  header .subject-label {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+  header h1 { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.3; }
+  header p { font-size: 13px; color: var(--subtext); margin-top: 6px; }
+
+  .progress-wrap {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 14px 20px;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 14px;
+  }
+  .progress-text { font-size: 14px; font-weight: 700; color: var(--primary); white-space: nowrap; }
+  .progress-bar-outer {
+    flex: 1; height: 8px; background: var(--border);
+    border-radius: 99px; overflow: hidden;
+  }
+  .progress-bar-inner {
+    height: 100%; background: var(--primary);
+    border-radius: 99px; transition: width .4s; width: 0%;
+  }
+  .cheer { font-size: 13px; color: var(--subtext); white-space: nowrap; }
+
+  .quiz-section { max-width: 720px; margin: 0 auto; }
+
+  .question-card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 22px 22px 18px;
+    margin-bottom: 18px; border-left: 4px solid var(--primary);
+  }
+  .question-card.answered-correct { border-left-color: var(--correct); }
+  .question-card.answered-wrong   { border-left-color: var(--wrong); }
+
+  .q-number {
+    font-size: 11px; font-weight: 800; letter-spacing: .1em;
+    color: var(--primary); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .question-card.answered-correct .q-number { color: var(--correct); }
+  .question-card.answered-wrong   .q-number { color: var(--wrong); }
+
+  .q-context {
+    font-size: 14px; color: var(--subtext); background: #f1f5f9;
+    border-radius: 6px; padding: 10px 14px; margin-bottom: 10px;
+    line-height: 1.75; border-left: 3px solid #cbd5e1;
+  }
+  .q-text { font-size: 15px; font-weight: 600; line-height: 1.75; margin-bottom: 16px; }
+
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; margin: 0 2px; font-size: .9em; line-height: 1.1;
+  }
+  .frac span:first-child { border-bottom: 1.5px solid currentColor; padding-bottom: 1px; }
+  .frac span:last-child  { padding-top: 1px; }
+
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 480px) { .choices { grid-template-columns: 1fr; } }
+
+  .choice-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: #fff; cursor: pointer;
+    font-size: 14px; font-weight: 500; color: var(--text);
+    text-align: left; transition: border-color .15s, background .15s, color .15s;
+    line-height: 1.5;
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--primary); background: var(--primary-light);
+  }
+  .choice-btn .choice-label {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #e2e8f0; color: var(--subtext);
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+    transition: background .15s, color .15s;
+  }
+  .choice-btn:hover:not(:disabled) .choice-label { background: var(--primary); color: #fff; }
+  .choice-btn.correct { border-color: var(--correct); background: var(--correct-light); color: var(--correct); }
+  .choice-btn.correct .choice-label { background: var(--correct); color: #fff; }
+  .choice-btn.wrong   { border-color: var(--wrong);   background: var(--wrong-light);   color: var(--wrong); }
+  .choice-btn.wrong   .choice-label { background: var(--wrong);   color: #fff; }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback { margin-top: 10px; font-size: 13px; font-weight: 600; display: none; }
+  .feedback.correct { color: var(--correct); display: block; }
+  .feedback.wrong   { color: var(--wrong);   display: block; }
+
+  #result-box {
+    display: none; background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 28px 24px; margin-bottom: 24px;
+    text-align: center; max-width: 720px; margin-left: auto; margin-right: auto;
+  }
+  #result-box h2 { font-size: 20px; margin-bottom: 6px; }
+  #result-box .score-big {
+    font-size: 48px; font-weight: 900; color: var(--primary); line-height: 1.1; margin: 10px 0 6px;
+  }
+  #result-box .score-sub { font-size: 14px; color: var(--subtext); margin-bottom: 16px; }
+
+  #wrong-list { max-width: 720px; margin: 0 auto 20px; display: none; }
+  #wrong-list h3 { font-size: 15px; font-weight: 700; color: var(--wrong); margin-bottom: 10px; }
+  .wrong-item {
+    background: var(--card); border-radius: 8px; padding: 12px 16px;
+    margin-bottom: 8px; border-left: 3px solid var(--wrong);
+    font-size: 13px; line-height: 1.6;
+  }
+  .wrong-item .wi-q { font-weight: 600; margin-bottom: 4px; }
+  .wrong-item .wi-a { color: var(--correct); }
+
+  #record-section { max-width: 720px; margin: 0 auto 20px; }
+  #record-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  #record-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    background: var(--card); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  #record-table th {
+    background: var(--primary); color: #fff;
+    padding: 8px 12px; font-weight: 700; text-align: center;
+  }
+  #record-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: center; }
+  #record-table tr:last-child td { border-bottom: none; }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+  .btn {
+    padding: 10px 22px; border-radius: 8px; border: none;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity .15s;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-danger  { background: var(--wrong); color: #fff; }
+  .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+
+  .q-cat { margin-left: 8px; font-weight: 700; letter-spacing: 0; color: var(--subtext);
+    background: var(--border); padding: 1px 8px; border-radius: 99px; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg:#0f172a; --card:#1e293b; --primary:#60a5fa; --primary-light:#1e3a5f;
+    --correct:#4ade80; --correct-light:#14532d; --wrong:#f87171; --wrong-light:#4c1d1d;
+    --border:#334155; --text:#e2e8f0; --subtext:#94a3b8; } }
+  :root[data-theme="dark"] {
+    --bg:#0f172a; --card:#1e293b; --primary:#60a5fa; --primary-light:#1e3a5f;
+    --correct:#4ade80; --correct-light:#14532d; --wrong:#f87171; --wrong-light:#4c1d1d;
+    --border:#334155; --text:#e2e8f0; --subtext:#94a3b8; }
+  .choice-btn { background: var(--card); }
+  .q-context { background: var(--bg); }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body { padding: 0 0 60px; }
+  .view { padding: 0 16px; }
+  .hidden { display: none !important; }
+
+  /* ===== 科目選択画面 ===== */
+  .hero {
+    position: relative; overflow: hidden; color: #fff;
+    background: linear-gradient(135deg, #0b1533 0%, #1e3a8a 55%, #4338ca 100%);
+    padding: calc(34px + env(safe-area-inset-top, 0px)) 24px 38px;
+    box-shadow: 0 10px 30px rgba(15,23,42,.25);
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; opacity: .14; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(120deg, #000 10%, transparent 75%);
+    -webkit-mask-image: linear-gradient(120deg, #000 10%, transparent 75%);
+  }
+  .hero::after {
+    content: ""; position: absolute; width: 260px; height: 260px; right: -80px; top: -90px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(129,140,248,.55), transparent 70%);
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700; letter-spacing: .2em; color: #c7d2fe;
+  }
+  .hero-eyebrow::before { content: ""; width: 22px; height: 2px; background: #818cf8; border-radius: 2px; }
+  header.hero { text-align: left; margin-bottom: 0; }
+  .hero h1 { font-size: 30px; font-weight: 900; letter-spacing: .02em; margin-top: 10px; line-height: 1.25; color: #fff; }
+  .hero p.hero-sub { font-size: 13px; color: #c7d2fe; margin-top: 10px; }
+
+  .menu { max-width: 720px; margin: 0 auto; padding: 28px 0 0; }
+  .q-fig { display: block; width: 100%; max-width: 560px; margin: 12px 0 4px; border-radius: 10px; background: #fff; }
+  .note-link { display: inline-block; margin-top: 6px; padding: 6px 12px; border-radius: 999px; background: var(--primary-light); color: var(--primary); font-weight: 800; text-decoration: none; }
+  .menu-note {
+    background: var(--card); color: var(--text); border: 1px solid var(--border);
+    border-left: 5px solid #f59e0b; border-radius: 14px; padding: 14px 16px; margin-bottom: 22px;
+    font-size: 13.5px; line-height: 1.7;
+  }
+  .quiz-note { margin: 12px 0 18px; font-weight: 700; font-size: 15px; }
+  .menu-note summary { font-weight: 900; font-size: 15px; cursor: pointer; color: #d97706; }
+  .menu-note ol { margin: 10px 0 8px; padding-left: 1.3em; }
+  .menu-note li { margin-bottom: 6px; }
+  .menu-note li b { color: var(--primary); }
+  .menu-note .note-foot { font-weight: 700; padding-top: 8px; border-top: 1px dashed var(--border); }
+  .menu-label {
+    font-size: 13px; font-weight: 700; color: var(--subtext); letter-spacing: .08em;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .menu-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .sel-card {
+    position: relative; display: flex; align-items: center; gap: 16px; width: 100%;
+    text-align: left; background: var(--card); color: var(--text);
+    border: 1px solid var(--border); border-radius: 18px; padding: 20px 18px 20px 22px;
+    margin-bottom: 14px; cursor: pointer; overflow: hidden;
+    box-shadow: 0 4px 16px rgba(15,23,42,.06);
+    transition: transform .18s, box-shadow .18s, border-color .18s;
+    font-family: inherit;
+  }
+  .sel-card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    background: linear-gradient(180deg, #6366f1, #2563eb);
+  }
+  .sel-card.sel-soon { opacity: .5; cursor: default; }
+  .sel-card:hover { transform: translateY(-2px); border-color: #818cf8; box-shadow: 0 10px 28px rgba(67,56,202,.18); }
+  .sel-card:active { transform: scale(.98); }
+  .sel-icon {
+    flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 900; color: #fff;
+    background: linear-gradient(135deg, #4338ca, #2563eb);
+    box-shadow: 0 6px 14px rgba(67,56,202,.35);
+  }
+  .sel-body { flex: 1; min-width: 0; }
+  .sel-eyebrow { font-size: 11px; font-weight: 700; color: var(--subtext); letter-spacing: .1em; }
+  .sel-title { font-size: 20px; font-weight: 900; color: var(--primary); margin: 4px 0 6px; }
+  .sel-meta { font-size: 12.5px; color: var(--subtext); line-height: 1.6; }
+  .sel-best {
+    display: inline-block; margin-top: 8px; font-size: 11.5px; font-weight: 700;
+    color: var(--correct); background: var(--correct-light); padding: 2px 10px; border-radius: 99px;
+  }
+  .sel-arrow {
+    flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--primary-light); color: var(--primary); font-size: 18px; font-weight: 900;
+    transition: transform .18s;
+  }
+  .sel-card:hover .sel-arrow { transform: translateX(3px); }
+
+  /* ===== 問題画面 ===== */
+  .topbar {
+    position: sticky; top: 0; z-index: 10; margin: 0 -16px 18px;
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+    background: linear-gradient(135deg, #0b1533, #1e3a8a 70%, #4338ca);
+    color: #fff; box-shadow: 0 4px 16px rgba(15,23,42,.2);
+  }
+  .topbar-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .back-btn {
+    flex-shrink: 0; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.12);
+    color: #fff; font-size: 13px; font-weight: 700; padding: 7px 12px; border-radius: 99px;
+    cursor: pointer; font-family: inherit;
+  }
+  .back-btn:hover { background: rgba(255,255,255,.22); }
+  .topbar-text { min-width: 0; }
+  .topbar-eyebrow { font-size: 10.5px; color: #c7d2fe; letter-spacing: .12em; font-weight: 700; }
+  .topbar-title { font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .subject-head { max-width: 720px; margin: 0 auto 14px; }
+  .subject-head h2 { font-size: 18px; font-weight: 800; }
+  .subject-head p { font-size: 13px; color: var(--subtext); margin-top: 4px; }
+  .progress-wrap { max-width: 720px; margin-left: auto; margin-right: auto; }
+  :root { padding-top: 0; }
+  .hero-back {
+    display: table; margin-bottom: 14px; border: 1px solid rgba(255,255,255,.35);
+    background: rgba(255,255,255,.12); color: #fff; font-size: 13px; font-weight: 700;
+    padding: 6px 12px; border-radius: 99px; cursor: pointer; font-family: inherit;
+  }
+  .hero-back:hover { background: rgba(255,255,255,.22); }
+  .q-ja { font-size: 13.5px; color: var(--subtext); margin: -8px 0 14px; line-height: 1.7; }
+  .input-row { display: flex; gap: 8px; }
+  .ans-input {
+    flex: 1; min-width: 0; padding: 10px 14px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: var(--card); color: var(--text);
+    font-size: 16px; font-family: inherit; outline: none;
+  }
+  .ans-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  .ans-input.correct { border-color: var(--correct); background: var(--correct-light); color: var(--correct); font-weight: 700; }
+  .ans-input.wrong   { border-color: var(--wrong);   background: var(--wrong-light);   color: var(--wrong);   font-weight: 700; }
+  .ans-btn { flex-shrink: 0; padding: 10px 18px; }
+  .ans-btn:disabled { opacity: .4; cursor: default; }
+  .q-text u { text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  .q-text small { font-size: 12.5px; color: var(--subtext); font-weight: 500; }
+  .q-fig { border: 1px solid var(--border); }
+  @media (max-width: 480px) { .choices.compact { grid-template-columns: 1fr 1fr; } }
+  .q-exp {
+    margin-top: 8px; padding: 10px 12px; border-radius: 8px; background: var(--bg);
+    color: var(--text); font-weight: 500; line-height: 1.7; font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 科目選択画面 -->
+<div id="menu-view">
+  <header class="hero">
+    <div class="hero-inner">
+      <button class="hero-back hidden" id="hero-back" onclick="goUp()"></button>
+      <div class="hero-eyebrow" id="hero-eyebrow">筆記問題</div>
+      <h1 id="hero-title">ビジネス文書筆記</h1>
+      <p class="hero-sub" id="hero-sub">選択肢を選ぶとその場で採点。出題順は毎回ランダムです。</p>
+    </div>
+  </header>
+  <div class="view">
+    <div class="menu">
+      <div id="menu-note"></div>
+      <div class="menu-label" id="menu-label">解く単元を選んでください</div>
+      <div id="menu-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 問題画面 -->
+<div id="quiz-view" class="view hidden">
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <button class="back-btn" id="back-btn" onclick="goUp()">‹ 単元一覧</button>
+    <div class="topbar-text">
+      <div class="topbar-eyebrow" id="topbar-eyebrow">ビジネス文書筆記</div>
+      <div class="topbar-title" id="topbar-title"></div>
+    </div>
+  </div>
+</div>
+
+<div class="subject-head">
+  <h2 id="subject-title"></h2>
+  <p id="subject-desc"></p>
+  <div id="quiz-note"></div>
+</div>
+
+<div class="progress-wrap">
+  <span class="progress-text" id="prog-text">0 / 0</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" id="prog-bar"></div></div>
+  <span class="cheer" id="cheer-text">がんばって！</span>
+</div>
+
+<div class="quiz-section" id="quiz"></div>
+
+<div id="result-box">
+  <h2>全問解答完了！</h2>
+  <div class="score-big" id="score-big">0／0</div>
+  <div class="score-sub" id="score-sub"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="restartAll()">シャッフルしてもう一度</button>
+    <button class="btn btn-outline" onclick="restartWrong()">間違えた問題のみもう一度</button>
+  </div>
+</div>
+
+<div id="wrong-list">
+  <h3>間違えた問題</h3>
+  <div id="wrong-items"></div>
+</div>
+
+
+<div id="record-section">
+  <h3 id="record-title">成長記録</h3>
+  <table id="record-table">
+    <thead>
+      <tr><th>回</th><th>日付</th><th>正解数</th><th>正答率</th><th>前回比</th></tr>
+    </thead>
+    <tbody id="record-body"></tbody>
+  </table>
+  <div class="btn-row" style="margin-top:12px">
+    <button class="btn btn-danger" onclick="clearRecord()">記録をリセット</button>
+  </div>
+</div>
+
+</div><!-- /quiz-view -->
+
+<script>
+// =====================
+// 科目データ
+// 問題セット: { id, tab, eyebrow, icon, meta, title, desc, recordKey, questions, choiceLabels? }
+// まとめ(単元一覧): { id, tab, eyebrow, icon, meta, title, desc, children: [問題セット...] }
+// 問題（選択）: { id, cat, context?, text, ja?, choices, answer(0始まり), labels?(記号), exp? }
+// 問題（記述）: { id, cat, context?, text, ja?, answers: ["正解", "別解"...], exp? }
+//   ※記述はカタカナ→ひらがな・全角/半角・空白の違いを無視して判定
+// =====================
+const SUBJECTS = [
+ {
+  "id": "bb76",
+  "tab": "第76回 第1級",
+  "eyebrow": "ビジネス文書実務検定 筆記",
+  "icon": "76",
+  "meta": "問1〜8（全50問）",
+  "title": "第76回 第1級 筆記問題",
+  "desc": "",
+  "mixLabel": "第76回 全問ミックス",
+  "children": [
+   {
+    "id": "bb76-12",
+    "tab": "問1・2",
+    "eyebrow": "第76回 第1級",
+    "icon": "1・2",
+    "meta": "用語と説明・正誤（Fw・置換・ＵＳＢポートなど）",
+    "title": "第76回 第1級 問1・2",
+    "desc": "最も適切なものを選びましょう。",
+    "recordKey": "bunsho_bb76_12",
+    "questions": [
+     {
+      "cat": "問1 用語と説明",
+      "text": "「文書の保存」の説明として最も適切なものはどれか。",
+      "choices": [
+       "他の作業と並行して印刷できる機能のこと。",
+       "開始ページ目から終了ページまでを1枚ずつ印刷し、これを指定した枚数になるまで繰り返す印刷方法のこと。",
+       "入力する方式や書式設定など、インストール直後の各種プロパティの初期設定のこと。",
+       "電子メールにおいて、転送を意味する略語のこと。",
+       "当面使う予定のない文書を、必要に応じて取り出せるように整理し、書庫で管理すること。",
+       "電子メールにおいて、追伸を意味する略語のこと。",
+       "入力する方式や書式などの初期設定を、利便性を向上させるためにユーザの好みで変更した設定のこと。",
+       "文書のある位置（ページ）から、文書の最初（最後）に移動する機能（呼び出して表示する機能）のこと。"
+      ],
+      "answer": 4,
+      "exp": "当面使わない文書を書庫で管理するのが「保存」。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク"
+      ],
+      "id": "bb76-12-1"
+     },
+     {
+      "cat": "問1 用語と説明",
+      "text": "「Fw」の説明として最も適切なものはどれか。",
+      "choices": [
+       "他の作業と並行して印刷できる機能のこと。",
+       "開始ページ目から終了ページまでを1枚ずつ印刷し、これを指定した枚数になるまで繰り返す印刷方法のこと。",
+       "入力する方式や書式設定など、インストール直後の各種プロパティの初期設定のこと。",
+       "電子メールにおいて、転送を意味する略語のこと。",
+       "当面使う予定のない文書を、必要に応じて取り出せるように整理し、書庫で管理すること。",
+       "電子メールにおいて、追伸を意味する略語のこと。",
+       "入力する方式や書式などの初期設定を、利便性を向上させるためにユーザの好みで変更した設定のこと。",
+       "文書のある位置（ページ）から、文書の最初（最後）に移動する機能（呼び出して表示する機能）のこと。"
+      ],
+      "answer": 3,
+      "exp": "Fw（Forward）＝転送。追伸はPS。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク"
+      ],
+      "id": "bb76-12-2"
+     },
+     {
+      "cat": "問1 用語と説明",
+      "text": "「文頭（文末）表示」の説明として最も適切なものはどれか。",
+      "choices": [
+       "他の作業と並行して印刷できる機能のこと。",
+       "開始ページ目から終了ページまでを1枚ずつ印刷し、これを指定した枚数になるまで繰り返す印刷方法のこと。",
+       "入力する方式や書式設定など、インストール直後の各種プロパティの初期設定のこと。",
+       "電子メールにおいて、転送を意味する略語のこと。",
+       "当面使う予定のない文書を、必要に応じて取り出せるように整理し、書庫で管理すること。",
+       "電子メールにおいて、追伸を意味する略語のこと。",
+       "入力する方式や書式などの初期設定を、利便性を向上させるためにユーザの好みで変更した設定のこと。",
+       "文書のある位置（ページ）から、文書の最初（最後）に移動する機能（呼び出して表示する機能）のこと。"
+      ],
+      "answer": 7,
+      "exp": "文書の最初（最後）へ移動して表示する機能。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク"
+      ],
+      "id": "bb76-12-3"
+     },
+     {
+      "cat": "問1 用語と説明",
+      "text": "「バックグラウンド印刷」の説明として最も適切なものはどれか。",
+      "choices": [
+       "他の作業と並行して印刷できる機能のこと。",
+       "開始ページ目から終了ページまでを1枚ずつ印刷し、これを指定した枚数になるまで繰り返す印刷方法のこと。",
+       "入力する方式や書式設定など、インストール直後の各種プロパティの初期設定のこと。",
+       "電子メールにおいて、転送を意味する略語のこと。",
+       "当面使う予定のない文書を、必要に応じて取り出せるように整理し、書庫で管理すること。",
+       "電子メールにおいて、追伸を意味する略語のこと。",
+       "入力する方式や書式などの初期設定を、利便性を向上させるためにユーザの好みで変更した設定のこと。",
+       "文書のある位置（ページ）から、文書の最初（最後）に移動する機能（呼び出して表示する機能）のこと。"
+      ],
+      "answer": 0,
+      "exp": "印刷しながら他の作業ができる機能。イは部単位印刷の説明。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク"
+      ],
+      "id": "bb76-12-4"
+     },
+     {
+      "cat": "問1 用語と説明",
+      "text": "「ユーザの設定」の説明として最も適切なものはどれか。",
+      "choices": [
+       "他の作業と並行して印刷できる機能のこと。",
+       "開始ページ目から終了ページまでを1枚ずつ印刷し、これを指定した枚数になるまで繰り返す印刷方法のこと。",
+       "入力する方式や書式設定など、インストール直後の各種プロパティの初期設定のこと。",
+       "電子メールにおいて、転送を意味する略語のこと。",
+       "当面使う予定のない文書を、必要に応じて取り出せるように整理し、書庫で管理すること。",
+       "電子メールにおいて、追伸を意味する略語のこと。",
+       "入力する方式や書式などの初期設定を、利便性を向上させるためにユーザの好みで変更した設定のこと。",
+       "文書のある位置（ページ）から、文書の最初（最後）に移動する機能（呼び出して表示する機能）のこと。"
+      ],
+      "answer": 6,
+      "exp": "ユーザの好みで変更した設定。ウはデフォルト設定（初期設定）の説明。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク"
+      ],
+      "id": "bb76-12-5"
+     },
+     {
+      "cat": "問2 正誤",
+      "text": "受信した電子メールを保存しているメールサーバの記憶領域のことを<u>受信箱</u>という。<br><small>正しい場合は○、誤っている場合は正しい用語を選びなさい。</small>",
+      "choices": [
+       "正しい",
+       "差し込み印刷",
+       "メールボックス",
+       "ＵＳＢポート",
+       "シフトＪＩＳコード",
+       "Unicode",
+       "ネットワークプリンタ",
+       "メーリングリスト",
+       "ＵＳＢメモリ"
+      ],
+      "answer": 2,
+      "exp": "メールサーバ上の記憶領域は「メールボックス」。",
+      "labels": [
+       "○",
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク"
+      ],
+      "id": "bb76-12-6"
+     },
+     {
+      "cat": "問2 正誤",
+      "text": "<u>ローカルプリンタ</u>とは、ＬＡＮなどを経由して、パソコンと接続されているプリンタのことである。<br><small>正しい場合は○、誤っている場合は正しい用語を選びなさい。</small>",
+      "choices": [
+       "正しい",
+       "差し込み印刷",
+       "メールボックス",
+       "ＵＳＢポート",
+       "シフトＪＩＳコード",
+       "Unicode",
+       "ネットワークプリンタ",
+       "メーリングリスト",
+       "ＵＳＢメモリ"
+      ],
+      "answer": 6,
+      "exp": "ＬＡＮ経由で接続するのは「ネットワークプリンタ」。ローカルプリンタはパソコンに直接接続するプリンタ。",
+      "labels": [
+       "○",
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク"
+      ],
+      "id": "bb76-12-7"
+     },
+     {
+      "cat": "問2 正誤",
+      "text": "条件をつけて指定した文字列を探しだし、他の文字列に変更することを<u>置換</u>という。<br><small>正しい場合は○、誤っている場合は正しい用語を選びなさい。</small>",
+      "choices": [
+       "正しい",
+       "差し込み印刷",
+       "メールボックス",
+       "ＵＳＢポート",
+       "シフトＪＩＳコード",
+       "Unicode",
+       "ネットワークプリンタ",
+       "メーリングリスト",
+       "ＵＳＢメモリ"
+      ],
+      "answer": 0,
+      "exp": "正しい。",
+      "labels": [
+       "○",
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク"
+      ],
+      "id": "bb76-12-8"
+     },
+     {
+      "cat": "問2 正誤",
+      "text": "<u>ＪＩＳ第1水準</u>とは、主に Windows で日本語を扱う際に利用される符号化方式のことである。<br><small>正しい場合は○、誤っている場合は正しい用語を選びなさい。</small>",
+      "choices": [
+       "正しい",
+       "差し込み印刷",
+       "メールボックス",
+       "ＵＳＢポート",
+       "シフトＪＩＳコード",
+       "Unicode",
+       "ネットワークプリンタ",
+       "メーリングリスト",
+       "ＵＳＢメモリ"
+      ],
+      "answer": 4,
+      "exp": "Windowsで日本語を扱う符号化方式は「シフトＪＩＳコード」。",
+      "labels": [
+       "○",
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク"
+      ],
+      "id": "bb76-12-9"
+     },
+     {
+      "cat": "問2 正誤",
+      "text": "<u>ＵＳＢハブ</u>とは、パソコンのインターフェースの一つで、ＵＳＢ機器を接続する接続口のことである。<br><small>正しい場合は○、誤っている場合は正しい用語を選びなさい。</small>",
+      "choices": [
+       "正しい",
+       "差し込み印刷",
+       "メールボックス",
+       "ＵＳＢポート",
+       "シフトＪＩＳコード",
+       "Unicode",
+       "ネットワークプリンタ",
+       "メーリングリスト",
+       "ＵＳＢメモリ"
+      ],
+      "answer": 3,
+      "exp": "ＵＳＢ機器を接続する接続口は「ＵＳＢポート」。ＵＳＢハブはポートの数を増やす機器。",
+      "labels": [
+       "○",
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク"
+      ],
+      "id": "bb76-12-10"
+     }
+    ]
+   },
+   {
+    "id": "bb76-3",
+    "tab": "問3",
+    "eyebrow": "第76回 第1級",
+    "icon": "3",
+    "meta": "月の異名・時候の挨拶・ショートカットキー",
+    "title": "第76回 第1級 問3",
+    "desc": "最も適切なものを選びましょう。",
+    "recordKey": "bunsho_bb76_3",
+    "questions": [
+     {
+      "cat": "問3",
+      "text": "文月は何月の異名か。",
+      "choices": [
+       "7月",
+       "8月",
+       "9月"
+      ],
+      "answer": 0,
+      "exp": "文月（ふみづき）＝7月。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-3-1"
+     },
+     {
+      "cat": "問3",
+      "text": "5月の時候の挨拶はどれか。",
+      "choices": [
+       "桜花爛漫の候、",
+       "新緑の候、",
+       "向暑の候、"
+      ],
+      "answer": 1,
+      "exp": "桜花爛漫の候＝4月、向暑の候＝6月。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-3-2"
+     },
+     {
+      "cat": "問3",
+      "text": "「風花の舞う今日このごろ、」とは、何月の時候の挨拶か。",
+      "choices": [
+       "1月",
+       "2月",
+       "3月"
+      ],
+      "answer": 0,
+      "exp": "「風花の舞う」は1月の時候の挨拶。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-3-3"
+     },
+     {
+      "cat": "問3",
+      "text": "「太字」の操作を実行するショートカットキーはどれか。",
+      "choices": [
+       "Ctrl ＋ S",
+       "Ctrl ＋ I",
+       "Ctrl ＋ B"
+      ],
+      "answer": 2,
+      "exp": "Ctrl＋B＝太字（Bold）、Ctrl＋I＝斜体、Ctrl＋S＝上書き保存。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-3-4"
+     },
+     {
+      "cat": "問3",
+      "text": "ショートカットキー Ctrl ＋ N により実行される内容はどれか。",
+      "choices": [
+       "終了",
+       "新規作成",
+       "すべてを選択"
+      ],
+      "answer": 1,
+      "exp": "Ctrl＋N＝新規作成（New）。すべてを選択はCtrl＋A。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-3-5"
+     }
+    ]
+   },
+   {
+    "id": "bb76-45",
+    "tab": "問4・5",
+    "eyebrow": "第76回 第1級",
+    "icon": "4・5",
+    "meta": "プレゼンテーション用語・ビジネス文書",
+    "title": "第76回 第1級 問4・5",
+    "desc": "最も適切なものを選びましょう。",
+    "recordKey": "bunsho_bb76_45",
+    "questions": [
+     {
+      "cat": "問4 プレゼンテーション",
+      "text": "ジェスチャ（動作）、視線（アイコンタクト）、表情などによる言葉以外の表現のこと。",
+      "choices": [
+       "プレゼンター",
+       "ストーリー",
+       "ボディランゲージ",
+       "聴衆分析（リサーチ）",
+       "三段論法",
+       "プレースホルダ",
+       "背景デザイン",
+       "ノートペイン",
+       "クライアント",
+       "アウトラインペイン"
+      ],
+      "answer": 2,
+      "exp": "",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク",
+       "ケ",
+       "コ"
+      ],
+      "id": "bb76-45-1"
+     },
+     {
+      "cat": "問4 プレゼンテーション",
+      "text": "スライドの地に配置する模様や風景などの、静止画像データのこと。",
+      "choices": [
+       "プレゼンター",
+       "ストーリー",
+       "ボディランゲージ",
+       "聴衆分析（リサーチ）",
+       "三段論法",
+       "プレースホルダ",
+       "背景デザイン",
+       "ノートペイン",
+       "クライアント",
+       "アウトラインペイン"
+      ],
+      "answer": 6,
+      "exp": "",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク",
+       "ケ",
+       "コ"
+      ],
+      "id": "bb76-45-2"
+     },
+     {
+      "cat": "問4 プレゼンテーション",
+      "text": "序論→本論→結論の3段落で構成する、論文や講話向きのフレームワークのこと。",
+      "choices": [
+       "プレゼンター",
+       "ストーリー",
+       "ボディランゲージ",
+       "聴衆分析（リサーチ）",
+       "三段論法",
+       "プレースホルダ",
+       "背景デザイン",
+       "ノートペイン",
+       "クライアント",
+       "アウトラインペイン"
+      ],
+      "answer": 4,
+      "exp": "",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク",
+       "ケ",
+       "コ"
+      ],
+      "id": "bb76-45-3"
+     },
+     {
+      "cat": "問4 プレゼンテーション",
+      "text": "プレゼンテーションにおいては、説明や提示を受ける顧客、依頼人、得意先などのこと。",
+      "choices": [
+       "プレゼンター",
+       "ストーリー",
+       "ボディランゲージ",
+       "聴衆分析（リサーチ）",
+       "三段論法",
+       "プレースホルダ",
+       "背景デザイン",
+       "ノートペイン",
+       "クライアント",
+       "アウトラインペイン"
+      ],
+      "answer": 8,
+      "exp": "",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク",
+       "ケ",
+       "コ"
+      ],
+      "id": "bb76-45-4"
+     },
+     {
+      "cat": "問4 プレゼンテーション",
+      "text": "プレゼンテーションを企画する段階で行う、聞き手に関する事前調査のこと。様々な調査を行い、適切な配付資料とプレゼンテーションの用意に役立てる。",
+      "choices": [
+       "プレゼンター",
+       "ストーリー",
+       "ボディランゲージ",
+       "聴衆分析（リサーチ）",
+       "三段論法",
+       "プレースホルダ",
+       "背景デザイン",
+       "ノートペイン",
+       "クライアント",
+       "アウトラインペイン"
+      ],
+      "answer": 3,
+      "exp": "",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク",
+       "ケ",
+       "コ"
+      ],
+      "id": "bb76-45-5"
+     },
+     {
+      "cat": "問4 プレゼンテーション",
+      "text": "スライドのサムネイルを表示する領域のこと。話の筋道（ストーリー）に沿って、表示する順序を考える。",
+      "choices": [
+       "プレゼンター",
+       "ストーリー",
+       "ボディランゲージ",
+       "聴衆分析（リサーチ）",
+       "三段論法",
+       "プレースホルダ",
+       "背景デザイン",
+       "ノートペイン",
+       "クライアント",
+       "アウトラインペイン"
+      ],
+      "answer": 9,
+      "exp": "",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク",
+       "ケ",
+       "コ"
+      ],
+      "id": "bb76-45-6"
+     },
+     {
+      "cat": "問4 プレゼンテーション",
+      "text": "リード→序論→本論→結論→質疑応答・締めくくり、といった話のアウトラインのこと。",
+      "choices": [
+       "プレゼンター",
+       "ストーリー",
+       "ボディランゲージ",
+       "聴衆分析（リサーチ）",
+       "三段論法",
+       "プレースホルダ",
+       "背景デザイン",
+       "ノートペイン",
+       "クライアント",
+       "アウトラインペイン"
+      ],
+      "answer": 1,
+      "exp": "",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ",
+       "エ",
+       "オ",
+       "カ",
+       "キ",
+       "ク",
+       "ケ",
+       "コ"
+      ],
+      "id": "bb76-45-7"
+     },
+     {
+      "cat": "問5 ビジネス文書",
+      "text": "すでに予定されている業務や起案された案件に対して、会議を開くことなく、決裁者が回覧・押印して許可を与えるための文書のことを〔　　〕という。",
+      "choices": [
+       "報告書",
+       "稟議書"
+      ],
+      "answer": 1,
+      "exp": "稟議書（りんぎしょ）。",
+      "labels": [
+       "ア",
+       "イ"
+      ],
+      "id": "bb76-45-8"
+     },
+     {
+      "cat": "問5 ビジネス文書",
+      "text": "〔　　〕とは、取引先から提示された内容について、了解したことを伝えるための文書のことである。",
+      "choices": [
+       "目論見書",
+       "通知状",
+       "承諾書"
+      ],
+      "answer": 2,
+      "exp": "了解を伝える文書＝承諾書。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-45-9"
+     },
+     {
+      "cat": "問5 ビジネス文書",
+      "text": "〔　　〕とは、事務上の必要事項を記入していくノートやバインダなどの文書のことである。",
+      "choices": [
+       "帳簿",
+       "公告",
+       "契約書"
+      ],
+      "answer": 0,
+      "exp": "帳簿。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-45-10"
+     },
+     {
+      "cat": "問5 ビジネス文書",
+      "text": "電子メール受信の留意事項として<u>適切でない</u>ものはどれか。",
+      "choices": [
+       "メーリングリストで届けられたメールは、単なる返信でもメンバー全員への返信になるので注意すること",
+       "全員返信は、送信者に加え、知ることができる全てのアドレスに送信されるため、複数のToとCcが指定されている場合は、特に注意深くチェックすること",
+       "心当たりの無い発信者や内容の迷惑メールは、返信や問い合わせを行い、発信者や内容について確認すること"
+      ],
+      "answer": 2,
+      "exp": "迷惑メールには返信や問い合わせをせず、開かずに削除する。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-45-11"
+     },
+     {
+      "cat": "問5 ビジネス文書",
+      "text": "〔　　〕とは、一通の文書に、一つの用件だけ書くことである。文書が定型化でき、また、受信者の確認ミスが少なくなるなど、事務の質や効率を重視する。",
+      "choices": [
+       "簡潔主義",
+       "一件一葉主義",
+       "文書主義"
+      ],
+      "answer": 1,
+      "exp": "一件一葉主義。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-45-12"
+     },
+     {
+      "cat": "問5 ビジネス文書",
+      "text": "用件や提案を正確に漏れなく伝えるために、文書中に盛り込まなくてはならない基本的な内容を表す5W1Hに含まれるものは〔　　〕である。",
+      "choices": [
+       "Where",
+       "Which",
+       "Whom"
+      ],
+      "answer": 0,
+      "exp": "5W1H＝When・Where・Who・What・Why・How。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-45-13"
+     },
+     {
+      "cat": "問5 ビジネス文書",
+      "text": "相手に対して書類や資料の確認と受け取りを依頼する際に用いる例文は、「提案書を同封いたしましたので、〔　　〕ください。」である。",
+      "choices": [
+       "ご鞭撻",
+       "ご愛顧",
+       "ご査収"
+      ],
+      "answer": 2,
+      "exp": "ご査収＝よく調べて受け取ること。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-45-14"
+     },
+     {
+      "cat": "問5 ビジネス文書",
+      "text": "下の文で使用されている江戸文字のデザインを模したフォントの種類を〔　　〕という。<img class=\"q-fig\" src=\"bunsho76_kanteiryu.png\" alt=\"フォント見本\">",
+      "choices": [
+       "勘亭流",
+       "行書体",
+       "楷書体"
+      ],
+      "answer": 0,
+      "exp": "歌舞伎の看板などに使われる勘亭流。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-45-15"
+     }
+    ]
+   },
+   {
+    "id": "bb76-6",
+    "tab": "問6（記述）",
+    "eyebrow": "第76回 第1級",
+    "icon": "6",
+    "meta": "漢字の読みをひらがなで入力",
+    "title": "第76回 第1級 問6（記述）",
+    "desc": "下線部の読みをひらがなで入力し、「答える」かEnterで採点します。",
+    "recordKey": "bunsho_bb76_6",
+    "questions": [
+     {
+      "cat": "問6 漢字の読み",
+      "text": "彼の作品は、独創的な<u>意匠</u>が特徴である。",
+      "ja": "下線部の読みをひらがなで入力",
+      "answers": [
+       "いしょう"
+      ],
+      "exp": "意匠＝デザイン・趣向の工夫。",
+      "id": "bb76-6-1"
+     },
+     {
+      "cat": "問6 漢字の読み",
+      "text": "私は母と同じく<u>未</u>年生まれだ。",
+      "ja": "下線部の読みをひらがなで入力",
+      "answers": [
+       "ひつじ"
+      ],
+      "exp": "未（ひつじ）は十二支の8番目。",
+      "id": "bb76-6-2"
+     },
+     {
+      "cat": "問6 漢字の読み",
+      "text": "<u>逓増</u>定期保険についての説明を聞く。",
+      "ja": "下線部の読みをひらがなで入力",
+      "answers": [
+       "ていぞう"
+      ],
+      "exp": "逓増＝次第に増えること。",
+      "id": "bb76-6-3"
+     },
+     {
+      "cat": "問6 漢字の読み",
+      "text": "両者の主張を聞いて、<u>折衷</u>案をまとめた。",
+      "ja": "下線部の読みをひらがなで入力",
+      "answers": [
+       "せっちゅう"
+      ],
+      "exp": "折衷＝よいところを取り合わせること。",
+      "id": "bb76-6-4"
+     },
+     {
+      "cat": "問6 漢字の読み",
+      "text": "今日はとても暑く、<u>陽炎</u>が発生した。",
+      "ja": "下線部の読みをひらがなで入力",
+      "answers": [
+       "かげろう"
+      ],
+      "exp": "陽炎＝熱で空気がゆらめいて見える現象。",
+      "id": "bb76-6-5"
+     }
+    ]
+   },
+   {
+    "id": "bb76-78",
+    "tab": "問7・8",
+    "eyebrow": "第76回 第1級",
+    "icon": "7・8",
+    "meta": "四字熟語・漢字の正誤・同音異義語",
+    "title": "第76回 第1級 問7・8",
+    "desc": "最も適切なものを選びましょう。",
+    "recordKey": "bunsho_bb76_78",
+    "questions": [
+     {
+      "cat": "問7 四字熟語",
+      "text": "臨機〔　　〕に対応する力をつける。",
+      "choices": [
+       "応返",
+       "欧変",
+       "応変"
+      ],
+      "answer": 2,
+      "exp": "臨機応変（りんきおうへん）。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-78-1"
+     },
+     {
+      "cat": "問7 四字熟語",
+      "text": "〔　　〕坦懐に相手の話を聞く。",
+      "choices": [
+       "虚心",
+       "許慎"
+      ],
+      "answer": 0,
+      "exp": "虚心坦懐（きょしんたんかい）＝わだかまりのない素直な心。",
+      "labels": [
+       "ア",
+       "イ"
+      ],
+      "id": "bb76-78-2"
+     },
+     {
+      "cat": "問7 四字熟語",
+      "text": "約束を忘れていたことを平身〔　　〕して謝罪した。",
+      "choices": [
+       "抵当",
+       "低頭"
+      ],
+      "answer": 1,
+      "exp": "平身低頭（へいしんていとう）。",
+      "labels": [
+       "ア",
+       "イ"
+      ],
+      "id": "bb76-78-3"
+     },
+     {
+      "cat": "問7 四字熟語",
+      "text": "彼は〔　　〕棒大に話す癖がある。",
+      "choices": [
+       "心証",
+       "針小",
+       "辛勝"
+      ],
+      "answer": 1,
+      "exp": "針小棒大（しんしょうぼうだい）＝小さなことを大げさに言う。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-78-4"
+     },
+     {
+      "cat": "問7 四字熟語",
+      "text": "彼女の提案に全員が異口〔　　〕に賛成した。",
+      "choices": [
+       "導音",
+       "同温",
+       "同音"
+      ],
+      "answer": 2,
+      "exp": "異口同音（いくどうおん）。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-78-5"
+     },
+     {
+      "cat": "問8A 漢字の正誤",
+      "text": "経済<u>聖祭</u>が解除された。<br><small>正しい場合は○、誤っている場合は正しい漢字を選びなさい。</small>",
+      "choices": [
+       "正しい",
+       "精細",
+       "生彩",
+       "制裁"
+      ],
+      "answer": 3,
+      "exp": "経済制裁。",
+      "labels": [
+       "○",
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-78-6"
+     },
+     {
+      "cat": "問8A 漢字の正誤",
+      "text": "目標だった優勝を達成し、<u>無情</u>の喜びを感じた。<br><small>正しい場合は○、誤っている場合は正しい漢字を選びなさい。</small>",
+      "choices": [
+       "正しい",
+       "無常",
+       "無上"
+      ],
+      "answer": 2,
+      "exp": "無上＝この上ないこと。",
+      "labels": [
+       "○",
+       "ア",
+       "イ"
+      ],
+      "id": "bb76-78-7"
+     },
+     {
+      "cat": "問8A 漢字の正誤",
+      "text": "国会の<u>快気</u>が延長された。<br><small>正しい場合は○、誤っている場合は正しい漢字を選びなさい。</small>",
+      "choices": [
+       "正しい",
+       "怪奇",
+       "回帰",
+       "会期"
+      ],
+      "answer": 3,
+      "exp": "会期。",
+      "labels": [
+       "○",
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-78-8"
+     },
+     {
+      "cat": "問8A 漢字の正誤",
+      "text": "背景を<u>透過</u>させた画像ファイルを保存する。<br><small>正しい場合は○、誤っている場合は正しい漢字を選びなさい。</small>",
+      "choices": [
+       "正しい",
+       "投下",
+       "等価"
+      ],
+      "answer": 0,
+      "exp": "正しい（透過）。",
+      "labels": [
+       "○",
+       "ア",
+       "イ"
+      ],
+      "id": "bb76-78-9"
+     },
+     {
+      "cat": "問8A 漢字の正誤",
+      "text": "博物館に訪れたが、臨時<u>急患</u>だった。<br><small>正しい場合は○、誤っている場合は正しい漢字を選びなさい。</small>",
+      "choices": [
+       "正しい",
+       "休館",
+       "休刊",
+       "旧館"
+      ],
+      "answer": 1,
+      "exp": "休館。",
+      "labels": [
+       "○",
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-78-10"
+     },
+     {
+      "cat": "問8B 同音異義語",
+      "text": "今回に限り、<u>れいがい</u>を設ける。",
+      "choices": [
+       "例外",
+       "冷害"
+      ],
+      "answer": 0,
+      "exp": "例外。冷害＝低温による農作物の被害。",
+      "labels": [
+       "ア",
+       "イ"
+      ],
+      "id": "bb76-78-11"
+     },
+     {
+      "cat": "問8B 同音異義語",
+      "text": "新たな条件が<u>ふか</u>された契約を結ぶ。",
+      "choices": [
+       "不可",
+       "付加",
+       "賦課"
+      ],
+      "answer": 1,
+      "exp": "付加＝付け加えること。賦課＝税などを割り当てること。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-78-12"
+     },
+     {
+      "cat": "問8B 同音異義語",
+      "text": "明日は<u>やこう</u>バスで東京に行く予定だ。",
+      "choices": [
+       "夜光",
+       "夜行"
+      ],
+      "answer": 1,
+      "exp": "夜行バス。",
+      "labels": [
+       "ア",
+       "イ"
+      ],
+      "id": "bb76-78-13"
+     },
+     {
+      "cat": "問8B 同音異義語",
+      "text": "今年の夏休みの旅行について、<u>しあん</u>を巡らす。",
+      "choices": [
+       "私案",
+       "試案",
+       "思案"
+      ],
+      "answer": 2,
+      "exp": "思案を巡らす。",
+      "labels": [
+       "ア",
+       "イ",
+       "ウ"
+      ],
+      "id": "bb76-78-14"
+     },
+     {
+      "cat": "問8B 同音異義語",
+      "text": "私の趣味は各地の<u>いせき</u>を見て回ることだ。",
+      "choices": [
+       "遺跡",
+       "移籍"
+      ],
+      "answer": 0,
+      "exp": "遺跡。",
+      "labels": [
+       "ア",
+       "イ"
+      ],
+      "id": "bb76-78-15"
+     }
+    ]
+   }
+  ]
+ }
+];
+
+// 各回のミックス（その回の全単元の問題をまとめて自動生成）
+SUBJECTS.forEach(g => {
+  if (!g.children) return;
+  const sets = g.children.filter(c => c.questions && c.questions.length);
+  if (sets.length < 2) return;
+  g.children.push({
+    id: g.id + "-all", tab: g.mixLabel || "全問ミックス", eyebrow: g.eyebrow, icon: "全",
+    meta: "この回の全問題をランダムに出題", title: g.title + "（全問ミックス）",
+    desc: "全単元の問題からランダムに出題します。", recordKey: "bunsho_" + g.id + "_all",
+    questions: sets.flatMap(c => c.questions.map(q => ({ ...q, id: "all-" + q.id })))
+  });
+});
+
+// 科目ごとの解答状態（タブを切り替えても途中経過を保持）
+const states = {};
+let current = null;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function st() { return states[current.id]; }
+
+function esc(t) {
+  return String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+// id から項目と親を探す（親がなければトップ）
+function findNode(id, list = SUBJECTS, parent = null) {
+  for (const n of list) {
+    if (n.id === id) return { node: n, parent };
+    if (n.children) { const r = findNode(id, n.children, n); if (r) return r; }
+  }
+  return null;
+}
+
+function countQuestions(n) {
+  return n.children ? n.children.reduce((t, c) => t + countQuestions(c), 0) : (n.questions ? n.questions.length : 0);
+}
+
+function renderMenu(group, parent) {
+  const items = group ? group.children : SUBJECTS;
+  document.getElementById("hero-back").classList.toggle("hidden", !group);
+  document.getElementById("hero-back").textContent = "‹ " + (parent ? parent.tab : "単元一覧");
+  document.getElementById("hero-eyebrow").textContent = group ? "ビジネス文書筆記" + (parent ? " ・ " + parent.tab : "") : "筆記問題";
+  document.getElementById("hero-title").textContent = group ? group.title : "ビジネス文書筆記";
+  document.getElementById("hero-sub").textContent = group
+    ? (countQuestions(group) ? `${group.children.length}単元 ・ 全${countQuestions(group)}問` : `${group.children.length}回分（PDF）`)
+    : "選択肢を選ぶとその場で採点。出題順は毎回ランダムです。";
+  document.getElementById("menu-label").textContent = group ? "解く単元を選んでください" : "解く単元を選んでください";
+  document.getElementById("menu-note").innerHTML = group && group.note
+    ? `<details class="menu-note" open><summary>${group.noteTitle || "📌 このサイトだけでは補えない部分"}</summary>${group.note}</details>` : "";
+  const list = document.getElementById("menu-list");
+  list.innerHTML = "";
+  items.forEach(s => {
+    let records = [];
+    if (s.recordKey) { try { records = JSON.parse(localStorage.getItem(s.recordKey) || "[]"); } catch(e) {} }
+    const best = records.length ? Math.max(...records.map(r => r.pct)) : null;
+    const meta = s.children
+      ? `${countQuestions(s) ? s.children.length + "単元" : s.children.length + "回分"} ・ ${esc(s.meta)}`
+      : s.questions ? `全${s.questions.length}問 ・ ${esc(s.meta)}` : esc(s.meta);
+    const b = document.createElement("button");
+    b.className = "sel-card";
+    b.innerHTML = `<div class="sel-icon">${esc(s.icon)}</div>
+      <div class="sel-body">
+        <div class="sel-eyebrow">${esc(s.eyebrow)}</div>
+        <div class="sel-title">${esc(s.tab)}</div>
+        <div class="sel-meta">${meta}</div>
+        ${best === null ? "" : `<span class="sel-best">最高 ${best}%（${records.length}回挑戦）</span>`}
+      </div>
+      <div class="sel-arrow">›</div>`;
+    if (s.soon) { b.disabled = true; b.classList.add("sel-soon"); }
+    else if (s.href) b.onclick = () => { window.open(s.href, "_blank", "noopener"); };
+    else b.onclick = () => { location.hash = s.id; };
+    list.appendChild(b);
+  });
+}
+
+// ひとつ上の画面へ（単元 → 単元一覧 → 科目一覧）
+function goUp() {
+  const f = findNode(location.hash.slice(1));
+  const url = location.pathname + location.search + (f && f.parent ? "#" + f.parent.id : "");
+  history.pushState(null, "", url);
+  route();
+}
+
+// URL の #id が問題セットなら問題画面、まとめなら単元一覧、なければ科目一覧
+function route() {
+  const f = findNode(location.hash.slice(1));
+  const isQuiz = !!(f && f.node.questions);
+  document.getElementById("menu-view").classList.toggle("hidden", isQuiz);
+  document.getElementById("quiz-view").classList.toggle("hidden", !isQuiz);
+  if (isQuiz) {
+    document.getElementById("back-btn").textContent = "‹ " + (f.parent ? f.parent.tab : "単元一覧");
+    document.getElementById("topbar-eyebrow").textContent = f.parent ? "ビジネス文書筆記 ・ " + f.parent.tab : "ビジネス文書筆記";
+    selectSubject(f.node);
+  } else {
+    renderMenu(f && f.node.children ? f.node : null, f && f.node.children ? f.parent : null);
+  }
+  window.scrollTo(0, 0);
+}
+
+function selectSubject(node) {
+  current = node;
+  document.getElementById("topbar-title").textContent = current.tab;
+  document.getElementById("subject-title").textContent = current.title;
+  document.getElementById("subject-desc").textContent = current.desc;
+  document.getElementById("quiz-note").innerHTML = current.note
+    ? `<div class="menu-note quiz-note">${current.note}</div>` : "";
+  document.getElementById("record-title").textContent = "成長記録（" + current.tab + "）";
+  if (!states[current.id]) {
+    states[current.id] = { questions: [], answered: {}, wrongIds: new Set(), isAllMode: true };
+    restartAll(true);
+  } else {
+    renderQuiz();
+    updateProgress();
+    showResult(false);
+  }
+  renderRecord();
+}
+
+function init(qList) {
+  const s = st();
+  s.questions = qList;
+  s.answered = {};
+  renderQuiz();
+  updateProgress();
+}
+
+function hideResult() {
+  document.getElementById("result-box").style.display = "none";
+  document.getElementById("wrong-list").style.display = "none";
+}
+
+function restartAll(noScroll) {
+  const s = st();
+  hideResult();
+  s.wrongIds = new Set();
+  s.isAllMode = true;
+  init(shuffle(current.questions));
+  if (!noScroll) window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function restartWrong() {
+  const s = st();
+  if (s.wrongIds.size === 0) { alert("間違えた問題はありません！"); return; }
+  const wrongQs = current.questions.filter(q => s.wrongIds.has(q.id));
+  hideResult();
+  s.wrongIds = new Set();
+  s.isAllMode = false;
+  init(shuffle(wrongQs));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderQuiz() {
+  const s = st();
+  const container = document.getElementById("quiz");
+  container.innerHTML = "";
+  s.questions.forEach((q, idx) => {
+    const card = document.createElement("div");
+    card.className = "question-card";
+    card.id = "card-" + q.id;
+
+    let html = `<div class="q-number">問 ${idx + 1}<span class="q-cat">${q.cat}</span></div>`;
+    if (q.context) html += `<div class="q-context">${q.context}</div>`;
+    html += `<div class="q-text">${q.text}</div>`;
+    if (q.ja) html += `<div class="q-ja">${q.ja}</div>`;
+    if (q.answers) {
+      html += `<div class="input-row">
+        <input class="ans-input" id="in-${q.id}" type="text" lang="ja" autocomplete="off"
+          autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done"
+          placeholder="ここに入力" onkeydown="inputKey(event, '${q.id}')">
+        <button class="btn btn-primary ans-btn" id="ab-${q.id}" onclick="submitInput('${q.id}')">答える</button>
+      </div><div class="feedback" id="fb-${q.id}"></div>`;
+      card.innerHTML = html;
+      container.appendChild(card);
+      if (s.answered[q.id] !== undefined) markAnswer(q, s.answered[q.id]);
+      return;
+    }
+    const compact = q.choices.every(c => c.replace(/<[^>]+>/g, "").length <= 12);
+    html += `<div class="choices${compact ? " compact" : ""}" id="choices-${q.id}">`;
+    q.choices.forEach((c, ci) => {
+      html += `<button class="choice-btn" id="btn-${q.id}-${ci}"
+        onclick="selectAnswer('${q.id}', ${ci})">
+        <span class="choice-label">${labelOf(q, ci)}</span><span>${c}</span></button>`;
+    });
+    html += `</div><div class="feedback" id="fb-${q.id}"></div>`;
+    card.innerHTML = html;
+    container.appendChild(card);
+    if (s.answered[q.id] !== undefined) markAnswer(q, s.answered[q.id]);
+  });
+}
+
+function labelOf(q, ci) {
+  const L = q.labels || current.choiceLabels;
+  return L ? L[ci] : String.fromCharCode(65 + ci);
+}
+
+// 正解の表示用テキスト（選択肢に記号が含まれていない科目は記号を付ける）
+// 記述の判定用：全角/半角・空白・カタカナ/ひらがなの違いをそろえる
+function normalize(t) {
+  return String(t).normalize("NFKC").replace(/\s+/g, "")
+    .replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+}
+
+function isCorrectAns(q, ans) {
+  if (q.answers) return q.answers.some(a => normalize(a) === normalize(ans));
+  return ans === q.answer;
+}
+
+function inputKey(e, qid) {
+  // 変換確定のEnterでは送信しない
+  if (e.key !== "Enter" || e.isComposing || e.keyCode === 229) return;
+  e.preventDefault();
+  submitInput(qid);
+}
+
+function submitInput(qid) {
+  const el = document.getElementById("in-" + qid);
+  if (!el || el.disabled) return;
+  if (!el.value.trim()) { el.focus(); return; }
+  selectAnswer(qid, el.value.trim());
+  // 次の未解答の記述欄へ移動（キーボードを出したまま続けられる）
+  const next = st().questions.find(x => x.answers && st().answered[x.id] === undefined);
+  if (next) {
+    const ni = document.getElementById("in-" + next.id);
+    if (ni) { ni.focus({ preventScroll: true }); ni.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  } else el.blur();
+}
+
+function answerText(q) {
+  if (q.answers) return q.answers.join("／");
+  return (q.labels || current.choiceLabels ? labelOf(q, q.answer) + " " : "") + q.choices[q.answer].replace(/<[^>]+>/g, "");
+}
+
+function markAnswer(q, chosen) {
+  const correct = q.answer;
+  const card = document.getElementById("card-" + q.id);
+  const fb = document.getElementById("fb-" + q.id);
+  const isCorrect = isCorrectAns(q, chosen);
+
+  if (q.answers) {
+    const el = document.getElementById("in-" + q.id);
+    el.value = chosen; el.disabled = true;
+    el.classList.add(isCorrect ? "correct" : "wrong");
+    document.getElementById("ab-" + q.id).disabled = true;
+  } else q.choices.forEach((_, ci) => {
+    const btn = document.getElementById(`btn-${q.id}-${ci}`);
+    btn.disabled = true;
+    if (ci === correct) btn.classList.add("correct");
+    if (ci === chosen && !isCorrect) btn.classList.add("wrong");
+  });
+
+  if (isCorrect) {
+    card.classList.add("answered-correct");
+    fb.className = "feedback correct";
+    fb.textContent = "✓ 正解！";
+  } else {
+    card.classList.add("answered-wrong");
+    fb.className = "feedback wrong";
+    fb.textContent = "✗ 不正解。正解は「" + answerText(q) + "」";
+  }
+  if (q.exp) {
+    const ex = document.createElement("div");
+    ex.className = "q-exp";
+    ex.textContent = "💡 " + q.exp;
+    fb.appendChild(ex);
+  }
+  return isCorrect;
+}
+
+function selectAnswer(qid, chosen) {
+  const s = st();
+  if (s.answered[qid] !== undefined) return;
+  const q = s.questions.find(x => x.id === qid);
+  s.answered[qid] = chosen;
+  if (!markAnswer(q, chosen)) s.wrongIds.add(qid);
+
+  updateProgress();
+  if (Object.keys(s.answered).length === s.questions.length) showResult(true);
+}
+
+function updateProgress() {
+  const s = st();
+  const done = Object.keys(s.answered).length;
+  const total = s.questions.length;
+  document.getElementById("prog-text").textContent = done + " / " + total;
+  document.getElementById("prog-bar").style.width = (total ? done / total * 100 : 0) + "%";
+  let cheer = "がんばって！";
+  if (done === total && total > 0) cheer = "全問解答完了！";
+  else if (done / total >= 0.8) cheer = "もう少し！";
+  else if (done / total >= 0.5) cheer = "折り返し！";
+  else if (done / total >= 0.2) cheer = "いい調子！";
+  document.getElementById("cheer-text").textContent = cheer;
+}
+
+// justFinished: 今まさに全問解き終えたとき true（記録保存とスクロール）
+function showResult(justFinished) {
+  const s = st();
+  hideResult();
+  if (s.questions.length === 0 || Object.keys(s.answered).length < s.questions.length) return;
+  const correctCount = s.questions.filter(q => isCorrectAns(q, s.answered[q.id])).length;
+  const total = s.questions.length;
+  const pct = Math.round(correctCount / total * 100);
+
+  const rb = document.getElementById("result-box");
+  rb.style.display = "block";
+  document.getElementById("score-big").textContent = correctCount + "／" + total;
+  document.getElementById("score-sub").textContent = "正答率 " + pct + "%";
+
+  if (s.wrongIds.size > 0) {
+    const wl = document.getElementById("wrong-list");
+    const wi = document.getElementById("wrong-items");
+    wi.innerHTML = "";
+    s.wrongIds.forEach(id => {
+      const q = current.questions.find(x => x.id === id);
+      if (!q) return;
+      const div = document.createElement("div");
+      div.className = "wrong-item";
+      div.innerHTML = `<div class="wi-q">${q.text}</div><div class="wi-a">正解：${answerText(q)}</div>`;
+      wi.appendChild(div);
+    });
+    wl.style.display = "block";
+  }
+
+  if (!justFinished) return;
+  // 結果は最後の問題のすぐ下に出るので、最後の問題が見える位置のまま結果まで見せる
+  setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
+  if (s.isAllMode) saveRecord(correctCount, total, pct);
+}
+
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(current.recordKey) || "[]"); } catch(e) { return []; }
+}
+
+function saveRecord(correct, total, pct) {
+  const records = loadRecords();
+  records.push({ date: new Date().toLocaleDateString("ja-JP"), correct, total, pct });
+  try { localStorage.setItem(current.recordKey, JSON.stringify(records)); } catch(e) {}
+  renderRecord();
+}
+
+function renderRecord() {
+  const records = loadRecords();
+  const tbody = document.getElementById("record-body");
+  tbody.innerHTML = "";
+  records.forEach((r, i) => {
+    const prev = i > 0 ? records[i - 1] : null;
+    const diff = prev ? (r.pct - prev.pct) : null;
+    const diffStr = diff === null ? "—" : diff > 0 ? "▲" + diff + "%" : diff < 0 ? "▼" + Math.abs(diff) + "%" : "±0%";
+    const diffColor = diff > 0 ? "color:var(--correct)" : diff < 0 ? "color:var(--wrong)" : "";
+    tbody.innerHTML += `<tr>
+      <td>${i + 1}</td><td>${r.date}</td>
+      <td>${r.correct}／${r.total}</td><td>${r.pct}%</td>
+      <td style="${diffColor}">${diffStr}</td></tr>`;
+  });
+}
+
+function clearRecord() {
+  if (!confirm("「" + current.tab + "」の記録をリセットしますか？")) return;
+  try { localStorage.removeItem(current.recordKey); } catch(e) {}
+  renderRecord();
+}
+
+window.addEventListener("hashchange", route);
+window.addEventListener("popstate", route);
+window.onload = route;
+</script>
+</body>
+</html>
