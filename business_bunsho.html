@@ -421,7 +421,7 @@ const SUBJECTS = [
   "meta": "問1〜8（全50問）",
   "title": "第76回 第1級 筆記問題",
   "desc": "",
-  "mixLabel": "第76回 全問ミックス",
+  "noMix": true,
   "children": [
    {
     "id": "bb76-12",
@@ -1506,7 +1506,7 @@ const SUBJECTS = [
 
 // 各回のミックス（その回の全単元の問題をまとめて自動生成）
 SUBJECTS.forEach(g => {
-  if (!g.children) return;
+  if (!g.children || g.noMix) return;
   const sets = g.children.filter(c => c.questions && c.questions.length);
   if (sets.length < 2) return;
   g.children.push({
