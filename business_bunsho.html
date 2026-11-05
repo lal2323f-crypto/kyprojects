@@ -303,6 +303,17 @@
   }
   .hero-back:hover { background: rgba(255,255,255,.22); }
   .q-ja { font-size: 13.5px; color: var(--subtext); margin: -8px 0 14px; line-height: 1.7; }
+  .input-row { display: flex; gap: 8px; }
+  .ans-input {
+    flex: 1; min-width: 0; padding: 10px 14px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: var(--card); color: var(--text);
+    font-size: 16px; font-family: inherit; outline: none;
+  }
+  .ans-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  .ans-input.correct { border-color: var(--correct); background: var(--correct-light); color: var(--correct); font-weight: 700; }
+  .ans-input.wrong   { border-color: var(--wrong);   background: var(--wrong-light);   color: var(--wrong);   font-weight: 700; }
+  .ans-btn { flex-shrink: 0; padding: 10px 18px; }
+  .ans-btn:disabled { opacity: .4; cursor: default; }
   .q-exp {
     margin-top: 8px; padding: 10px 12px; border-radius: 8px; background: var(--bg);
     color: var(--text); font-weight: 500; line-height: 1.7; font-size: 13px;
@@ -362,7 +373,7 @@
   <div class="score-big" id="score-big">0／0</div>
   <div class="score-sub" id="score-sub"></div>
   <div class="btn-row">
-    <button class="btn btn-primary" onclick="restartAll()">選択肢をシャッフルしてもう一度</button>
+    <button class="btn btn-primary" onclick="restartAll()">シャッフルしてもう一度</button>
     <button class="btn btn-outline" onclick="restartWrong()">間違えた問題のみもう一度</button>
   </div>
 </div>
@@ -393,7 +404,9 @@
 // 科目データ
 // 問題セット: { id, tab, eyebrow, icon, meta, title, desc, recordKey, questions, choiceLabels? }
 // まとめ(単元一覧): { id, tab, eyebrow, icon, meta, title, desc, children: [問題セット...] }
-// 問題: { id, cat, context?, text, ja?, choices, answer(0始まり), exp? }
+// 問題（4択）: { id, cat, context?, text, ja?, choices, answer(0始まり), exp? }
+// 問題（記述）: { id, cat, context?, text, ja?, answers: ["正解", "別解"...], exp? }
+//   ※記述はカタカナ→ひらがな・全角/半角・空白の違いを無視して判定
 // =====================
 const SUBJECTS = [
   // ここに単元（問題セット）を追加します。例:
@@ -578,6 +591,18 @@ function renderQuiz() {
     if (q.context) html += `<div class="q-context">${q.context}</div>`;
     html += `<div class="q-text">${q.text}</div>`;
     if (q.ja) html += `<div class="q-ja">${q.ja}</div>`;
+    if (q.answers) {
+      html += `<div class="input-row">
+        <input class="ans-input" id="in-${q.id}" type="text" lang="ja" autocomplete="off"
+          autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done"
+          placeholder="ここに入力" onkeydown="inputKey(event, '${q.id}')">
+        <button class="btn btn-primary ans-btn" id="ab-${q.id}" onclick="submitInput('${q.id}')">答える</button>
+      </div><div class="feedback" id="fb-${q.id}"></div>`;
+      card.innerHTML = html;
+      container.appendChild(card);
+      if (s.answered[q.id] !== undefined) markAnswer(q, s.answered[q.id]);
+      return;
+    }
     html += `<div class="choices" id="choices-${q.id}">`;
     q.choices.forEach((c, ci) => {
       html += `<button class="choice-btn" id="btn-${q.id}-${ci}"
@@ -596,7 +621,39 @@ function labelOf(ci) {
 }
 
 // 正解の表示用テキスト（選択肢に記号が含まれていない科目は記号を付ける）
+// 記述の判定用：全角/半角・空白・カタカナ/ひらがなの違いをそろえる
+function normalize(t) {
+  return String(t).normalize("NFKC").replace(/\s+/g, "")
+    .replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+}
+
+function isCorrectAns(q, ans) {
+  if (q.answers) return q.answers.some(a => normalize(a) === normalize(ans));
+  return ans === q.answer;
+}
+
+function inputKey(e, qid) {
+  // 変換確定のEnterでは送信しない
+  if (e.key !== "Enter" || e.isComposing || e.keyCode === 229) return;
+  e.preventDefault();
+  submitInput(qid);
+}
+
+function submitInput(qid) {
+  const el = document.getElementById("in-" + qid);
+  if (!el || el.disabled) return;
+  if (!el.value.trim()) { el.focus(); return; }
+  selectAnswer(qid, el.value.trim());
+  // 次の未解答の記述欄へ移動（キーボードを出したまま続けられる）
+  const next = st().questions.find(x => x.answers && st().answered[x.id] === undefined);
+  if (next) {
+    const ni = document.getElementById("in-" + next.id);
+    if (ni) { ni.focus({ preventScroll: true }); ni.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  } else el.blur();
+}
+
 function answerText(q) {
+  if (q.answers) return q.answers.join("／");
   return (current.choiceLabels ? labelOf(q.answer) + " " : "") + q.choices[q.answer].replace(/<[^>]+>/g, "");
 }
 
@@ -604,9 +661,14 @@ function markAnswer(q, chosen) {
   const correct = q.answer;
   const card = document.getElementById("card-" + q.id);
   const fb = document.getElementById("fb-" + q.id);
-  const isCorrect = (chosen === correct);
+  const isCorrect = isCorrectAns(q, chosen);
 
-  q.choices.forEach((_, ci) => {
+  if (q.answers) {
+    const el = document.getElementById("in-" + q.id);
+    el.value = chosen; el.disabled = true;
+    el.classList.add(isCorrect ? "correct" : "wrong");
+    document.getElementById("ab-" + q.id).disabled = true;
+  } else q.choices.forEach((_, ci) => {
     const btn = document.getElementById(`btn-${q.id}-${ci}`);
     btn.disabled = true;
     if (ci === correct) btn.classList.add("correct");
@@ -661,7 +723,7 @@ function showResult(justFinished) {
   const s = st();
   hideResult();
   if (s.questions.length === 0 || Object.keys(s.answered).length < s.questions.length) return;
-  const correctCount = s.questions.filter(q => s.answered[q.id] === q.answer).length;
+  const correctCount = s.questions.filter(q => isCorrectAns(q, s.answered[q.id])).length;
   const total = s.questions.length;
   const pct = Math.round(correctCount / total * 100);
 
