@@ -413,16 +413,16 @@
 // 問題（記述）: { id, cat, context?, text, ja?, answers: ["正解", "別解"...], exp? }
 //   ※記述はカタカナ→ひらがな・全角/半角・空白の違いを無視して判定
 // =====================
+// 単元: { id, tab, icon, meta, desc, firstRecordKey?, questions: [問題...] }
+//   問題は追加した順に20問ずつ ①②③… に自動で分割されます（分類の「76回・」などで出典の回を管理）
 const SUBJECTS = [
  {
-  "id": "bb-12",
+  "id": "q12",
   "tab": "問1・2",
-  "eyebrow": "ビジネス文書筆記",
   "icon": "1・2",
   "meta": "用語と説明・下線部の正誤",
-  "title": "問1・2　用語と説明・下線部の正誤",
   "desc": "最も適切なものを選びましょう。",
-  "recordKey": "bunsho_bb76_12",
+  "firstRecordKey": "bunsho_bb76_12",
   "questions": [
    {
     "cat": "76回・問1 用語と説明",
@@ -987,14 +987,12 @@ const SUBJECTS = [
   ]
  },
  {
-  "id": "bb-3",
+  "id": "q3",
   "tab": "問3",
-  "eyebrow": "ビジネス文書筆記",
   "icon": "3",
   "meta": "月の異名・時候の挨拶・ショートカットキー",
-  "title": "問3　月の異名・時候の挨拶・ショートカットキー",
   "desc": "最も適切なものを選びましょう。",
-  "recordKey": "bunsho_bb76_3",
+  "firstRecordKey": "bunsho_bb76_3",
   "questions": [
    {
     "cat": "76回・問3",
@@ -1169,14 +1167,12 @@ const SUBJECTS = [
   ]
  },
  {
-  "id": "bb-45",
-  "tab": "問4・5 ①",
-  "eyebrow": "ビジネス文書筆記",
+  "id": "q45",
+  "tab": "問4・5",
   "icon": "4・5",
   "meta": "プレゼンテーション用語・ビジネス文書",
-  "title": "問4・5 ①　プレゼンテーション用語・ビジネス文書",
   "desc": "最も適切なものを選びましょう。",
-  "recordKey": "bunsho_bb76_45",
+  "firstRecordKey": "bunsho_bb76_45",
   "questions": [
    {
     "cat": "76回・問4 プレゼンテーション",
@@ -1528,19 +1524,7 @@ const SUBJECTS = [
      "ウ"
     ],
     "id": "bb76-45-15"
-   }
-  ]
- },
- {
-  "id": "bb-45-2",
-  "tab": "問4・5 ②",
-  "eyebrow": "ビジネス文書筆記",
-  "icon": "4・5",
-  "meta": "プレゼンテーション用語・ビジネス文書",
-  "title": "問4・5 ②　プレゼンテーション用語・ビジネス文書",
-  "desc": "最も適切なものを選びましょう。",
-  "recordKey": "bunsho_bb_45_2",
-  "questions": [
+   },
    {
     "cat": "68回・問4 プレゼンテーション",
     "text": "「起承転結」の説明として最も適切なものはどれか。",
@@ -1893,14 +1877,12 @@ const SUBJECTS = [
   ]
  },
  {
-  "id": "bb-6",
+  "id": "q6",
   "tab": "問6（記述）",
-  "eyebrow": "ビジネス文書筆記",
   "icon": "6",
   "meta": "漢字の読みをひらがなで入力",
-  "title": "問6（記述）　漢字の読みをひらがなで入力",
   "desc": "下線部の読みをひらがなで入力し、「答える」かEnterで採点します。",
-  "recordKey": "bunsho_bb76_6",
+  "firstRecordKey": "bunsho_bb76_6",
   "questions": [
    {
     "cat": "76回・問6 漢字の読み",
@@ -2005,14 +1987,12 @@ const SUBJECTS = [
   ]
  },
  {
-  "id": "bb-78",
-  "tab": "問7・8 ①",
-  "eyebrow": "ビジネス文書筆記",
+  "id": "q78",
+  "tab": "問7・8",
   "icon": "7・8",
   "meta": "四字熟語・漢字の正誤・同音異義語",
-  "title": "問7・8 ①　四字熟語・漢字の正誤・同音異義語",
   "desc": "最も適切なものを選びましょう。",
-  "recordKey": "bunsho_bb76_78",
+  "firstRecordKey": "bunsho_bb76_78",
   "questions": [
    {
     "cat": "76回・問7 四字熟語",
@@ -2264,19 +2244,7 @@ const SUBJECTS = [
      "イ"
     ],
     "id": "bb76-78-15"
-   }
-  ]
- },
- {
-  "id": "bb-78-2",
-  "tab": "問7・8 ②",
-  "eyebrow": "ビジネス文書筆記",
-  "icon": "7・8",
-  "meta": "四字熟語・漢字の正誤・同音異義語",
-  "title": "問7・8 ②　四字熟語・漢字の正誤・同音異義語",
-  "desc": "最も適切なものを選びましょう。",
-  "recordKey": "bunsho_bb_78_2",
-  "questions": [
+   },
    {
     "cat": "68回・問7 四字熟語",
     "text": "彼の言動は責任〔　　〕をしているに過ぎない。",
@@ -2534,17 +2502,27 @@ const SUBJECTS = [
  }
 ];
 
-// 各回のミックス（その回の全単元の問題をまとめて自動生成）
+// 各単元の問題を20問ずつ ①②③… に分割（どの回の問題が入っているかを meta に表示）
+const MAX_PER_SET = 20;
 SUBJECTS.forEach(g => {
-  if (!g.children || g.noMix) return;
-  const sets = g.children.filter(c => c.questions && c.questions.length);
-  if (sets.length < 2) return;
-  g.children.push({
-    id: g.id + "-all", tab: g.mixLabel || "全問ミックス", eyebrow: g.eyebrow, icon: "全",
-    meta: "この回の全問題をランダムに出題", title: g.title + "（全問ミックス）",
-    desc: "全単元の問題からランダムに出題します。", recordKey: "bunsho_" + g.id + "_all",
-    questions: sets.flatMap(c => c.questions.map(q => ({ ...q, id: "all-" + q.id })))
-  });
+  const pool = g.questions;
+  delete g.questions;
+  g.eyebrow = "ビジネス文書筆記";
+  g.title = g.tab;
+  g.children = [];
+  for (let i = 0; i * MAX_PER_SET < pool.length; i++) {
+    const qs = pool.slice(i * MAX_PER_SET, (i + 1) * MAX_PER_SET);
+    const no = String.fromCharCode(0x2460 + i); // ①②③…
+    const rounds = {};
+    qs.forEach(q => { const r = (q.cat.match(/^(\d+)回/) || [])[1]; if (r) rounds[r] = (rounds[r] || 0) + 1; });
+    const src = Object.keys(rounds).sort((a, b) => b - a).map(r => `第${r}回${rounds[r]}問`).join("・");
+    g.children.push({
+      id: g.id + "-" + (i + 1), tab: g.tab + " " + no, eyebrow: g.tab, icon: no,
+      meta: src, title: g.tab + " " + no + "（" + src + "）", desc: g.desc,
+      recordKey: i === 0 && g.firstRecordKey ? g.firstRecordKey : "bunsho_" + g.id + "_" + (i + 1),
+      questions: qs
+    });
+  }
 });
 
 // 科目ごとの解答状態（タブを切り替えても途中経過を保持）
@@ -2598,7 +2576,7 @@ function renderMenu(group, parent) {
     if (s.recordKey) { try { records = JSON.parse(localStorage.getItem(s.recordKey) || "[]"); } catch(e) {} }
     const best = records.length ? Math.max(...records.map(r => r.pct)) : null;
     const meta = s.children
-      ? `${countQuestions(s) ? s.children.length + "単元" : s.children.length + "回分"} ・ ${esc(s.meta)}`
+      ? `全${countQuestions(s)}問（${s.children.map(c => c.icon).join("")}） ・ ${esc(s.meta)}`
       : s.questions ? `全${s.questions.length}問 ・ ${esc(s.meta)}` : esc(s.meta);
     const b = document.createElement("button");
     b.className = "sel-card";
