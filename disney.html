@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ディズニー 情報・混雑予想リンク集</title>
+<meta name="description" content="東京ディズニーランド・東京ディズニーシーの公式情報、混雑予想、天気、持ち物をまとめたリンク集">
+<style>
+:root {
+  --bg: #F4F1EA;
+  --card: #FFFFFF;
+  --ink: #1F2230;
+  --faint: #6E6A75;
+  --border: #DDD6CA;
+  --line: #ECE6DB;
+  --navy: #1F3A6B;
+  --tdl: #2B5BA8;
+  --tdl-bg: #EAF0FA;
+  --tds: #0E7C7B;
+  --tds-bg: #E5F4F3;
+  --gold: #C9A23A;
+  --lv1: #3E9B63; --lv2: #8BB443; --lv3: #E0B23A; --lv4: #E07B39; --lv5: #C8413B;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  font-family: 'Hiragino Kaku Gothic ProN','Hiragino Sans','Yu Gothic','Meiryo',sans-serif;
+  color: var(--ink);
+  line-height: 1.6;
+  padding-bottom: 60px;
+}
+a { color: inherit; }
+
+/* ── ヘッダー ── */
+.top {
+  background: var(--navy); color: #fff;
+  padding: 22px 18px 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+}
+.top-eyebrow { font-size: 11px; opacity: 0.7; letter-spacing: 0.1em; }
+.top-title { font-size: 21px; font-weight: 700; margin: 2px 0 6px; }
+.top-sub { font-size: 13px; opacity: 0.85; }
+.top-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.chip-btn {
+  border: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.12);
+  color: #fff; font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 20px; cursor: pointer;
+}
+.chip-btn:hover { background: rgba(255,255,255,0.22); }
+
+/* ── 目次 ── */
+.toc {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(244,241,234,0.96); border-bottom: 1px solid var(--border);
+  display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.toc a {
+  flex-shrink: 0; text-decoration: none; font-size: 13px; font-weight: 600;
+  color: var(--navy); background: #fff; border: 1px solid var(--border);
+  padding: 6px 12px; border-radius: 16px;
+}
+
+main { max-width: 760px; margin: 0 auto; padding: 0 14px; }
+section { margin-top: 28px; scroll-margin-top: 56px; }
+h2 {
+  font-size: 17px; color: var(--navy);
+  display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+}
+h2::after { content: ''; flex: 1; height: 1px; background: var(--navy); opacity: 0.2; }
+.sec-note { font-size: 12.5px; color: var(--faint); margin-bottom: 12px; }
+
+/* ── リンクカード ── */
+.links { display: grid; gap: 10px; }
+@media (min-width: 620px) { .links { grid-template-columns: 1fr 1fr; } }
+.lcard {
+  background: var(--card); border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 13px 14px; display: flex; flex-direction: column; gap: 4px;
+}
+.lcard-title { font-size: 15px; font-weight: 700; }
+.lcard-desc { font-size: 12.5px; color: var(--faint); flex: 1; }
+.lcard-btns { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.lbtn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  min-height: 38px; padding: 6px 14px; border-radius: 8px;
+  font-size: 13.5px; font-weight: 700; text-decoration: none;
+  border: 1.5px solid var(--navy); color: var(--navy); background: #fff;
+  flex: 1; min-width: 110px;
+}
+.lbtn:hover { background: #F1F4FA; }
+.lbtn.tdl { border-color: var(--tdl); color: var(--tdl); background: var(--tdl-bg); }
+.lbtn.tds { border-color: var(--tds); color: var(--tds); background: var(--tds-bg); }
+.lbtn::after { content: '\2197'; font-size: 12px; opacity: 0.7; }
+.tag {
+  display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em;
+  padding: 1px 7px; border-radius: 4px; margin-right: 6px; vertical-align: 2px;
+  background: var(--navy); color: #fff;
+}
+.tag.unofficial { background: #8A8392; }
+
+/* ── 混雑の目安 ── */
+.box {
+  background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px;
+}
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.cal-head button {
+  font: inherit; font-size: 14px; border: 1px solid var(--border); background: #fff;
+  border-radius: 8px; padding: 6px 12px; cursor: pointer; min-width: 44px;
+}
+.cal-month { font-weight: 700; font-size: 16px; }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal .dow { font-size: 11px; text-align: center; color: var(--faint); padding-bottom: 2px; }
+.cal .dow.sun { color: #C8413B; } .cal .dow.sat { color: var(--tdl); }
+.day {
+  border: none; font: inherit; cursor: pointer;
+  border-radius: 7px; aspect-ratio: 1 / 1; min-height: 38px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff; position: relative;
+}
+.day small { font-size: 9.5px; font-weight: 600; opacity: 0.95; line-height: 1; }
+.day.empty { background: transparent; cursor: default; }
+.day.past { opacity: 0.35; }
+.day.today { outline: 2.5px solid var(--ink); outline-offset: 1px; }
+.day.sel { outline: 2.5px solid var(--gold); outline-offset: 1px; }
+.lv1 { background: var(--lv1); } .lv2 { background: var(--lv2); } .lv3 { background: var(--lv3); color: #3A2A00; }
+.lv4 { background: var(--lv4); } .lv5 { background: var(--lv5); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 10px; font-size: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+.detail {
+  margin-top: 12px; padding: 11px 12px; border-radius: 8px; background: #F7F4EE;
+  font-size: 13.5px; border-left: 4px solid var(--gold);
+}
+.detail b { font-size: 15px; }
+.detail ul { margin: 6px 0 0 18px; font-size: 12.5px; color: var(--faint); }
+.warn { font-size: 12px; color: var(--faint); margin-top: 10px; }
+
+/* ── 持ち物 ── */
+.check { list-style: none; display: grid; gap: 6px; }
+@media (min-width: 620px) { .check { grid-template-columns: 1fr 1fr; } }
+.check label {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  background: var(--card); border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 9px 12px; font-size: 14px; min-height: 44px;
+}
+.check input { width: 20px; height: 20px; accent-color: var(--navy); flex-shrink: 0; }
+.check input:checked + span { text-decoration: line-through; color: var(--faint); }
+.check-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 13px; color: var(--faint); }
+.text-btn { font: inherit; font-size: 13px; background: none; border: none; color: var(--navy); text-decoration: underline; cursor: pointer; padding: 6px; }
+
+/* ── コツ ── */
+.tips { list-style: none; display: grid; gap: 8px; }
+.tips li {
+  background: var(--card); border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 10px 12px; font-size: 13.5px;
+}
+.tips b { color: var(--navy); }
+
+footer { max-width: 760px; margin: 34px auto 0; padding: 0 14px; font-size: 11.5px; color: var(--faint); }
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  background: var(--ink); color: #fff; font-size: 13px; padding: 9px 16px; border-radius: 20px;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-eyebrow">TOKYO DISNEY RESORT LINKS</div>
+  <h1 class="top-title">ディズニー 情報・混雑予想リンク集</h1>
+  <p class="top-sub">東京ディズニーランド・東京ディズニーシーに行く前に見るページをまとめました。</p>
+  <div class="top-row">
+    <button class="chip-btn" id="shareBtn" type="button">このページを共有</button>
+  </div>
+</header>
+
+<nav class="toc" aria-label="目次">
+  <a href="#crowd">混雑の目安</a>
+  <a href="#official">公式</a>
+  <a href="#forecast">混雑予想サイト</a>
+  <a href="#prep">行く前に</a>
+  <a href="#items">持ち物</a>
+  <a href="#tips">コツ</a>
+</nav>
+
+<main>
+
+<!-- ── 混雑の目安 ── -->
+<section id="crowd">
+  <h2>混雑の目安カレンダー</h2>
+  <p class="sec-note">曜日・祝日・長い休み・イベントから自動で出したざっくりの目安です。日付を押すと理由が出ます。</p>
+  <div class="box">
+    <div class="cal-head">
+      <button type="button" id="prevM" aria-label="前の月">&#8249;</button>
+      <div class="cal-month" id="calMonth"></div>
+      <button type="button" id="nextM" aria-label="次の月">&#8250;</button>
+    </div>
+    <div class="cal" id="cal"></div>
+    <div class="legend">
+      <span><i class="lv1"></i>空いてそう</span>
+      <span><i class="lv2"></i>ふつう</span>
+      <span><i class="lv3"></i>やや混む</span>
+      <span><i class="lv4"></i>混む</span>
+      <span><i class="lv5"></i>とても混む</span>
+    </div>
+    <div class="detail" id="detail"></div>
+    <p class="warn">あくまで目安です。チケットが売り切れの日はとても混みます。行く日が決まったら、下の公式カレンダーと混雑予想サイトでも確かめてください。</p>
+  </div>
+</section>
+
+<!-- ── 公式 ── -->
+<section id="official">
+  <h2>公式の情報</h2>
+  <p class="sec-note">いちばん正確なのは公式です。迷ったらここを見ます。</p>
+  <div class="links" id="officialLinks"></div>
+</section>
+
+<!-- ── 混雑予想サイト ── -->
+<section id="forecast">
+  <h2>混雑予想サイト</h2>
+  <p class="sec-note">公式ではないサイトです。予想の出し方がサイトごとに違うので、2〜3か所を見比べるのがおすすめです。</p>
+  <div class="links" id="forecastLinks"></div>
+</section>
+
+<!-- ── 行く前に ── -->
+<section id="prep">
+  <h2>行く前に見る</h2>
+  <p class="sec-note">天気・行き方・新しい情報など。</p>
+  <div class="links" id="prepLinks"></div>
+</section>
+
+<!-- ── 持ち物 ── -->
+<section id="items">
+  <h2>持ち物チェックリスト</h2>
+  <p class="sec-note">チェックはこの端末に残ります（ほかの人には見えません）。</p>
+  <ul class="check" id="checkList"></ul>
+  <div class="check-foot">
+    <span id="checkCount"></span>
+    <button class="text-btn" type="button" id="checkReset">チェックを外す</button>
+  </div>
+</section>
+
+<!-- ── コツ ── -->
+<section id="tips">
+  <h2>混雑を避けるコツ</h2>
+  <ul class="tips">
+    <li><b>平日の火〜木がねらい目。</b>土日・祝日・その前日は混みやすいです。</li>
+    <li><b>長い休みはどこも混みます。</b>春休み（3月下旬〜4月上旬）、GW、夏休み、年末年始は早めに計画を。</li>
+    <li><b>イベントの始まりと終わりの週は混みます。</b>ハロウィーンやクリスマスの初日・最終週は特に。</li>
+    <li><b>雨の日は空きやすいです。</b>レインコートがあれば、待ち時間が短くなることも。</li>
+    <li><b>チケットは2か月前の14時から発売。</b>売り切れの日は混雑のサインです。</li>
+    <li><b>アプリは前日までに入れておく。</b>待ち時間の確認、DPA（有料の優先パス）、レストランの受付、モバイルオーダーができます。</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <p>このページはファンがまとめた非公式のリンク集です。東京ディズニーリゾートの運営とは関係ありません。料金・時間・イベントの内容は変わることがあるので、最新の情報は必ず公式サイトで確かめてください。</p>
+  <p style="margin-top:6px">リンクの確認：2026年11月</p>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+  var OFF = 'https://www.tokyodisneyresort.jp';
+
+  // ── リンク一覧（park: 'both' は TDL/TDS の2ボタン、'one' は1ボタン）──
+  var OFFICIAL = [
+    { t: '運営時間・カレンダー', d: '開園・閉園時間と、その日のショーやパレードの予定。',
+      tdl: OFF + '/tdl/daily/calendar/', tds: OFF + '/tds/daily/calendar/' },
+    { t: 'チケット（空き状況）', d: '日付指定のチケット。売り切れの日は混む日の目安になります。',
+      url: OFF + '/ticket/index.html', label: 'チケットを見る' },
+    { t: '東京ディズニーリゾート・アプリ', d: '待ち時間、DPA、プライオリティパス、レストラン受付、モバイルオーダー。',
+      url: OFF + '/tdr/app/', label: 'アプリの案内' },
+    { t: '待ち時間（いま）', d: 'アトラクションの今の待ち時間と運営状況。くわしくはアプリが便利です。',
+      tdl: OFF + '/tdl/realtime/attraction/', tds: OFF + '/tds/realtime/attraction/' },
+    { t: 'パークマップ', d: '園内の地図。紙のマップは配られていないので、ここから保存しておくと安心。',
+      tdl: OFF + '/tdl/map/', tds: OFF + '/tds/map/' },
+    { t: 'イベント', d: 'ハロウィーン・クリスマスなど、季節のスペシャルイベント。',
+      tdl: OFF + '/tdl/event', tds: OFF + '/tds/event.html' },
+    { t: 'アトラクション', d: 'アトラクションの一覧と、休止の予定。',
+      tdl: OFF + '/tdl/attraction/', tds: OFF + '/tds/attraction/' },
+    { t: '今日のパーク情報', d: 'その日のショー・グリーティング・お知らせ。',
+      tdl: OFF + '/tdl/daily/', tds: OFF + '/tds/daily/' }
+  ];
+
+  var FORECAST = [
+    { t: 'TDR PLUS', d: 'ランド・シー別の日ごとの混雑予想。毎日更新。', unofficial: true,
+      tdl: 'https://tdr-plus.com/crowd-tdl.html', both: 'https://tdr-plus.com/crowd.html', bothLabel: '両パーク' },
+    { t: 'ディズニーニュース 混雑予想カレンダー', d: '月ごとのカレンダーで混み具合を確認できます。', unofficial: true,
+      tdl: 'https://disney-news.com/calendar/tdl', tds: 'https://disney-news.com/calendar/tds' },
+    { t: 'ディズニーリアル 混雑予想', d: '半年先までの混雑予想。早めに計画したいとき向け。', unofficial: true,
+      url: 'https://disneyreal.asumirai.info/monthly/6month-expect.html', label: '半年先まで見る' },
+    { t: 'ディズニー混雑予想カレンダー（月別・時間帯別）', d: '月ごと・時間帯ごとの傾向がまとまっています。', unofficial: true,
+      url: 'https://yasushi-duffy.com/calendar/', label: 'カレンダーを見る' }
+  ];
+
+  var PREP = [
+    { t: '天気（舞浜）', d: '10日先までの天気と、6時間ごとの雨の確率。',
+      url: 'https://tenki.jp/leisure/3/15/80/100001/', label: 'tenki.jp で見る', unofficial: true },
+    { t: '電車での行き方', d: 'JR京葉線・武蔵野線の舞浜駅から。シーへはディズニーリゾートラインに乗り換え。',
+      url: OFF + '/tdr/access/railway.html', label: '行き方を見る' },
+    { t: '新しくなる・変わる情報', d: '新しいアトラクションや、料金・ルールの変更。',
+      url: OFF + '/tdr/update.html', label: 'お知らせを見る' },
+    { t: '公式サイト トップ', d: 'グッズ、レストラン、ホテルなどほかの情報はここから。',
+      url: OFF + '/', label: '公式サイトへ' }
+  ];
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function btn(href, label, cls) {
+    return '<a class="lbtn ' + (cls || '') + '" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a>';
+  }
+  function renderLinks(id, list) {
+    var html = '';
+    list.forEach(function (x) {
+      var b = '';
+      if (x.tdl) b += btn(x.tdl, 'ランド', 'tdl');
+      if (x.tds) b += btn(x.tds, 'シー', 'tds');
+      if (x.both) b += btn(x.both, x.bothLabel || '両パーク', '');
+      if (x.url) b += btn(x.url, x.label || '開く', '');
+      html += '<div class="lcard">' +
+        '<div class="lcard-title"><span class="tag' + (x.unofficial ? ' unofficial' : '') + '">' + (x.unofficial ? '非公式' : '公式') + '</span>' + esc(x.t) + '</div>' +
+        '<div class="lcard-desc">' + esc(x.d) + '</div>' +
+        '<div class="lcard-btns">' + b + '</div></div>';
+    });
+    document.getElementById(id).innerHTML = html;
+  }
+  renderLinks('officialLinks', OFFICIAL);
+  renderLinks('forecastLinks', FORECAST);
+  renderLinks('prepLinks', PREP);
+
+  // ── 日本の祝日（振替休日・国民の休日を含む）──
+  function nthMonday(y, m, n) { // m: 0始まり
+    var d = new Date(y, m, 1);
+    var first = (8 - d.getDay()) % 7 + 1; // 最初の月曜日
+    return first + (n - 1) * 7;
+  }
+  function vernal(y) { return Math.floor(20.8431 + 0.242194 * (y - 1980) - Math.floor((y - 1980) / 4)); }
+  function autumnal(y) { return Math.floor(23.2488 + 0.242194 * (y - 1980) - Math.floor((y - 1980) / 4)); }
+  var holidayCache = {};
+  function holidays(y) {
+    if (holidayCache[y]) return holidayCache[y];
+    var h = {};
+    function add(m, d, name) { h[key(y, m, d)] = name; }
+    add(0, 1, '元日'); add(0, nthMonday(y, 0, 2), '成人の日');
+    add(1, 11, '建国記念の日'); add(1, 23, '天皇誕生日');
+    add(2, vernal(y), '春分の日');
+    add(3, 29, '昭和の日'); add(4, 3, '憲法記念日'); add(4, 4, 'みどりの日'); add(4, 5, 'こどもの日');
+    add(6, nthMonday(y, 6, 3), '海の日'); add(7, 11, '山の日');
+    add(8, nthMonday(y, 8, 3), '敬老の日'); add(8, autumnal(y), '秋分の日');
+    add(9, nthMonday(y, 9, 2), 'スポーツの日');
+    add(10, 3, '文化の日'); add(10, 23, '勤労感謝の日');
+    // 国民の休日（祝日にはさまれた平日）
+    for (var d = new Date(y, 0, 2); d.getFullYear() === y; d.setDate(d.getDate() + 1)) {
+      var prev = new Date(d); prev.setDate(d.getDate() - 1);
+      var next = new Date(d); next.setDate(d.getDate() + 1);
+      var k = keyD(d);
+      if (!h[k] && d.getDay() !== 0 && h[keyD(prev)] && h[keyD(next)]) h[k] = '国民の休日';
+    }
+    // 振替休日（日曜の祝日のあと、最初の平日）
+    Object.keys(h).forEach(function (k) {
+      var p = k.split('-'), dt = new Date(+p[0], +p[1] - 1, +p[2]);
+      if (dt.getDay() === 0) {
+        var s = new Date(dt);
+        do { s.setDate(s.getDate() + 1); } while (h[keyD(s)]);
+        if (s.getFullYear() === y) h[keyD(s)] = '振替休日';
+      }
+    });
+    holidayCache[y] = h;
+    return h;
+  }
+  function key(y, m, d) { return y + '-' + (m + 1) + '-' + d; }
+  function keyD(dt) { return key(dt.getFullYear(), dt.getMonth(), dt.getDate()); }
+  function holidayName(dt) { return holidays(dt.getFullYear())[keyD(dt)] || ''; }
+  function isOff(dt) { return dt.getDay() === 0 || dt.getDay() === 6 || !!holidayName(dt); }
+  function md(dt) { return (dt.getMonth() + 1) * 100 + dt.getDate(); } // 例：12月25日 → 1225
+  function inRange(dt, a, b) { var v = md(dt); return a <= b ? (v >= a && v <= b) : (v >= a || v <= b); }
+
+  // ── 混雑の目安（1〜5）──
+  function estimate(dt) {
+    var why = [], score;
+    var dow = dt.getDay(), hn = holidayName(dt);
+    var next = new Date(dt); next.setDate(dt.getDate() + 1);
+    if (hn) { score = 4; why.push('祝日（' + hn + '）'); }
+    else if (dow === 6) { score = 4; why.push('土曜日'); }
+    else if (dow === 0) { score = 3.5; why.push('日曜日'); }
+    else if (dow === 5) { score = 2.5; why.push('金曜日'); }
+    else if (dow === 1) { score = 2; why.push('月曜日'); }
+    else { score = 1.25; why.push('平日（火〜木）'); }
+    if (!isOff(dt) && isOff(next) && dow !== 5) { score += 0.5; why.push('次の日が休み'); }
+    // 連休の中日
+    var prev = new Date(dt); prev.setDate(dt.getDate() - 1);
+    if (isOff(dt) && isOff(prev) && isOff(next) && dow !== 0 && dow !== 6) { score += 0.5; why.push('連休のまんなか'); }
+
+    if (inRange(dt, 320, 407)) { score += 1; why.push('春休み'); }
+    else if (inRange(dt, 429, 506)) { score += 1; why.push('ゴールデンウィーク'); }
+    else if (inRange(dt, 720, 831)) { score += 1; why.push('夏休み'); }
+    else if (inRange(dt, 1223, 107)) { score += 1; why.push('冬休み・年末年始'); }
+    if (inRange(dt, 1220, 1225)) { score += 0.5; why.push('クリスマス直前'); }
+    if (inRange(dt, 1025, 1031)) { score += 0.5; why.push('ハロウィーン最終週'); }
+    if (inRange(dt, 1111, 1115)) { score += 0.5; why.push('クリスマスイベントの始まり'); }
+    if (inRange(dt, 225, 319) && !isOff(dt)) { score += 0.5; why.push('卒業旅行シーズン'); }
+    if ((inRange(dt, 108, 131) || inRange(dt, 601, 630)) && !isOff(dt)) { score -= 0.5; why.push('比較的すいている時期'); }
+
+    var lv = Math.max(1, Math.min(5, Math.round(score)));
+    return { lv: lv, why: why };
+  }
+  var LV_NAME = ['', '空いてそう', 'ふつう', 'やや混む', '混む', 'とても混む'];
+
+  // ── カレンダー表示 ──
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var view = new Date(today.getFullYear(), today.getMonth(), 1);
+  var selected = new Date(today);
+  var DOW = ['日', '月', '火', '水', '木', '金', '土'];
+
+  function renderCal() {
+    var y = view.getFullYear(), m = view.getMonth();
+    document.getElementById('calMonth').textContent = y + '年' + (m + 1) + '月';
+    var html = '';
+    DOW.forEach(function (w, i) {
+      html += '<div class="dow' + (i === 0 ? ' sun' : i === 6 ? ' sat' : '') + '">' + w + '</div>';
+    });
+    var start = new Date(y, m, 1).getDay();
+    for (var i = 0; i < start; i++) html += '<div class="day empty"></div>';
+    var last = new Date(y, m + 1, 0).getDate();
+    for (var d = 1; d <= last; d++) {
+      var dt = new Date(y, m, d), e = estimate(dt);
+      var cls = 'day lv' + e.lv;
+      if (dt < today) cls += ' past';
+      if (+dt === +today) cls += ' today';
+      if (+dt === +selected) cls += ' sel';
+      html += '<button type="button" class="' + cls + '" data-d="' + d + '" aria-label="' +
+        (m + 1) + '月' + d + '日 ' + LV_NAME[e.lv] + '">' + d +
+        (holidayName(dt) ? '<small>祝</small>' : '') + '</button>';
+    }
+    document.getElementById('cal').innerHTML = html;
+    renderDetail();
+  }
+  function renderDetail() {
+    var e = estimate(selected), dt = selected;
+    var label = (dt.getMonth() + 1) + '月' + dt.getDate() + '日（' + DOW[dt.getDay()] + '）';
+    document.getElementById('detail').innerHTML =
+      label + 'は <b>' + LV_NAME[e.lv] + '</b> の目安' +
+      '<ul>' + e.why.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>';
+  }
+  document.getElementById('cal').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-d]');
+    if (!b) return;
+    selected = new Date(view.getFullYear(), view.getMonth(), +b.getAttribute('data-d'));
+    renderCal();
+  });
+  document.getElementById('prevM').addEventListener('click', function () { view.setMonth(view.getMonth() - 1); renderCal(); });
+  document.getElementById('nextM').addEventListener('click', function () { view.setMonth(view.getMonth() + 1); renderCal(); });
+  renderCal();
+
+  // ── 持ち物 ──
+  var ITEMS = ['チケット（アプリかQRコード）', 'スマホ', 'モバイルバッテリー', '充電ケーブル', 'お財布・交通系IC',
+    '雨具（レインコート・折りたたみ傘）', 'タオル・ハンカチ', 'ウェットティッシュ', '飲み物', '羽織るもの・防寒具',
+    '日焼け止め・帽子', 'レジャーシート（パレード待ち用）', 'エコバッグ（おみやげ用）', '常備薬・ばんそうこう'];
+  var STORE = 'disney_checklist_v1';
+  var checked = {};
+  try { checked = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) { checked = {}; }
+  function renderCheck() {
+    var html = '';
+    ITEMS.forEach(function (it, i) {
+      html += '<li><label><input type="checkbox" data-i="' + i + '"' + (checked[it] ? ' checked' : '') + '><span>' + esc(it) + '</span></label></li>';
+    });
+    document.getElementById('checkList').innerHTML = html;
+    updateCount();
+  }
+  function updateCount() {
+    var n = ITEMS.filter(function (it) { return checked[it]; }).length;
+    document.getElementById('checkCount').textContent = n + ' / ' + ITEMS.length + ' 準備できた';
+  }
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(checked)); } catch (e) {} }
+  document.getElementById('checkList').addEventListener('change', function (ev) {
+    var i = ev.target.getAttribute('data-i');
+    if (i === null) return;
+    if (ev.target.checked) checked[ITEMS[i]] = true; else delete checked[ITEMS[i]];
+    save(); updateCount();
+  });
+  document.getElementById('checkReset').addEventListener('click', function () { checked = {}; save(); renderCheck(); });
+  renderCheck();
+
+  // ── 共有 ──
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(function () { t.classList.remove('show'); }, 1800);
+  }
+  document.getElementById('shareBtn').addEventListener('click', function () {
+    var data = { title: document.title, text: 'ディズニーの情報と混雑予想のリンク集', url: location.href };
+    if (navigator.share) {
+      navigator.share(data).catch(function () {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(location.href).then(function () { toast('リンクをコピーしました'); },
+        function () { toast('コピーできませんでした'); });
+    } else {
+      prompt('このリンクをコピーしてください', location.href);
+    }
+  });
+})();
+</script>
+</body>
+</html>
