@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#05080a">
+<title>XSS 重要語句クイズ</title>
+<style>
+:root {
+  --bg: #05080a;
+  --panel: #0b1210;
+  --panel2: #0f1a16;
+  --line: #1c3a2e;
+  --green: #00ff9c;
+  --green-dim: #00b36d;
+  --cyan: #35d7ff;
+  --text: #cfeee0;
+  --muted: #6f9a87;
+  --correct: #00ff9c;
+  --wrong: #ff3b6b;
+  --warn: #ffd23f;
+  --mono: "JetBrains Mono", "Fira Code", Consolas, "Courier New", "BIZ UDGothic", "Osaka-Mono", "MS Gothic", monospace;
+  --sans: "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  background-image:
+    linear-gradient(rgba(0,255,156,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,156,.035) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+/* 走査線 */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 100;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px);
+}
+#matrix { position: fixed; inset: 0; z-index: 0; opacity: .13; pointer-events: none; }
+#menu-view, #quiz-view { position: relative; z-index: 1; }
+.hidden { display: none !important; }
+.view { max-width: 780px; margin: 0 auto; padding: 0 16px 60px; }
+
+/* ===== ヒーロー ===== */
+.hero { padding: 40px 16px 28px; }
+.hero-inner {
+  max-width: 748px; margin: 0 auto;
+  border: 1px solid var(--line); background: rgba(11,18,16,.92);
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0,255,156,.05), 0 0 40px rgba(0,255,156,.08);
+}
+.term-bar {
+  display: flex; align-items: center; gap: 7px; padding: 9px 14px;
+  background: #0d1714; border-bottom: 1px solid var(--line);
+  font-family: var(--mono); font-size: 12px; color: var(--muted);
+}
+.term-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+.term-bar i:nth-child(1) { background: #ff5f56; }
+.term-bar i:nth-child(2) { background: #ffbd2e; }
+.term-bar i:nth-child(3) { background: #27c93f; }
+.term-bar span { margin-left: 8px; }
+.term-body { padding: 22px 22px 24px; }
+.prompt { font-family: var(--mono); font-size: 13px; color: var(--muted); margin-bottom: 10px; word-break: break-all; }
+.prompt b { color: var(--green); font-weight: 400; }
+.prompt em { color: var(--cyan); font-style: normal; }
+.hero-eyebrow { font-family: var(--mono); font-size: 12px; color: var(--cyan); letter-spacing: .12em; margin-bottom: 6px; }
+.hero h1 {
+  font-family: var(--mono); font-size: clamp(24px, 6vw, 36px); line-height: 1.25;
+  color: var(--green); text-shadow: 0 0 10px rgba(0,255,156,.55), 0 0 26px rgba(0,255,156,.25);
+}
+.hero h1::after {
+  content: "_"; margin-left: 4px; animation: blink 1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+.hero-sub { margin-top: 10px; color: var(--muted); font-size: 14px; }
+.hero-back, .back-btn {
+  font-family: var(--mono); font-size: 13px; color: var(--green);
+  background: transparent; border: 1px solid var(--line); border-radius: 4px;
+  padding: 4px 10px; cursor: pointer; margin-bottom: 14px;
+}
+.hero-back:hover, .back-btn:hover { border-color: var(--green); background: rgba(0,255,156,.08); }
+
+/* ===== メニュー ===== */
+.menu-label { font-family: var(--mono); font-size: 13px; color: var(--muted); margin: 6px 0 12px; }
+.menu-label::before { content: "> "; color: var(--green); }
+#menu-list { display: grid; gap: 12px; }
+.sel-card {
+  display: flex; align-items: center; gap: 16px; width: 100%; text-align: left;
+  background: rgba(11,18,16,.92); border: 1px solid var(--line); border-radius: 8px;
+  padding: 16px 18px; color: var(--text); cursor: pointer; font: inherit;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+  position: relative; overflow: hidden;
+}
+.sel-card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--green);
+  box-shadow: 0 0 12px var(--green);
+}
+.sel-card:hover { border-color: var(--green); box-shadow: 0 0 22px rgba(0,255,156,.18); transform: translateY(-1px); }
+.sel-card:active { transform: translateY(0); }
+.sel-icon {
+  flex: none; width: 52px; height: 52px; display: grid; place-items: center;
+  font-family: var(--mono); font-size: 24px; color: var(--green);
+  border: 1px solid var(--green-dim); border-radius: 6px; background: rgba(0,255,156,.06);
+  text-shadow: 0 0 8px rgba(0,255,156,.6);
+}
+.sel-body { flex: 1; min-width: 0; }
+.sel-eyebrow { font-family: var(--mono); font-size: 11px; color: var(--cyan); letter-spacing: .08em; }
+.sel-title { font-family: var(--mono); font-size: 18px; color: #eafff5; }
+.sel-meta { font-size: 13px; color: var(--muted); }
+.sel-best {
+  display: inline-block; margin-top: 6px; font-family: var(--mono); font-size: 12px;
+  color: var(--bg); background: var(--green); border-radius: 3px; padding: 0 6px;
+}
+.sel-arrow { font-family: var(--mono); font-size: 22px; color: var(--green-dim); }
+.sel-card:hover .sel-arrow { color: var(--green); }
+.menu-foot { margin-top: 22px; font-size: 12px; color: var(--muted); font-family: var(--mono); line-height: 1.8; }
+
+/* ===== 問題画面 ===== */
+.topbar {
+  position: sticky; top: 0; z-index: 10; margin: 0 -16px 18px;
+  background: rgba(5,8,10,.94); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line);
+}
+.topbar-inner { max-width: 780px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+.topbar .back-btn { margin: 0; flex: none; }
+.topbar-eyebrow { font-family: var(--mono); font-size: 11px; color: var(--cyan); }
+.topbar-title { font-family: var(--mono); font-size: 15px; color: var(--green); }
+.subject-head { margin-bottom: 14px; }
+.subject-head h2 { font-family: var(--mono); font-size: 20px; color: var(--green); text-shadow: 0 0 8px rgba(0,255,156,.4); }
+.subject-head h2::before { content: "# "; color: var(--muted); }
+.subject-head p { color: var(--muted); font-size: 14px; }
+
+.progress-wrap {
+  position: sticky; top: 52px; z-index: 9; display: flex; align-items: center; gap: 12px;
+  background: rgba(5,8,10,.94); padding: 8px 0 10px; margin-bottom: 8px;
+}
+.progress-text { font-family: var(--mono); font-size: 13px; color: var(--green); white-space: nowrap; }
+.progress-bar-outer { flex: 1; height: 8px; border: 1px solid var(--line); border-radius: 2px; background: #07100c; overflow: hidden; }
+.progress-bar-inner {
+  height: 100%; width: 0; transition: width .3s;
+  background: repeating-linear-gradient(90deg, var(--green) 0 6px, var(--green-dim) 6px 8px);
+  box-shadow: 0 0 10px var(--green);
+}
+.cheer { font-family: var(--mono); font-size: 12px; color: var(--cyan); white-space: nowrap; }
+
+.quiz-section { display: grid; gap: 14px; }
+.question-card {
+  background: rgba(11,18,16,.94); border: 1px solid var(--line); border-radius: 8px; padding: 16px 16px 14px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.question-card.answered-correct { border-color: rgba(0,255,156,.55); box-shadow: 0 0 18px rgba(0,255,156,.10); }
+.question-card.answered-wrong { border-color: rgba(255,59,107,.6); box-shadow: 0 0 18px rgba(255,59,107,.10); }
+.q-number { font-family: var(--mono); font-size: 13px; color: var(--green); margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.q-number::before { content: "$"; color: var(--muted); }
+.question-card.answered-wrong .q-number { color: var(--wrong); }
+.q-cat { font-size: 11px; color: var(--cyan); border: 1px solid rgba(53,215,255,.35); border-radius: 3px; padding: 0 6px; }
+.q-text { font-size: 16px; color: #eafff5; margin-bottom: 12px; }
+.q-text b { color: var(--green); font-weight: 700; }
+
+.choices { display: grid; gap: 8px; }
+.choice-btn {
+  display: flex; align-items: flex-start; gap: 10px; width: 100%; text-align: left;
+  background: #08100d; border: 1px solid var(--line); border-radius: 6px;
+  color: var(--text); font: inherit; font-size: 15px; padding: 10px 12px; cursor: pointer;
+  transition: border-color .12s, background .12s;
+}
+.choice-btn .choice-label {
+  flex: none; font-family: var(--mono); font-size: 13px; color: var(--green);
+  border: 1px solid var(--green-dim); border-radius: 3px; padding: 0 6px; margin-top: 2px;
+}
+.choice-btn:hover:not(:disabled) { border-color: var(--green); background: rgba(0,255,156,.07); }
+.choice-btn:hover:not(:disabled) .choice-label { background: var(--green); color: var(--bg); }
+.choice-btn:disabled { cursor: default; opacity: .55; }
+.choice-btn.correct { opacity: 1; border-color: var(--correct); background: rgba(0,255,156,.12); color: #eafff5; }
+.choice-btn.correct .choice-label { background: var(--correct); color: var(--bg); border-color: var(--correct); }
+.choice-btn.wrong { opacity: 1; border-color: var(--wrong); background: rgba(255,59,107,.12); }
+.choice-btn.wrong .choice-label { background: var(--wrong); color: #fff; border-color: var(--wrong); }
+
+.feedback { font-family: var(--mono); font-size: 14px; margin-top: 10px; }
+.feedback:empty { display: none; }
+.feedback.correct { color: var(--correct); }
+.feedback.wrong { color: var(--wrong); }
+.q-exp {
+  margin-top: 8px; font-family: var(--sans); font-size: 13.5px; color: var(--text);
+  border-left: 2px solid var(--cyan); background: rgba(53,215,255,.06); padding: 6px 10px; border-radius: 0 4px 4px 0;
+}
+
+/* ===== 結果 ===== */
+#result-box, #wrong-list { display: none; }
+#result-box {
+  margin-top: 22px; text-align: center; padding: 22px 16px;
+  background: rgba(11,18,16,.95); border: 1px solid var(--green); border-radius: 8px;
+  box-shadow: 0 0 30px rgba(0,255,156,.18);
+}
+#result-box h2 { font-family: var(--mono); font-size: 16px; color: var(--cyan); }
+#result-box .score-big {
+  font-family: var(--mono); font-size: 46px; color: var(--green);
+  text-shadow: 0 0 14px rgba(0,255,156,.6); margin: 6px 0 2px;
+}
+#result-box .score-sub { font-family: var(--mono); color: var(--text); margin-bottom: 4px; }
+.rank { font-family: var(--mono); font-size: 13px; color: var(--warn); margin-bottom: 14px; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.btn {
+  font-family: var(--mono); font-size: 14px; padding: 9px 16px; border-radius: 4px; cursor: pointer;
+  border: 1px solid var(--green); transition: background .12s, box-shadow .12s;
+}
+.btn-primary { background: var(--green); color: var(--bg); font-weight: 700; }
+.btn-primary:hover { box-shadow: 0 0 16px var(--green); }
+.btn-outline { background: transparent; color: var(--green); }
+.btn-outline:hover { background: rgba(0,255,156,.1); }
+.btn-danger { background: transparent; color: var(--wrong); border-color: var(--wrong); }
+.btn-danger:hover { background: rgba(255,59,107,.1); }
+
+#wrong-list, #record-section {
+  margin-top: 18px; background: rgba(11,18,16,.94); border: 1px solid var(--line); border-radius: 8px; padding: 16px;
+}
+#wrong-list h3, #record-section h3 { font-family: var(--mono); font-size: 15px; color: var(--wrong); margin-bottom: 10px; }
+#record-section h3 { color: var(--green); }
+#wrong-list h3::before, #record-section h3::before { content: "// "; color: var(--muted); }
+.wrong-item { border-left: 2px solid var(--wrong); padding: 6px 10px; margin-bottom: 8px; background: rgba(255,59,107,.05); }
+.wrong-item .wi-q { font-size: 14px; }
+.wrong-item .wi-a { font-size: 13px; color: var(--green); font-family: var(--sans); }
+
+#record-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 13px; }
+#record-table th, #record-table td { border-bottom: 1px solid var(--line); padding: 6px 4px; text-align: center; }
+#record-table th { color: var(--cyan); font-weight: 400; }
+#record-table tr:last-child td { border-bottom: none; }
+
+@media (max-width: 480px) {
+  .term-body { padding: 18px 16px 20px; }
+  .sel-icon { width: 44px; height: 44px; font-size: 20px; }
+  .q-text { font-size: 15px; }
+  .choice-btn { font-size: 14px; }
+  .cheer { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero h1::after { animation: none; }
+  #matrix { display: none; }
+}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+
+<!-- 単元選択画面 -->
+<div id="menu-view">
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="term-bar"><i></i><i></i><i></i><span>whitehat@lab: ~/xss</span></div>
+      <div class="term-body">
+        <button class="hero-back hidden" id="hero-back" onclick="goUp()"></button>
+        <div class="prompt"><b>whitehat@lab</b>:<em>~/xss</em>$ ./start_training --mode quiz</div>
+        <div class="hero-eyebrow" id="hero-eyebrow">// SECURITY TRAINING</div>
+        <h1 id="hero-title">XSS 重要語句</h1>
+        <p class="hero-sub" id="hero-sub">クロスサイト・スクリプティングの重要語句を4択でチェック。選ぶとその場で採点、出題順と選択肢の並びは毎回ランダムです。</p>
+      </div>
+    </div>
+  </header>
+  <div class="view">
+    <div class="menu">
+      <div class="menu-label" id="menu-label">解くセットを選んでください</div>
+      <div id="menu-list"></div>
+      <p class="menu-foot">出典：IPA 脆弱性体験学習ツール AppGoat「クロスサイト・スクリプティングとは」イントロダクション をもとにした重要語句集</p>
+    </div>
+  </div>
+</div>
+
+<!-- 問題画面 -->
+<div id="quiz-view" class="view hidden">
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <button class="back-btn" id="back-btn" onclick="goUp()">‹ cd ..</button>
+    <div class="topbar-text">
+      <div class="topbar-eyebrow" id="topbar-eyebrow">XSS 重要語句</div>
+      <div class="topbar-title" id="topbar-title"></div>
+    </div>
+  </div>
+</div>
+
+<div class="subject-head">
+  <h2 id="subject-title"></h2>
+  <p id="subject-desc"></p>
+</div>
+
+<div class="progress-wrap">
+  <span class="progress-text" id="prog-text">0 / 0</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" id="prog-bar"></div></div>
+  <span class="cheer" id="cheer-text">[ RUNNING ]</span>
+</div>
+
+<div class="quiz-section" id="quiz"></div>
+
+<div id="result-box">
+  <h2>&gt; SCAN COMPLETE</h2>
+  <div class="score-big" id="score-big">0／0</div>
+  <div class="score-sub" id="score-sub"></div>
+  <div class="rank" id="rank"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="restartAll()">シャッフルしてもう一度</button>
+    <button class="btn btn-outline" onclick="restartWrong()">間違えた問題のみもう一度</button>
+  </div>
+</div>
+
+<div id="wrong-list">
+  <h3>間違えた問題</h3>
+  <div id="wrong-items"></div>
+</div>
+
+<div id="record-section">
+  <h3 id="record-title">成長記録</h3>
+  <table id="record-table">
+    <thead>
+      <tr><th>回</th><th>日付</th><th>正解数</th><th>正答率</th><th>前回比</th></tr>
+    </thead>
+    <tbody id="record-body"></tbody>
+  </table>
+  <div class="btn-row" style="margin-top:12px">
+    <button class="btn btn-danger" onclick="clearRecord()">記録をリセット</button>
+  </div>
+</div>
+
+</div><!-- /quiz-view -->
+
+<script>
+// =====================
+// 問題データ
+// 問題セット: { id, tab, eyebrow, icon, meta, title, desc, recordKey, questions }
+// 問題: { id, cat, text, choices(4つ), answer(0始まり), exp? }
+// ※選択肢の並びは出題のたびにシャッフルされます
+// =====================
+const SUBJECTS = [
+ {
+  id: "set1", tab: "SET ①", eyebrow: "基本用語・攻撃の流れ", icon: "①",
+  meta: "基本用語・攻撃の流れ", title: "SET ① 基本用語・攻撃の流れ",
+  desc: "XSSの基本用語と、攻撃が起こるまでの流れを確認しましょう。",
+  recordKey: "xss_quiz_set1",
+  questions: [
+   { cat: "基本用語", text: "ブラウザ上で実行される命令の一種で、ウェブページの内容を動的に入れ替えたり、ユーザの入力データをチェックしたりできるものはどれか。",
+     choices: ["スクリプト", "ブラウザ", "Cookie", "DOMツリー"], answer: 0,
+     exp: "スクリプトは動きのあるウェブページの構築に使われる。" },
+   { cat: "基本用語", text: "代表的なスクリプト言語で、ブラウザ上で実行され、XSSで埋め込まれる不正なスクリプトにもよく使われるものはどれか。",
+     choices: ["JavaScript", "HTML", "DOM", "セッションID"], answer: 0,
+     exp: "JavaScriptは代表的なスクリプト言語。XSSの不正なスクリプトにもよく使われる。" },
+   { cat: "基本用語", text: "ウェブページを表示し、ページ内のスクリプトを実行するソフトウェアはどれか。",
+     choices: ["ブラウザ", "ウェブアプリケーション", "データ格納領域", "掲示板"], answer: 0,
+     exp: "XSSでは、被害者のブラウザ上で不正なスクリプトが実行される。" },
+   { cat: "基本用語", text: "「<b>脆弱性</b>」の説明として最も適切なものはどれか。",
+     choices: ["ソフトウェアやウェブアプリケーションにある、セキュリティ上の欠陥・弱点。",
+               "脆弱性を悪い目的に利用すること。",
+               "ウェブページの内容を不正に書き換えること。",
+               "他人のセッションIDなどを使って本人のふりをすること。"], answer: 0,
+     exp: "脆弱性は悪用されると被害につながる。ほかの選択肢は「悪用」「改ざん」「成りすまし」の説明。" },
+   { cat: "基本用語", text: "「<b>クロスサイト・スクリプティング（XSS）の脆弱性</b>」の説明として最も適切なものはどれか。",
+     choices: ["悪意のある人が不正なスクリプトをウェブページに埋め込み、そのスクリプトが被害者のブラウザ上で実行されてしまう脆弱性。",
+               "パスワードを総当たりで試され、ログインされてしまう脆弱性。",
+               "ウェブサーバの電源が切れ、ウェブページが表示できなくなる脆弱性。",
+               "ウェブページの表示内容がその場で変化してしまう脆弱性。"], answer: 0,
+     exp: "XSSの脆弱性は、偽ページの表示や情報漏えいの原因となる。" },
+   { cat: "基本用語", text: "不正なスクリプトを作成し、脆弱性を悪用して被害者を攻撃する人を何というか。",
+     choices: ["悪意のある人（攻撃者）", "被害者", "第三者のウェブサイト", "脆弱ウェブアプリケーション"], answer: 0,
+     exp: "攻撃者は罠のリンクを第三者のウェブサイトに貼り付けるなどして攻撃する。" },
+   { cat: "基本用語", text: "罠のリンクをクリックするなどして、自分のブラウザ上で不正なスクリプトを実行させられてしまうユーザを何というか。",
+     choices: ["被害者", "悪意のある人（攻撃者）", "ウェブアプリケーション", "第三者のウェブサイト"], answer: 0,
+     exp: "XSSで不正なスクリプトが実行されるのは、被害者のブラウザ上。" },
+   { cat: "基本用語", text: "不正なスクリプトを含むリンクで、掲示板など第三者のウェブサイトに貼り付けられ、被害者にクリックさせる目的で使われるものはどれか。",
+     choices: ["罠のリンク", "偽情報", "セッションID", "DOMツリー"], answer: 0,
+     exp: "攻撃の流れの第1段階は「罠のリンクの設置」。" },
+   { cat: "基本用語", text: "攻撃対象とは別のサイト（掲示板など）で、罠のリンクを貼り付ける場所として使われるものはどれか。",
+     choices: ["第三者のウェブサイト", "脆弱ウェブアプリケーション", "データ格納領域", "ブラウザ"], answer: 0,
+     exp: "罠のリンクは、攻撃対象とは別の「第三者のウェブサイト」に貼られる。" },
+   { cat: "基本用語", text: "ユーザの入力を受け取り、処理結果をウェブページとして返すプログラムはどれか。",
+     choices: ["ウェブアプリケーション", "ブラウザ", "スクリプト", "Cookie"], answer: 0,
+     exp: "ウェブアプリケーションは、入力を受け取り処理結果をページとして返す。" },
+   { cat: "基本用語", text: "受信した不正なスクリプトを、そのままの形（実行可能な形）でウェブページに出力してしまうウェブアプリケーションを何というか。",
+     choices: ["脆弱ウェブアプリケーション", "第三者のウェブサイト", "掲示板", "データ格納領域"], answer: 0,
+     exp: "脆弱ウェブアプリケーションが不正なスクリプトをそのまま出力することでXSSが成立する。" },
+   { cat: "基本用語", text: "XSSの<b>直接の原因</b>として最も適切なものはどれか。",
+     choices: ["入力データを無害化せずに、そのままの形（実行可能な形）でウェブページに出力すること。",
+               "ブラウザでスクリプトを実行できるようにしていること。",
+               "ウェブページの内容を動的に入れ替えていること。",
+               "ウェブサイトが複数のウェブページで構成されていること。"], answer: 0,
+     exp: "入力データを無害化せずに出力すると、スクリプトがブラウザで実行されてしまう。" },
+   { cat: "基本用語", text: "スクリプトを使うと実現できる、ウェブページの表示内容がその場で変化することを何というか。",
+     choices: ["動的", "永続的", "改ざん", "悪用"], answer: 0,
+     exp: "動的＝動きのあるウェブページ。スクリプトでページの内容を動的に入れ替えられる。" },
+   { cat: "基本用語", text: "ユーザがフォームなどからウェブアプリケーションに送るデータで、XSSでは不正なスクリプトが含まれていることが問題になるものはどれか。",
+     choices: ["入力データ", "Cookie", "偽情報", "セッションID"], answer: 0,
+     exp: "入力データ（ユーザからの入力データ）に不正なスクリプトが含まれていることが問題となる。" },
+   { cat: "攻撃の流れ", text: "XSSの攻撃の流れ（図1）で、<b>最初</b>に行われる段階はどれか。",
+     choices: ["罠のリンクの設置", "不正な文字列の送信", "ウェブページへの出力", "スクリプトの実行"], answer: 0,
+     exp: "悪意のある人が、不正なスクリプトを含む罠のリンクを掲示板などに貼り付けるところから始まる。" },
+   { cat: "攻撃の流れ", text: "被害者が罠のリンクをクリックし、不正なスクリプトを含む文字列を脆弱ウェブアプリケーションに送信した。<b>次に</b>起こることはどれか。",
+     choices: ["脆弱ウェブアプリケーションが、不正なスクリプトをそのままの形でウェブページに出力する。",
+               "悪意のある人が、罠のリンクを掲示板に貼り付ける。",
+               "ウェブアプリケーションが、不正なスクリプトを無害化してから出力する。",
+               "被害者が、第三者のウェブサイトに罠のリンクを貼り付ける。"], answer: 0,
+     exp: "不正な文字列の送信 → ウェブページへの出力 → スクリプトの実行 の順。" },
+   { cat: "攻撃の流れ", text: "XSSの攻撃の流れを正しい順に並べたものはどれか。",
+     choices: ["罠のリンクの設置 → 不正な文字列の送信 → ウェブページへの出力 → スクリプトの実行",
+               "不正な文字列の送信 → 罠のリンクの設置 → スクリプトの実行 → ウェブページへの出力",
+               "罠のリンクの設置 → ウェブページへの出力 → 不正な文字列の送信 → スクリプトの実行",
+               "スクリプトの実行 → 罠のリンクの設置 → 不正な文字列の送信 → ウェブページへの出力"], answer: 0,
+     exp: "設置 → 送信 → 出力 → 実行。最後に被害者のブラウザ上でスクリプトが実行される。" }
+  ]
+ },
+ {
+  id: "set2", tab: "SET ②", eyebrow: "被害・影響・XSSの種類", icon: "②",
+  meta: "被害・影響・XSSの種類", title: "SET ② 被害・影響・XSSの種類",
+  desc: "XSSで起こる被害と、XSSの3つの種類を確認しましょう。",
+  recordKey: "xss_quiz_set2",
+  questions: [
+   { cat: "被害・影響", text: "本物のウェブサイト上に偽のページが表示される被害を何というか。",
+     choices: ["偽のウェブページの表示", "Cookieの取得", "任意のCookieの保存", "セッションIDの固定化"], answer: 0,
+     exp: "偽情報による混乱や、フィッシング詐欺による情報漏えいにつながる。" },
+   { cat: "被害・影響", text: "「<b>フィッシング詐欺</b>」の説明として最も適切なものはどれか。",
+     choices: ["本物そっくりの偽ページなどでユーザをだまし、個人情報やパスワードなどを入力させて盗み取る詐欺。",
+               "偽のウェブページによって表示される誤った情報で、利用者の混乱を招くもの。",
+               "他人のセッションIDなどを使って本人のふりをすること。",
+               "ウェブページの内容を不正に書き換えること。"], answer: 0,
+     exp: "ほかの選択肢は「偽情報」「成りすまし」「改ざん」の説明。" },
+   { cat: "被害・影響", text: "個人情報などの重要な情報が、意図せず外部（悪意のある人）に渡ってしまうことを何というか。",
+     choices: ["情報漏えい", "改ざん", "悪用", "偽情報"], answer: 0,
+     exp: "Cookieに個人情報が入っていると、XSSで情報漏えいにつながる。" },
+   { cat: "被害・影響", text: "「<b>Cookie（クッキー）</b>」の説明として最も適切なものはどれか。",
+     choices: ["ブラウザに保存される小さなデータ。セッションIDや個人情報などが格納されることがある。",
+               "ウェブサイトがログイン中のユーザを識別するための番号。",
+               "ウェブアプリケーションがデータを保存しておく場所（データベースなど）。",
+               "ウェブページの要素を木構造で表したもの。"], answer: 0,
+     exp: "Cookieは、XSSで取得・改変される対象になる。ほかの選択肢は「セッションID」「データ格納領域」「DOMツリー」の説明。" },
+   { cat: "被害・影響", text: "ウェブサイトがログイン中のユーザを識別するための番号で、Cookieに格納されることが多く、盗まれると成りすましに悪用されるものはどれか。",
+     choices: ["セッションID", "個人情報", "スクリプト", "文字列"], answer: 0,
+     exp: "セッションIDが盗まれると、成りすましに悪用される。" },
+   { cat: "被害・影響", text: "XSSで<b>セッションID</b>が入ったCookieを盗まれた場合、主につながる被害はどれか。",
+     choices: ["成りすまし", "改ざん", "偽情報", "永続的に格納"], answer: 0,
+     exp: "Cookieの取得：セッションIDなら成りすまし、個人情報なら情報漏えいにつながる。" },
+   { cat: "被害・影響", text: "「成りすまし」の被害の例として、学習ページで挙げられているものはどれか。",
+     choices: ["知らないうちにショッピングサイトで勝手に商品を購入される。",
+               "掲示板に罠のリンクが貼り付けられる。",
+               "ウェブページの表示内容がその場で変化する。",
+               "ブラウザに小さなデータが保存される。"], answer: 0,
+     exp: "成りすまし＝他人のセッションIDなどを使って本人のふりをすること。" },
+   { cat: "被害・影響", text: "XSSで氏名・住所などの<b>個人情報</b>が入ったCookieを取得された場合、主につながる被害はどれか。",
+     choices: ["情報漏えい", "成りすまし", "セッションIDの固定化", "改ざん"], answer: 0,
+     exp: "個人情報が入ったCookieを盗まれると情報漏えい、セッションIDなら成りすまし。" },
+   { cat: "被害・影響", text: "攻撃者が用意した好きなCookieを、被害者のブラウザに保存させられる被害を何というか。",
+     choices: ["任意のCookieの保存", "Cookieの取得", "偽のウェブページの表示", "情報漏えい"], answer: 0,
+     exp: "任意のCookieの保存は、セッションIDの固定化に悪用される。" },
+   { cat: "被害・影響", text: "悪意のある人が取得（用意）したセッションIDを被害者のブラウザに送り込んで使わせ、ユーザの成りすましにつなげる攻撃はどれか。",
+     choices: ["セッションIDの固定化", "フィッシング詐欺", "罠のリンクの設置", "Cookieの取得"], answer: 0,
+     exp: "任意のCookieの保存 → セッションIDの固定化 → 成りすまし、という流れ。" },
+   { cat: "XSSの種類", text: "入力データに含まれる不正なスクリプトがウェブアプリケーションのデータ格納領域に永続的に保存され、ページを閲覧するたびに実行されるタイプのXSSはどれか。",
+     choices: ["格納型クロスサイト・スクリプティング", "反射型クロスサイト・スクリプティング", "DOMベースのクロスサイト・スクリプティング", "セッションIDの固定化"], answer: 0,
+     exp: "学習テーマは「掲示板に埋め込まれるスクリプト」。" },
+   { cat: "XSSの種類", text: "ウェブアプリケーションがデータを保存しておく場所（データベースなど）で、格納型XSSでは不正なスクリプトが保存されるものはどれか。",
+     choices: ["データ格納領域", "DOMツリー", "Cookie", "ブラウザ"], answer: 0,
+     exp: "格納型XSSでは、データ格納領域に不正なスクリプトが保存される。" },
+   { cat: "XSSの種類", text: "一時的ではなく、継続して保存され続けることを何というか。格納型XSSの特徴である。",
+     choices: ["永続的に格納", "動的", "そのままの形で出力", "反射"], answer: 0,
+     exp: "格納型XSSは、不正なスクリプトが永続的に格納されるのが特徴。" },
+   { cat: "XSSの種類", text: "入力データに含まれる不正なスクリプトを、ウェブアプリケーションがそのままの形でページの出力に利用してしまうことで実行されるタイプのXSSはどれか。",
+     choices: ["反射型クロスサイト・スクリプティング", "格納型クロスサイト・スクリプティング", "DOMベースのクロスサイト・スクリプティング", "フィッシング詐欺"], answer: 0,
+     exp: "学習テーマは「アンケートページの改ざん、入力情報の漏えい」。" },
+   { cat: "XSSの種類", text: "DOMを利用しているスクリプトが、DOMツリーに存在する不正なスクリプトをページの表示に利用してしまうことで実行されるタイプのXSSはどれか。",
+     choices: ["DOMベースのクロスサイト・スクリプティング", "格納型クロスサイト・スクリプティング", "反射型クロスサイト・スクリプティング", "セッションIDの固定化"], answer: 0,
+     exp: "学習テーマは「ウェブページの改ざん」。" },
+   { cat: "XSSの種類", text: "「<b>DOM（Document Object Model）</b>」の説明として最も適切なものはどれか。",
+     choices: ["ウェブページ（HTML）の構造を、スクリプトから操作できる形で表したしくみ。",
+               "ブラウザに保存される小さなデータ。",
+               "ユーザの入力を受け取り、処理結果をウェブページとして返すプログラム。",
+               "複数のウェブページのまとまり。"], answer: 0,
+     exp: "ほかの選択肢は「Cookie」「ウェブアプリケーション」「ウェブサイト」の説明。" },
+   { cat: "XSSの種類", text: "DOMによってウェブページの要素を木構造で表したもので、DOMベースXSSではここにある不正なスクリプトが表示に使われてしまうものはどれか。",
+     choices: ["DOMツリー", "データ格納領域", "セッションID", "第三者のウェブサイト"], answer: 0,
+     exp: "DOMツリー＝要素を木（ツリー）構造で表したもの。" },
+   { cat: "XSSの種類", text: "XSSの種類と学習テーマの組合せとして正しいものはどれか。",
+     choices: ["格納型 ― 掲示板に埋め込まれるスクリプト",
+               "反射型 ― ウェブページの改ざん",
+               "DOMベース ― アンケートページの改ざん",
+               "格納型 ― 入力情報の漏えい"], answer: 0,
+     exp: "格納型＝掲示板に埋め込まれるスクリプト／反射型＝アンケートページの改ざん、入力情報の漏えい／DOMベース＝ウェブページの改ざん。" }
+  ]
+ }
+];
+SUBJECTS.forEach(s => s.questions.forEach((q, i) => { q.id = s.id + "-" + (i + 1); }));
+
+const TITLE = "XSS 重要語句";
+const states = {};
+let current = null;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+// 選択肢の並びもシャッフル（正解の位置を毎回変える）
+function shuffleChoices(q) {
+  const order = shuffle(q.choices.map((_, i) => i));
+  return { ...q, choices: order.map(i => q.choices[i]), answer: order.indexOf(q.answer) };
+}
+
+function st() { return states[current.id]; }
+function esc(t) {
+  return String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+function plain(t) { return String(t).replace(/<[^>]+>/g, ""); }
+
+function findNode(id) {
+  const n = SUBJECTS.find(s => s.id === id);
+  return n ? { node: n } : null;
+}
+
+function renderMenu() {
+  const list = document.getElementById("menu-list");
+  list.innerHTML = "";
+  SUBJECTS.forEach(s => {
+    let records = [];
+    try { records = JSON.parse(localStorage.getItem(s.recordKey) || "[]"); } catch(e) {}
+    const best = records.length ? Math.max(...records.map(r => r.pct)) : null;
+    const b = document.createElement("button");
+    b.className = "sel-card";
+    b.innerHTML = `<div class="sel-icon">${esc(s.icon)}</div>
+      <div class="sel-body">
+        <div class="sel-eyebrow">${esc(s.eyebrow)}</div>
+        <div class="sel-title">${esc(s.tab)}</div>
+        <div class="sel-meta">全${s.questions.length}問 ・ 4択</div>
+        ${best === null ? "" : `<span class="sel-best">BEST ${best}%（${records.length}回挑戦）</span>`}
+      </div>
+      <div class="sel-arrow">›</div>`;
+    b.onclick = () => { location.hash = s.id; };
+    list.appendChild(b);
+  });
+}
+
+function goUp() {
+  history.pushState(null, "", location.pathname + location.search);
+  route();
+}
+
+function route() {
+  const f = findNode(location.hash.slice(1));
+  document.getElementById("menu-view").classList.toggle("hidden", !!f);
+  document.getElementById("quiz-view").classList.toggle("hidden", !f);
+  if (f) selectSubject(f.node); else renderMenu();
+  window.scrollTo(0, 0);
+}
+
+function selectSubject(node) {
+  current = node;
+  document.getElementById("topbar-title").textContent = current.tab;
+  document.getElementById("subject-title").textContent = current.title;
+  document.getElementById("subject-desc").textContent = current.desc;
+  document.getElementById("record-title").textContent = "成長記録（" + current.tab + "）";
+  if (!states[current.id]) {
+    states[current.id] = { questions: [], answered: {}, wrongIds: new Set(), isAllMode: true };
+    restartAll(true);
+  } else {
+    renderQuiz();
+    updateProgress();
+    showResult(false);
+  }
+  renderRecord();
+}
+
+function init(qList) {
+  const s = st();
+  s.questions = qList.map(shuffleChoices);
+  s.answered = {};
+  renderQuiz();
+  updateProgress();
+}
+
+function hideResult() {
+  document.getElementById("result-box").style.display = "none";
+  document.getElementById("wrong-list").style.display = "none";
+}
+
+function restartAll(noScroll) {
+  const s = st();
+  hideResult();
+  s.wrongIds = new Set();
+  s.isAllMode = true;
+  init(shuffle(current.questions));
+  if (!noScroll) window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function restartWrong() {
+  const s = st();
+  if (s.wrongIds.size === 0) { alert("間違えた問題はありません！"); return; }
+  const wrongQs = current.questions.filter(q => s.wrongIds.has(q.id));
+  hideResult();
+  s.wrongIds = new Set();
+  s.isAllMode = false;
+  init(shuffle(wrongQs));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function labelOf(ci) { return String.fromCharCode(65 + ci); }
+
+function renderQuiz() {
+  const s = st();
+  const container = document.getElementById("quiz");
+  container.innerHTML = "";
+  s.questions.forEach((q, idx) => {
+    const card = document.createElement("div");
+    card.className = "question-card";
+    card.id = "card-" + q.id;
+    let html = `<div class="q-number">Q${String(idx + 1).padStart(2, "0")}<span class="q-cat">${q.cat}</span></div>`;
+    html += `<div class="q-text">${q.text}</div><div class="choices" id="choices-${q.id}">`;
+    q.choices.forEach((c, ci) => {
+      html += `<button class="choice-btn" id="btn-${q.id}-${ci}" onclick="selectAnswer('${q.id}', ${ci})">
+        <span class="choice-label">${labelOf(ci)}</span><span>${c}</span></button>`;
+    });
+    html += `</div><div class="feedback" id="fb-${q.id}"></div>`;
+    card.innerHTML = html;
+    container.appendChild(card);
+    if (s.answered[q.id] !== undefined) markAnswer(q, s.answered[q.id]);
+  });
+}
+
+function answerText(q) { return labelOf(q.answer) + " " + plain(q.choices[q.answer]); }
+
+function markAnswer(q, chosen) {
+  const card = document.getElementById("card-" + q.id);
+  const fb = document.getElementById("fb-" + q.id);
+  const isCorrect = chosen === q.answer;
+  q.choices.forEach((_, ci) => {
+    const btn = document.getElementById(`btn-${q.id}-${ci}`);
+    btn.disabled = true;
+    if (ci === q.answer) btn.classList.add("correct");
+    if (ci === chosen && !isCorrect) btn.classList.add("wrong");
+  });
+  if (isCorrect) {
+    card.classList.add("answered-correct");
+    fb.className = "feedback correct";
+    fb.textContent = "[ ACCESS GRANTED ] 正解！";
+  } else {
+    card.classList.add("answered-wrong");
+    fb.className = "feedback wrong";
+    fb.textContent = "[ ACCESS DENIED ] 不正解。正解は「" + answerText(q) + "」";
+  }
+  if (q.exp) {
+    const ex = document.createElement("div");
+    ex.className = "q-exp";
+    ex.textContent = "💡 " + q.exp;
+    fb.appendChild(ex);
+  }
+  return isCorrect;
+}
+
+function selectAnswer(qid, chosen) {
+  const s = st();
+  if (s.answered[qid] !== undefined) return;
+  const q = s.questions.find(x => x.id === qid);
+  s.answered[qid] = chosen;
+  if (!markAnswer(q, chosen)) s.wrongIds.add(qid);
+  updateProgress();
+  if (Object.keys(s.answered).length === s.questions.length) showResult(true);
+}
+
+function updateProgress() {
+  const s = st();
+  const done = Object.keys(s.answered).length;
+  const total = s.questions.length;
+  document.getElementById("prog-text").textContent = done + " / " + total;
+  document.getElementById("prog-bar").style.width = (total ? done / total * 100 : 0) + "%";
+  let cheer = "[ RUNNING ]";
+  if (done === total && total > 0) cheer = "[ COMPLETE ]";
+  else if (done / total >= 0.8) cheer = "[ もう少し！ ]";
+  else if (done / total >= 0.5) cheer = "[ 折り返し！ ]";
+  else if (done / total >= 0.2) cheer = "[ いい調子！ ]";
+  document.getElementById("cheer-text").textContent = cheer;
+}
+
+function rankOf(pct) {
+  if (pct === 100) return "RANK: ELITE WHITE HACKER — 完璧！";
+  if (pct >= 80) return "RANK: SECURITY ENGINEER — あと一歩！";
+  if (pct >= 60) return "RANK: JUNIOR ANALYST — 間違えた語句を復習しよう";
+  return "RANK: TRAINEE — もう一度チャレンジ！";
+}
+
+function showResult(justFinished) {
+  const s = st();
+  hideResult();
+  if (s.questions.length === 0 || Object.keys(s.answered).length < s.questions.length) return;
+  const correctCount = s.questions.filter(q => s.answered[q.id] === q.answer).length;
+  const total = s.questions.length;
+  const pct = Math.round(correctCount / total * 100);
+  const rb = document.getElementById("result-box");
+  rb.style.display = "block";
+  document.getElementById("score-big").textContent = correctCount + "／" + total;
+  document.getElementById("score-sub").textContent = "正答率 " + pct + "%";
+  document.getElementById("rank").textContent = rankOf(pct);
+
+  if (s.wrongIds.size > 0) {
+    const wi = document.getElementById("wrong-items");
+    wi.innerHTML = "";
+    s.wrongIds.forEach(id => {
+      const q = s.questions.find(x => x.id === id);
+      if (!q) return;
+      const div = document.createElement("div");
+      div.className = "wrong-item";
+      div.innerHTML = `<div class="wi-q">${q.text}</div><div class="wi-a">正解：${esc(plain(q.choices[q.answer]))}</div>`;
+      wi.appendChild(div);
+    });
+    document.getElementById("wrong-list").style.display = "block";
+  }
+  if (!justFinished) return;
+  setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
+  if (s.isAllMode) saveRecord(correctCount, total, pct);
+}
+
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(current.recordKey) || "[]"); } catch(e) { return []; }
+}
+function saveRecord(correct, total, pct) {
+  const records = loadRecords();
+  records.push({ date: new Date().toLocaleDateString("ja-JP"), correct, total, pct });
+  try { localStorage.setItem(current.recordKey, JSON.stringify(records)); } catch(e) {}
+  renderRecord();
+}
+function renderRecord() {
+  const records = loadRecords();
+  const tbody = document.getElementById("record-body");
+  tbody.innerHTML = "";
+  records.forEach((r, i) => {
+    const prev = i > 0 ? records[i - 1] : null;
+    const diff = prev ? (r.pct - prev.pct) : null;
+    const diffStr = diff === null ? "—" : diff > 0 ? "▲" + diff + "%" : diff < 0 ? "▼" + Math.abs(diff) + "%" : "±0%";
+    const diffColor = diff > 0 ? "color:var(--correct)" : diff < 0 ? "color:var(--wrong)" : "";
+    tbody.innerHTML += `<tr><td>${i + 1}</td><td>${r.date}</td>
+      <td>${r.correct}／${r.total}</td><td>${r.pct}%</td><td style="${diffColor}">${diffStr}</td></tr>`;
+  });
+}
+function clearRecord() {
+  if (!confirm("「" + current.tab + "」の記録をリセットしますか？")) return;
+  try { localStorage.removeItem(current.recordKey); } catch(e) {}
+  renderRecord();
+}
+
+// 背景のコードの雨
+(function matrix() {
+  const cv = document.getElementById("matrix");
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const ctx = cv.getContext("2d");
+  const chars = "01<>/{}=;$#XSSアイウエオカキクケコ".split("");
+  const fs = 14;
+  let cols, drops;
+  function resize() {
+    cv.width = innerWidth; cv.height = innerHeight;
+    cols = Math.ceil(cv.width / fs);
+    drops = Array.from({ length: cols }, () => Math.random() * -50);
+  }
+  resize();
+  addEventListener("resize", resize);
+  setInterval(() => {
+    ctx.fillStyle = "rgba(5,8,10,.12)";
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = "#00ff9c";
+    ctx.font = fs + "px monospace";
+    for (let i = 0; i < cols; i++) {
+      ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * fs, drops[i] * fs);
+      if (drops[i] * fs > cv.height && Math.random() > .975) drops[i] = 0;
+      drops[i]++;
+    }
+  }, 60);
+})();
+
+window.addEventListener("hashchange", route);
+window.addEventListener("popstate", route);
+window.onload = route;
+</script>
+</body>
+</html>
