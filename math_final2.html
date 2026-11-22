@@ -849,7 +849,7 @@ const SUBJECTS = [
         "tab": "授業内容",
         "eyebrow": "ネットワーク",
         "icon": "授",
-        "meta": "期末試験対策PDF（Linux・DNS・IP・コマンド・設定）",
+        "meta": "期末試験対策PDF（Linux・DNS・IP・コマンド・設定・サブネット）",
         "title": "授業内容",
         "desc": "解く単元を選んでください",
         "children": [
@@ -858,7 +858,7 @@ const SUBJECTS = [
             "tab": "① Linux・サーバーソフト",
             "eyebrow": "ネットワーク ・ 授業内容",
             "icon": "①",
-            "meta": "ディストリビューション・Kali Linux・Apache・Samba・設定ファイル",
+            "meta": "ディストリビューション・カーネル・Kali Linux・Apache・Samba・設定ファイル",
             "title": "Linux・サーバーソフト",
             "desc": "期末試験対策PDF（授業内容）からの4択問題です。",
             "recordKey": "final2_net_c1",
@@ -1008,6 +1008,34 @@ const SUBJECTS = [
                 ],
                 "answer": 2,
                 "exp": "設定ファイルは、変更後にサービスを再起動（またはリロード）して読み込ませる必要がある。"
+              },
+              {
+                "id": "c1-11",
+                "cat": "Linux・サーバーソフト",
+                "context": null,
+                "text": "「Linuxカーネル」の説明として、適切なものはどれか。",
+                "choices": [
+                  "OSの中核となる部分",
+                  "カーネルに便利なソフトや管理ツールを組み合わせて配布しているパッケージ",
+                  "Webサーバーソフト",
+                  "設定ファイルを置くディレクトリ"
+                ],
+                "answer": 0,
+                "exp": "Linuxカーネル＝OSの中核。これにソフトや管理ツールを組み合わせて配布しているものがLinuxディストリビューション。"
+              },
+              {
+                "id": "c1-12",
+                "cat": "Linux・サーバーソフト",
+                "context": null,
+                "text": "Samba（ファイルサーバーソフト）の設定ファイルの例として、適切なものはどれか。",
+                "choices": [
+                  "/etc/apache2/apache2.conf",
+                  "/etc/unbound/unbound.conf",
+                  "/var/www/html",
+                  "/etc/samba/smb.conf"
+                ],
+                "answer": 3,
+                "exp": "Sambaの設定ファイルは /etc/samba/smb.conf。/etc/apache2/apache2.conf はApache、/etc/unbound/unbound.conf はUnboundの設定ファイル。"
               }
             ]
           },
@@ -1016,7 +1044,7 @@ const SUBJECTS = [
             "tab": "② DNS・ドメイン",
             "eyebrow": "ネットワーク ・ 授業内容",
             "icon": "②",
-            "meta": "DNS・Unbound/BIND・FQDN・TLD・JPNIC",
+            "meta": "DNS・Unbound/BIND・FQDN・TLD（gTLD/ccTLD）・JPNIC/JPRS",
             "title": "DNS・ドメイン",
             "desc": "期末試験対策PDF（授業内容）からの4択問題です。",
             "recordKey": "final2_net_c2",
@@ -1166,6 +1194,48 @@ const SUBJECTS = [
                 ],
                 "answer": 1,
                 "exp": "JPNIC＝日本ネットワークインフォメーションセンター。実際の .jp の登録管理業務は子会社のJPRSが担当している。"
+              },
+              {
+                "id": "c2-11",
+                "cat": "DNS・ドメイン",
+                "context": null,
+                "text": "トップレベルドメイン（TLD）のうち、gTLD（分野別TLD）に分類されるものはどれか。",
+                "choices": [
+                  ".jp",
+                  ".us",
+                  ".com",
+                  "www"
+                ],
+                "answer": 2,
+                "exp": "gTLD＝分野別のTLD（.com、.orgなど）。.jp・.usは国コードのccTLD。wwwはホスト名。"
+              },
+              {
+                "id": "c2-12",
+                "cat": "DNS・ドメイン",
+                "context": null,
+                "text": ".jp ドメインの実際の登録管理業務を担当している、JPNICの子会社はどれか。",
+                "choices": [
+                  "JPNIC",
+                  "JPRS",
+                  "Unbound",
+                  "BIND"
+                ],
+                "answer": 1,
+                "exp": "JPNICは .jp に関する業務や調査研究を行う非営利法人で、実際の .jp の登録管理業務は子会社のJPRSが担当している。"
+              },
+              {
+                "id": "c2-13",
+                "cat": "DNS・ドメイン",
+                "context": null,
+                "text": "DNSキャッシュサーバー（Unboundなど）が、クライアントの代わりに問い合わせを行う相手はどれか。",
+                "choices": [
+                  "クライアントのPC",
+                  "Webサーバー（Apache）",
+                  "ファイルサーバー（Samba）",
+                  "外部の権威DNSサーバー"
+                ],
+                "answer": 3,
+                "exp": "DNSキャッシュサーバーは、クライアントから問い合わせを受けると外部の権威DNSサーバーへ代理で問い合わせ、その結果をキャッシュする。"
               }
             ]
           },
@@ -1174,7 +1244,7 @@ const SUBJECTS = [
             "tab": "③ IPアドレス・ルーティング",
             "eyebrow": "ネットワーク ・ 授業内容",
             "icon": "③",
-            "meta": "ネットワークアドレス・サブネットマスク・CIDR・ルータ・静的/動的ルーティング",
+            "meta": "ネットワーク/ホスト/ブロードキャストアドレス・サブネットマスク・CIDR・ルータ・静的/動的ルーティング",
             "title": "IPアドレス・ルーティング",
             "desc": "期末試験対策PDF（授業内容）からの4択問題です。",
             "recordKey": "final2_net_c3",
@@ -1324,6 +1394,62 @@ const SUBJECTS = [
                 ],
                 "answer": 1,
                 "exp": "動的ルーティング（Dynamic Routing）＝OSPFやBGPなどのプロトコルで経路情報を自動交換・更新する。大規模ネットワーク向き。"
+              },
+              {
+                "id": "c3-11",
+                "cat": "IPアドレス・ルーティング",
+                "context": null,
+                "text": "ネットワーク内の個々の機器（PCやサーバー）を識別する部分を何というか。",
+                "choices": [
+                  "ネットワークアドレス",
+                  "サブネットマスク",
+                  "ホストアドレス",
+                  "CIDR"
+                ],
+                "answer": 2,
+                "exp": "ホストアドレス＝ネットワーク内の個々の機器を識別する部分。ネットワークそのものを識別するのがネットワークアドレス。"
+              },
+              {
+                "id": "c3-12",
+                "cat": "IPアドレス・ルーティング",
+                "context": null,
+                "text": "ホスト部がすべて1になっているため、機器に割り当てることができないアドレス（例：192.168.1.255）を何というか。",
+                "choices": [
+                  "ネットワークアドレス",
+                  "ブロードキャストアドレス",
+                  "ホストアドレス",
+                  "サブネットマスク"
+                ],
+                "answer": 1,
+                "exp": "ホスト部がすべて1＝ブロードキャストアドレス、ホスト部がすべて0＝ネットワークアドレス。どちらも機器には割り当てられない。"
+              },
+              {
+                "id": "c3-13",
+                "cat": "IPアドレス・ルーティング",
+                "context": null,
+                "text": "CIDRの特徴として、適切なものはどれか。",
+                "choices": [
+                  "クラスにとらわれず、柔軟にネットワークを分割できる",
+                  "ドメイン名とIPアドレスを変換できる",
+                  "通信を暗号化できる",
+                  "ルータ同士が経路情報を自動で交換できる"
+                ],
+                "answer": 0,
+                "exp": "CIDR（Classless Inter-Domain Routing）は、クラスにとらわれず /24 や /26 のように柔軟にネットワークを分割できる。"
+              },
+              {
+                "id": "c3-14",
+                "cat": "IPアドレス・ルーティング",
+                "context": null,
+                "text": "動的ルーティングで、ルータ同士が経路情報を自動的に交換するために使うプロトコルの例はどれか。",
+                "choices": [
+                  "ICMP・FTP",
+                  "SMB・HTTP",
+                  "DNS・DHCP",
+                  "OSPF・BGP"
+                ],
+                "answer": 3,
+                "exp": "動的ルーティングはOSPFやBGPなどの専用プロトコルで経路情報を自動交換・更新する。"
               }
             ]
           },
@@ -1332,7 +1458,7 @@ const SUBJECTS = [
             "tab": "④ プロトコル・診断コマンド",
             "eyebrow": "ネットワーク ・ 授業内容",
             "icon": "④",
-            "meta": "ICMP・ping・nslookup・netstat・nc・nmap",
+            "meta": "ICMP・ping・nslookup/dig・netstat/ss・nc・nmap",
             "title": "プロトコル・診断コマンド",
             "desc": "期末試験対策PDF（授業内容）からの4択問題です。",
             "recordKey": "final2_net_c4",
@@ -1482,16 +1608,44 @@ const SUBJECTS = [
                 ],
                 "answer": 1,
                 "exp": "pingはICMPを使い、ICMPにはポート番号がない。ポート単位の確認にはncなどを使う。"
+              },
+              {
+                "id": "c4-11",
+                "cat": "プロトコル・診断コマンド",
+                "context": null,
+                "text": "pingが疎通確認に使うICMPのメッセージはどれか。",
+                "choices": [
+                  "Echo Request／Echo Reply",
+                  "LISTEN",
+                  "forward-zone",
+                  "VirtualHost"
+                ],
+                "answer": 0,
+                "exp": "pingはICMPのEcho Request（応答要求）を送り、Echo Reply（応答）が返ってくるかで疎通を確認する。"
+              },
+              {
+                "id": "c4-12",
+                "cat": "プロトコル・診断コマンド",
+                "context": null,
+                "text": "ポートスキャンなどを行うセキュリティ調査ツール「nmap」が、標準で搭載されているLinuxディストリビューションはどれか。",
+                "choices": [
+                  "AlmaLinux",
+                  "Red Hat Enterprise Linux",
+                  "Ubuntu",
+                  "Kali Linux"
+                ],
+                "answer": 3,
+                "exp": "nmapはKali Linuxに標準搭載されている。Kali Linuxはセキュリティ診断用ツールが数百種類プリインストールされたディストリビューション。"
               }
             ]
           },
           {
             "id": "net-c5",
-            "tab": "⑤ 設定ファイル・サブネット計算",
+            "tab": "⑤ 設定ファイル",
             "eyebrow": "ネットワーク ・ 授業内容",
             "icon": "⑤",
-            "meta": "Apache/Samba/Unboundの設定・CIDRの計算",
-            "title": "設定ファイル・サブネット計算",
+            "meta": "Apache・Samba・Unboundの設定の読み方",
+            "title": "設定ファイル",
             "desc": "期末試験対策PDF（授業内容）からの4択問題です。",
             "recordKey": "final2_net_c5",
             "choiceLabels": [
@@ -1503,7 +1657,7 @@ const SUBJECTS = [
             "questions": [
               {
                 "id": "c5-1",
-                "cat": "設定ファイル・サブネット計算",
+                "cat": "設定ファイル",
                 "context": null,
                 "text": "Apacheの設定ファイルにある次の行の意味として、適切なものはどれか。<br><code>DocumentRoot /var/www/html</code>",
                 "choices": [
@@ -1517,7 +1671,7 @@ const SUBJECTS = [
               },
               {
                 "id": "c5-2",
-                "cat": "設定ファイル・サブネット計算",
+                "cat": "設定ファイル",
                 "context": null,
                 "text": "Apacheの設定ファイルにある <code>&lt;VirtualHost *:80&gt;</code> の「80」が表しているものはどれか。",
                 "choices": [
@@ -1531,7 +1685,7 @@ const SUBJECTS = [
               },
               {
                 "id": "c5-3",
-                "cat": "設定ファイル・サブネット計算",
+                "cat": "設定ファイル",
                 "context": null,
                 "text": "Apacheの設定項目のうち、Webサイトのドメイン名（FQDN）を指定するものはどれか。",
                 "choices": [
@@ -1545,7 +1699,7 @@ const SUBJECTS = [
               },
               {
                 "id": "c5-4",
-                "cat": "設定ファイル・サブネット計算",
+                "cat": "設定ファイル",
                 "context": null,
                 "text": "Sambaの設定ファイル（smb.conf）にある <code>writable = yes</code> の意味として、適切なものはどれか。",
                 "choices": [
@@ -1559,7 +1713,7 @@ const SUBJECTS = [
               },
               {
                 "id": "c5-5",
-                "cat": "設定ファイル・サブネット計算",
+                "cat": "設定ファイル",
                 "context": null,
                 "text": "Sambaの設定ファイル（smb.conf）にある <code>guest ok = no</code> の意味として、適切なものはどれか。",
                 "choices": [
@@ -1573,7 +1727,7 @@ const SUBJECTS = [
               },
               {
                 "id": "c5-6",
-                "cat": "設定ファイル・サブネット計算",
+                "cat": "設定ファイル",
                 "context": null,
                 "text": "Unboundの設定ファイルにある <code>access-control: 192.168.1.0/24 allow</code> の意味として、適切なものはどれか。",
                 "choices": [
@@ -1587,7 +1741,7 @@ const SUBJECTS = [
               },
               {
                 "id": "c5-7",
-                "cat": "設定ファイル・サブネット計算",
+                "cat": "設定ファイル",
                 "context": null,
                 "text": "Unboundの設定ファイルにある <code>forward-addr: 8.8.8.8</code> の意味として、適切なものはどれか。",
                 "choices": [
@@ -1601,7 +1755,151 @@ const SUBJECTS = [
               },
               {
                 "id": "c5-8",
-                "cat": "設定ファイル・サブネット計算",
+                "cat": "設定ファイル",
+                "context": null,
+                "text": "Apacheの設定ファイルにある <code>ServerAdmin webmaster@example.com</code> の意味として、適切なものはどれか。",
+                "choices": [
+                  "管理者のメールアドレス",
+                  "Webサイトのドメイン名（FQDN）",
+                  "HTMLファイルなどを置くディレクトリ",
+                  "待ち受けるポート番号"
+                ],
+                "answer": 0,
+                "exp": "ServerAdmin＝管理者のメールアドレス。ServerNameはドメイン名、DocumentRootはファイルを置くディレクトリ。"
+              },
+              {
+                "id": "c5-9",
+                "cat": "設定ファイル",
+                "context": null,
+                "text": "Sambaの設定ファイル（smb.conf）にある <code>workgroup = WORKGROUP</code> の意味として、適切なものはどれか。",
+                "choices": [
+                  "共有フォルダのパスを指定する",
+                  "書き込みを許可する",
+                  "Windowsのワークグループ名に合わせる",
+                  "ゲストでのアクセスを禁止する"
+                ],
+                "answer": 2,
+                "exp": "workgroup＝Windowsのワークグループ名。[global]（全体の設定）の中に書く。"
+              },
+              {
+                "id": "c5-10",
+                "cat": "設定ファイル",
+                "context": null,
+                "text": "Sambaの設定ファイル（smb.conf）にある <code>path = /srv/samba/share</code> の意味として、適切なものはどれか。",
+                "choices": [
+                  "Windowsのワークグループ名",
+                  "共有フォルダとして公開する、Linux上の実際のディレクトリパス",
+                  "Webページを置くディレクトリ",
+                  "設定ファイルの保存場所"
+                ],
+                "answer": 1,
+                "exp": "path＝共有フォルダの、Linux上の実際のディレクトリパス。"
+              },
+              {
+                "id": "c5-11",
+                "cat": "設定ファイル",
+                "context": null,
+                "text": "Sambaの設定ファイル（smb.conf）にある <code>[share]</code> の意味として、適切なものはどれか。",
+                "choices": [
+                  "全体の設定",
+                  "ログインするユーザー名",
+                  "アクセス用のパスワード",
+                  "共有フォルダの設定の始まりで、「share」が共有名になる"
+                ],
+                "answer": 3,
+                "exp": "[share] の部分が共有フォルダの設定で、[ ] の中の名前（share）が共有名になる。[global] はSamba全体の設定。"
+              },
+              {
+                "id": "c5-12",
+                "cat": "設定ファイル",
+                "context": null,
+                "text": "Unboundの設定ファイルにある <code>interface: 0.0.0.0</code> の意味として、適切なものはどれか。",
+                "choices": [
+                  "すべてのインターフェース（IPアドレス）で問い合わせを待ち受ける",
+                  "すべての問い合わせを拒否する",
+                  "問い合わせを0.0.0.0へ転送する",
+                  "問い合わせを許可するセグメントを指定する"
+                ],
+                "answer": 0,
+                "exp": "interface＝待ち受けるIPアドレス。0.0.0.0 は全インターフェースを意味する。"
+              },
+              {
+                "id": "c5-13",
+                "cat": "設定ファイル",
+                "context": null,
+                "text": "Unboundの設定ファイルの forward-zone にある <code>name: \".\"</code> の意味として、適切なものはどれか。",
+                "choices": [
+                  "ルートドメインへの問い合わせだけを拒否する",
+                  "ドットを含むドメインを無視する",
+                  "すべてのドメイン（\".\"）の問い合わせを転送の対象にする",
+                  "設定ファイルの終わりを表す"
+                ],
+                "answer": 2,
+                "exp": "\".\"（ルート）はすべてのドメインを表す。forward-zone で name: \".\" とすると、すべての問い合わせを forward-addr の外部DNSへ転送する。"
+              },
+              {
+                "id": "c5-14",
+                "cat": "設定ファイル",
+                "context": null,
+                "text": "設定ファイルの中で、「#」で始まる行の扱いとして、適切なものはどれか。",
+                "choices": [
+                  "管理者だけが実行できる命令になる",
+                  "コメント（メモ）として無視される",
+                  "最優先で読み込まれる",
+                  "エラーになる"
+                ],
+                "answer": 1,
+                "exp": "# で始まる行はコメント（メモ）として無視される。設定の説明を書いておくのに使う。"
+              }
+            ]
+          },
+          {
+            "id": "net-c6",
+            "tab": "⑥ サブネット計算",
+            "eyebrow": "ネットワーク ・ 授業内容",
+            "icon": "⑥",
+            "meta": "CIDRからマスク・ネットワークアドレス・範囲を求める",
+            "title": "サブネット計算",
+            "desc": "期末試験対策PDF（授業内容）からの4択問題です。",
+            "recordKey": "final2_net_c6",
+            "choiceLabels": [
+              "①",
+              "②",
+              "③",
+              "④"
+            ],
+            "questions": [
+              {
+                "id": "c6-1",
+                "cat": "サブネット計算",
+                "context": null,
+                "text": "IPアドレス 192.168.10.75/26 で、ネットワーク部に当たるのはどこまでか。",
+                "choices": [
+                  "第1〜第2オクテットのすべてと、第3オクテットの左から2ビット目まで",
+                  "第1〜第3オクテットのすべてと、第4オクテットの左から2ビット目まで",
+                  "第4オクテットのすべて",
+                  "第1オクテットの左から2ビット目まで"
+                ],
+                "answer": 1,
+                "exp": "/26＝8+8+8+2。第1〜第3オクテット（192.168.10）はすべてネットワーク部で、第4オクテットは左から2ビット目までがネットワーク部。"
+              },
+              {
+                "id": "c6-2",
+                "cat": "サブネット計算",
+                "context": null,
+                "text": "192.168.10.75 の第4オクテット「75」を8ビットの2進数で表したものはどれか。",
+                "choices": [
+                  "01001101",
+                  "10010110",
+                  "01001011",
+                  "01110101"
+                ],
+                "answer": 2,
+                "exp": "75＝64＋8＋2＋1 なので 01001011。"
+              },
+              {
+                "id": "c6-3",
+                "cat": "サブネット計算",
                 "context": null,
                 "text": "IPアドレス 192.168.10.75/26 のネットワークアドレスはどれか。",
                 "choices": [
@@ -1614,8 +1912,8 @@ const SUBJECTS = [
                 "exp": "/26＝8+8+8+2。第4オクテット75＝01 001011。左2ビットを残してホスト部を0にすると01 000000＝64。よって192.168.10.64。"
               },
               {
-                "id": "c5-9",
-                "cat": "設定ファイル・サブネット計算",
+                "id": "c6-4",
+                "cat": "サブネット計算",
                 "context": null,
                 "text": "IPアドレス 192.168.10.75/26 のサブネットマスクはどれか。",
                 "choices": [
@@ -1628,8 +1926,50 @@ const SUBJECTS = [
                 "exp": "/26は第4オクテットの左2ビットまでが1 → 11 000000＝128+64＝192。よって255.255.255.192。"
               },
               {
-                "id": "c5-10",
-                "cat": "設定ファイル・サブネット計算",
+                "id": "c6-5",
+                "cat": "サブネット計算",
+                "context": null,
+                "text": "IPアドレス 172.16.50.130/25 のサブネットマスクはどれか。",
+                "choices": [
+                  "255.255.255.0",
+                  "255.255.255.128",
+                  "255.255.255.192",
+                  "255.255.0.0"
+                ],
+                "answer": 1,
+                "exp": "/25＝8+8+8+1。第4オクテットは左1ビットだけ1 → 10000000＝128。よって255.255.255.128。"
+              },
+              {
+                "id": "c6-6",
+                "cat": "サブネット計算",
+                "context": null,
+                "text": "IPアドレス 172.16.50.130/25 のネットワークアドレスはどれか。",
+                "choices": [
+                  "172.16.50.128",
+                  "172.16.50.0",
+                  "172.16.50.130",
+                  "172.16.50.255"
+                ],
+                "answer": 0,
+                "exp": "130＝1 0000010。ホスト部（右7ビット）をすべて0にすると 10000000＝128。よって172.16.50.128。"
+              },
+              {
+                "id": "c6-7",
+                "cat": "サブネット計算",
+                "context": null,
+                "text": "IPアドレス 172.16.50.130/25 のセグメントのブロードキャストアドレスはどれか。",
+                "choices": [
+                  "172.16.50.128",
+                  "172.16.50.129",
+                  "172.16.50.254",
+                  "172.16.50.255"
+                ],
+                "answer": 3,
+                "exp": "ホスト部（右7ビット）をすべて1にすると 11111111＝255。よって172.16.50.255。機器には割り当てられない。"
+              },
+              {
+                "id": "c6-8",
+                "cat": "サブネット計算",
                 "context": null,
                 "text": "IPアドレス 172.16.50.130/25 のセグメントで、機器に割り当てられるホストアドレスの範囲はどれか。",
                 "choices": [
