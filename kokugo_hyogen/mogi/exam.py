@@ -111,7 +111,7 @@ body {{ font-family: {SERIF}; color: #000; }}
 .score {{ margin-top: 3mm; border: 1.4px solid #000; display: flex; flex-direction: column; }}
 .score div {{ height: 7mm; border-bottom: 1px solid #000; position: relative; }}
 .score div:last-child {{ border-bottom: none; }}
-.score .sh {{ background: repeating-linear-gradient(45deg, #ccc 0 2px, #fff 2px 5px); }}
+.score .sh {{ background: #c8c8c8; }}
 .score .mx {{ position: absolute; right: 1px; bottom: 0; font-size: 6pt; }}
 .total {{ position: absolute; right: 10mm; bottom: 8mm; border: 1.4px solid #000; display: grid; grid-template-columns: 14mm 14mm 30mm; font-size: 8pt; }}
 .total div {{ border-left: 1px solid #000; border-bottom: 1px solid #000; height: 7mm; display: flex; align-items: center; justify-content: flex-end; padding-right: 2px; }}
