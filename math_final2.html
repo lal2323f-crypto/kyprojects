@@ -418,11 +418,18 @@ const SUBJECTS = [
             children: []
           },
           {
-            id: "mock-jpn-in", tab: "解答書き込み", eyebrow: "模擬問題 ・ 国語", icon: "✏️", meta: "問題用紙に直接答えを書き込むPDF",
+            id: "mock-jpn-in", tab: "解答書き込み", eyebrow: "模擬問題 ・ 国語", icon: "✏️", meta: "問題用紙に直接答えを書き込む（①〜⑥）",
             title: "国語　解答書き込み", desc: "解く回を選んでください（PDFが開きます）",
-            noteTitle: "📌 お知らせ", note: "国語（解答書き込み）の模擬問題のPDFはまだありません。追加されるとここに表示されます。",
+            noteTitle: "📌 お知らせ", note: "PDFの最後に解答・解説が付いています。まず問題を解いてから確認しよう！",
             // PDFを追加するときは children に { id, tab, eyebrow, icon, meta, href: "final2_mock/ファイル名.pdf" } を足す
-            children: []
+            children: [
+              { id: "mock-jpn-in-1", tab: "模擬問題①", eyebrow: "国語表現 ・ 書き込み式", icon: "①", meta: "問題＋解答・解説（11ページ）", href: "final2_mock/kokugo_kakikomi_01.pdf" },
+              { id: "mock-jpn-in-2", tab: "模擬問題②", eyebrow: "国語表現 ・ 書き込み式", icon: "②", meta: "問題＋解答・解説（11ページ）", href: "final2_mock/kokugo_kakikomi_02.pdf" },
+              { id: "mock-jpn-in-3", tab: "模擬問題③", eyebrow: "国語表現 ・ 書き込み式", icon: "③", meta: "問題＋解答・解説（11ページ）", href: "final2_mock/kokugo_kakikomi_03.pdf" },
+              { id: "mock-jpn-in-4", tab: "模擬問題④", eyebrow: "国語表現 ・ 書き込み式", icon: "④", meta: "問題＋解答・解説（10ページ）", href: "final2_mock/kokugo_kakikomi_04.pdf" },
+              { id: "mock-jpn-in-5", tab: "模擬問題⑤", eyebrow: "国語表現 ・ 書き込み式", icon: "⑤", meta: "問題＋解答・解説（10ページ）", href: "final2_mock/kokugo_kakikomi_05.pdf" },
+              { id: "mock-jpn-in-6", tab: "模擬問題⑥", eyebrow: "国語表現 ・ 書き込み式", icon: "⑥", meta: "問題＋解答・解説（11ページ）", href: "final2_mock/kokugo_kakikomi_06.pdf" }
+            ]
           }
         ]
       },
