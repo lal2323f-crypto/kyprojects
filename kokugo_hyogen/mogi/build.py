@@ -223,7 +223,7 @@ def sec5(M):
             if w.startswith("（"):
                 q = "次の文を二つの文に分けて書き換えるとき、一文目の終わりとして最も適当な位置をア〜エから選びなさい。"
             else:
-                q = f"「{w}」という語を次の文に入れるとき、最も適当な位置をア〜エから選びなさい。"
+                q = f"「{w}」という語を次の文に加えるとき、最も適当な位置をア〜エから選びなさい。"
             M.add(f'<div class="item"><span class="no">({i})</span>{q}<br>{marks(s)}　{box()}</div>')
             M.k(f"5 問2({i})", a, 2, "思", ex, src)
     if plan["q3"] == "CUKE":
