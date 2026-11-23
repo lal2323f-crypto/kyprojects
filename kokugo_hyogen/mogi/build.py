@@ -19,6 +19,13 @@ class Mock:
         self._seq2 = itertools.cycle([1, 0, 0, 1, 1, 0, 1, 0])
         self._seq5 = itertools.cycle([3, 0, 4, 1, 2, 4, 2, 0, 1, 3])
         self._seq3 = itertools.cycle([2, 1, 0, 1, 2, 0])
+        # 回ごとに答えの並びをずらす（毎回同じ並びにならないように）
+        for _ in range(m * 3):
+            next(self._seq4)
+        for _ in range(m):
+            next(self._seq2); next(self._seq3)
+        for _ in range(m * 2):
+            next(self._seq5)
 
     def pos(self, n):
         if n == 2:
