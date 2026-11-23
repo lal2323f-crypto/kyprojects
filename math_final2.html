@@ -407,11 +407,24 @@ const SUBJECTS = [
     title: "模擬問題", desc: "科目を選んでください",
     children: [
       {
-        id: "mock-jpn", tab: "国語", eyebrow: "模擬問題", icon: "国", meta: "国語の模擬問題（PDF）",
-        title: "模擬問題　国語", desc: "解く回を選んでください（PDFが開きます）",
-        noteTitle: "📌 お知らせ", note: "国語の模擬問題のPDFはまだありません。追加されるとここに表示されます。",
-        // PDFを追加するときは children に { id, tab, eyebrow, icon, meta, href: "final2_mock/ファイル名.pdf" } を足す
-        children: []
+        id: "mock-jpn", tab: "国語", eyebrow: "模擬問題", icon: "国", meta: "解答用紙別・解答書き込み（PDF）",
+        title: "模擬問題　国語", desc: "種類を選んでください", unitName: "種類",
+        children: [
+          {
+            id: "mock-jpn-sep", tab: "解答用紙別", eyebrow: "模擬問題 ・ 国語", icon: "📄", meta: "問題と解答用紙が別になっているPDF",
+            title: "国語　解答用紙別", desc: "解く回を選んでください（PDFが開きます）",
+            noteTitle: "📌 お知らせ", note: "国語（解答用紙別）の模擬問題のPDFはまだありません。追加されるとここに表示されます。",
+            // PDFを追加するときは children に { id, tab, eyebrow, icon, meta, href: "final2_mock/ファイル名.pdf" } を足す
+            children: []
+          },
+          {
+            id: "mock-jpn-in", tab: "解答書き込み", eyebrow: "模擬問題 ・ 国語", icon: "✏️", meta: "問題用紙に直接答えを書き込むPDF",
+            title: "国語　解答書き込み", desc: "解く回を選んでください（PDFが開きます）",
+            noteTitle: "📌 お知らせ", note: "国語（解答書き込み）の模擬問題のPDFはまだありません。追加されるとここに表示されます。",
+            // PDFを追加するときは children に { id, tab, eyebrow, icon, meta, href: "final2_mock/ファイル名.pdf" } を足す
+            children: []
+          }
+        ]
       },
       {
         id: "mock-geo", tab: "地理", eyebrow: "模擬問題", icon: "地", meta: "地理の模擬問題（PDF）",
@@ -2055,7 +2068,7 @@ function findNode(id, list = SUBJECTS, parent = null) {
 function countLabel(g, hero) {
   const n = g.children.length, q = countQuestions(g);
   if (q) return hero ? `${n}単元 ・ 全${q}問` : `${n}単元`;
-  if (g.children.some(c => c.children)) return `${n}科目`;
+  if (g.children.some(c => c.children)) return `${n}${g.unitName || "科目"}`;
   return hero ? `${n}回分（PDF）` : `${n}回分`;
 }
 
