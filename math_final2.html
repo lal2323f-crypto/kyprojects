@@ -313,6 +313,9 @@
   .q-context { overflow-x: auto; }
   .blank { display: inline-block; min-width: 2.2em; padding: 0 6px; margin: 0 3px; border: 1.5px solid currentColor; border-radius: 3px; text-align: center; font-weight: 700; line-height: 1.4; }
   .q-text code { display: inline-block; margin: 4px 0; padding: 2px 8px; background: #0f172a; color: #e2e8f0; border-radius: 5px; font-family: Consolas, Menlo, monospace; font-size: 13px; font-weight: 500; }
+  .menu-note.alert { background: #fef2f2; border: 2px solid #dc2626; box-shadow: 0 0 0 4px rgba(220,38,38,.12); color: #7f1d1d; font-size: 15px; }
+  .menu-note.alert summary { color: #dc2626; font-size: 20px; }
+  .menu-note.alert b { color: #dc2626; }
 </style>
 </head>
 <body>
@@ -409,13 +412,22 @@ const SUBJECTS = [
       {
         id: "mock-jpn", tab: "国語", eyebrow: "模擬問題", icon: "国", meta: "解答用紙別・解答書き込み（PDF）",
         title: "模擬問題　国語", desc: "種類を選んでください", unitName: "種類",
+        noteClass: "alert", noteTitle: "⚠️ 問題は同じです！",
+        note: "「解答用紙別」と「解答書き込み」は<b>まったく同じ問題</b>です。答えを書く場所が違うだけなので、どちらか一方を解けばOK！",
         children: [
           {
-            id: "mock-jpn-sep", tab: "解答用紙別", eyebrow: "模擬問題 ・ 国語", icon: "📄", meta: "問題と解答用紙が別になっているPDF",
+            id: "mock-jpn-sep", tab: "解答用紙別", eyebrow: "模擬問題 ・ 国語", icon: "📄", meta: "問題と解答用紙が別になっている（①〜⑥）",
             title: "国語　解答用紙別", desc: "解く回を選んでください（PDFが開きます）",
-            noteTitle: "📌 お知らせ", note: "国語（解答用紙別）の模擬問題のPDFはまだありません。追加されるとここに表示されます。",
+            noteTitle: "📌 お知らせ", note: "問題のあとに解答用紙、最後に解答・解説が付いています。解答用紙を印刷して解いてみよう！",
             // PDFを追加するときは children に { id, tab, eyebrow, icon, meta, href: "final2_mock/ファイル名.pdf" } を足す
-            children: []
+            children: [
+              { id: "mock-jpn-sep-1", tab: "模擬問題①", eyebrow: "国語表現 ・ 解答用紙付き", icon: "①", meta: "問題＋解答用紙＋解答・解説（11ページ）", href: "final2_mock/kokugo_betsu_01.pdf" },
+              { id: "mock-jpn-sep-2", tab: "模擬問題②", eyebrow: "国語表現 ・ 解答用紙付き", icon: "②", meta: "問題＋解答用紙＋解答・解説（11ページ）", href: "final2_mock/kokugo_betsu_02.pdf" },
+              { id: "mock-jpn-sep-3", tab: "模擬問題③", eyebrow: "国語表現 ・ 解答用紙付き", icon: "③", meta: "問題＋解答用紙＋解答・解説（11ページ）", href: "final2_mock/kokugo_betsu_03.pdf" },
+              { id: "mock-jpn-sep-4", tab: "模擬問題④", eyebrow: "国語表現 ・ 解答用紙付き", icon: "④", meta: "問題＋解答用紙＋解答・解説（10ページ）", href: "final2_mock/kokugo_betsu_04.pdf" },
+              { id: "mock-jpn-sep-5", tab: "模擬問題⑤", eyebrow: "国語表現 ・ 解答用紙付き", icon: "⑤", meta: "問題＋解答用紙＋解答・解説（11ページ）", href: "final2_mock/kokugo_betsu_05.pdf" },
+              { id: "mock-jpn-sep-6", tab: "模擬問題⑥", eyebrow: "国語表現 ・ 解答用紙付き", icon: "⑥", meta: "問題＋解答用紙＋解答・解説（10ページ）", href: "final2_mock/kokugo_betsu_06.pdf" }
+            ]
           },
           {
             id: "mock-jpn-in", tab: "解答書き込み", eyebrow: "模擬問題 ・ 国語", icon: "✏️", meta: "問題用紙に直接答えを書き込む（①〜⑥）",
@@ -2094,7 +2106,7 @@ function renderMenu(group, parent) {
     : "選択肢を選ぶとその場で採点。出題順は毎回ランダムです。";
   document.getElementById("menu-label").textContent = group ? "解く単元を選んでください" : "解く科目を選んでください";
   document.getElementById("menu-note").innerHTML = group && group.note
-    ? `<details class="menu-note" open><summary>${group.noteTitle || "📌 このサイトだけでは補えない部分"}</summary>${group.note}</details>` : "";
+    ? `<details class="menu-note ${group.noteClass || ""}" open><summary>${group.noteTitle || "📌 このサイトだけでは補えない部分"}</summary>${group.note}</details>` : "";
   const list = document.getElementById("menu-list");
   list.innerHTML = "";
   items.forEach(s => {
