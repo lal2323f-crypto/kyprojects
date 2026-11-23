@@ -538,3 +538,61 @@ if __name__ == "__main__":
         json.dump([list(x) for x in M.leak], open(f"leak{m}.json", "w"), ensure_ascii=False)
         json.dump([list(x) for x in M.key], open(f"key{m}.json", "w"), ensure_ascii=False)
     print(json.dumps(out, ensure_ascii=False, indent=1))
+
+
+# ---------------------------------------------------------------- 縦書き・横向き版
+import re as _re
+
+VCSS = CSS.replace("@page { size: A4; }", "@page { size: A4 landscape; }") + """
+html { writing-mode: vertical-rl; }
+body { font-size: 10.5pt; line-height: 1.8; }
+.ab { width:auto; height:auto; }
+.wb { width:auto; height:auto; inline-size: 100%; block-size: 2.4em; margin: 0 4px; }
+.item { margin: 0 6px 0 0; margin-inline-start: 1.2em; margin-block-end: 6px; }
+.opts { margin-left: 0; margin-inline-start: .5em; }
+.opt { margin-left: 0; margin-inline-start: 1.2em; }
+.grid2 { margin-left: 0; margin-inline-start: 1.2em; }
+.secpt { float: none; margin-inline-start: 1em; }
+.sec { border-bottom: none; border-left: 2px solid #222; padding: 0 0 0 2px; margin: 0 0 0 4px; margin-block-start: 14px; }
+.secno { width: auto; block-size: 1.6em; inline-size: auto; }
+u { text-underline-position: right; }
+.tcy { text-combine-upright: all; }
+.cover table.info td[style] { width:auto !important; }
+.cover table.info td { min-inline-size: 5em; block-size: 2.4em; }
+table.info td, table.info th { padding: 6px 3px; }
+table.dt td, table.dt th { padding: 8px 3px; }
+.fig.tree td { padding: 14px 3px; }
+.fig .row { flex-direction: row; }
+.end { margin: 0 10px; }
+"""
+
+
+def _tcy(html):
+    def fix_text(t):
+        return _re.sub(r"\(?[0-9A-Za-z]{1,3}\)?", lambda mo: f'<span class="tcy">{mo.group(0)}</span>' if len(mo.group(0)) <= 4 else mo.group(0), t)
+    parts = _re.split(r"(<[^>]+>)", html)
+    return "".join(p if p.startswith("<") else fix_text(p) for p in parts)
+
+
+def _vbox(html):
+    # 解答欄：width/height を inline/block サイズに置き換える（縦書きで縦長の枠になる）
+    return _re.sub(r'class="ab" style="width:([\d.]+)em;height:([\d.]+)em"',
+                   lambda mo: f'class="ab" style="inline-size:{mo.group(1)}em;block-size:{mo.group(2)}em"', html)
+
+
+def build_vertical(m):
+    M, doc, tot, chi = build(m)
+    body = doc.split("<body>")[1].split("</body>")[0]
+    prob, key = body.split('<div class="keyh">')
+    title = f"【国語表現】模擬問題{MARU[m-1]}"
+    q = f'<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>{title}</title><style>{VCSS}</style></head><body>{_tcy(_vbox(prob))}</body></html>'
+    KCSS = CSS.replace("@page { size: A4; }", "@page { size: A4 landscape; }").replace(".keyh { page-break-before: always;", ".keyh {")
+    k = f'<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>{title} 解答</title><style>{KCSS}</style></head><body><div class="keyh">{key}</body></html>'
+    return q, k
+
+
+if __name__ == "__main__":
+    for m in range(1, 6):
+        q, k = build_vertical(m)
+        open(f"v{m}_q.html", "w").write(q)
+        open(f"v{m}_k.html", "w").write(k)

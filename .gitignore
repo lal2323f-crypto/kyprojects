@@ -1,3 +1,5 @@
 __pycache__/
 kokugo_hyogen/mogi/leak*.json
 kokugo_hyogen/mogi/key*.json
+kokugo_hyogen/mogi/_q*.pdf
+kokugo_hyogen/mogi/_k*.pdf
