@@ -402,6 +402,14 @@
 // 問題: { id, cat, context?, text, ja?, choices, answer(0始まり), exp? }
 // =====================
 const SUBJECTS = [
+  {
+    id: "mock", tab: "模擬問題", eyebrow: "模擬問題", icon: "📝", meta: "PDFで解く模擬問題",
+    title: "模擬問題", desc: "解く回を選んでください（PDFが開きます）",
+    noteTitle: "📌 お知らせ",
+    note: "模擬問題のPDFはまだありません。追加されるとここに表示されます。",
+    // PDFを追加するときは children に { id, tab, eyebrow, icon, meta, href: "final2_mock/ファイル名.pdf" } を足す
+    children: []
+  },
   { id: "eng",    tab: "英語",        eyebrow: "英語",         icon: "A",  meta: "準備中", soon: true },
   { id: "geo",    tab: "地理",        eyebrow: "地理",         icon: "地", meta: "準備中", soon: true },
   {
