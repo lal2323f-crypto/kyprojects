@@ -87,28 +87,25 @@ ACSS = f"""
 html, body {{ margin: 0; }}
 body {{ font-family: {SERIF}; color: #000; }}
 .sheet {{ position: relative; width: 297mm; height: 210mm; box-sizing: border-box; padding: 10mm 10mm 8mm; }}
-.wrap {{ display: flex; flex-direction: row-reverse; align-items: flex-start; gap: 3mm; transform-origin: top right; }}
-.title {{ writing-mode: vertical-rl; font-size: 12pt; font-weight: bold; letter-spacing: .05em; height: 150mm; }}
+.wrap {{ display: flex; flex-direction: row-reverse; align-items: stretch; gap: 3mm; transform-origin: top right; }}
+.title {{ writing-mode: vertical-rl; font-size: 12pt; font-weight: bold; letter-spacing: .05em; height: 150mm; align-self: flex-start; }}
 .title .d {{ font-weight: normal; font-size: 10pt; margin-inline-start: 1em; }}
-.name {{ writing-mode: vertical-rl; border: 1.4px solid #000; width: 9mm; height: 150mm; font-size: 10pt; padding: 2mm 0; box-sizing: border-box; }}
+.name {{ align-self: flex-start; writing-mode: vertical-rl; border: 1.4px solid #000; width: 9mm; height: 150mm; font-size: 10pt; padding: 2mm 0; box-sizing: border-box; }}
 .name span {{ margin-block-end: 0; }}
-.dai {{ display: flex; flex-direction: column; align-items: stretch; }}
-.dai > .dh {{ border: 1.4px solid #000; border-bottom: none; text-align: center; font-size: 8pt; line-height: 1.5; }}
-.mons {{ display: flex; flex-direction: row-reverse; border: 1.4px solid #000; }}
-.mon {{ display: flex; flex-direction: column; border-left: 1px solid #000; }}
-.mon:last-child {{ border-left: none; }}
-.mh {{ font-size: 7pt; text-align: center; border-bottom: 1px solid #000; line-height: 1.5; white-space: nowrap; }}
-.cols {{ display: flex; flex-direction: row-reverse; }}
-.col {{ display: flex; flex-direction: column; border-left: 1px solid #000; }}
-.col:last-child {{ border-left: none; }}
-.cell {{ border-bottom: 1px solid #000; display: flex; flex-direction: column; }}
-.cell:last-child {{ border-bottom: none; }}
+.dai {{ display: flex; flex-direction: column; align-items: stretch; gap: 3mm; }}
+.dai > .dh {{ border: 1.2px solid #000; text-align: center; font-size: 8pt; line-height: 1.5; }}
+.mons {{ display: flex; flex-direction: row-reverse; align-items: flex-start; }}
+.mon {{ display: flex; flex-direction: column; margin-left: -1px; }}
+.mh {{ font-size: 7pt; text-align: center; border: 1px solid #000; margin-top: -1px; line-height: 1.5; white-space: nowrap; }}
+.cols {{ display: flex; flex-direction: row-reverse; align-items: flex-start; }}
+.col {{ display: flex; flex-direction: column; margin-left: -1px; }}
+.cell {{ border: 1px solid #000; margin-top: -1px; display: flex; flex-direction: column; box-sizing: content-box; }}
 .lbl {{ font-size: 6.5pt; text-align: center; border-bottom: .6px solid #000; line-height: 1.35; white-space: nowrap; overflow: hidden; }}
 .area {{ flex: none; }}
 .part {{ display: flex; flex-direction: column; }}
 .part + .part {{ border-top: .6px dashed #000; }}
 .pl {{ font-size: 6pt; text-align: center; line-height: 1.3; }}
-.score {{ margin-top: 3mm; border: 1.4px solid #000; display: flex; flex-direction: column; }}
+.score {{ margin-top: auto; border: 1.4px solid #000; display: flex; flex-direction: column; }}
 .score div {{ height: 7mm; border-bottom: 1px solid #000; position: relative; }}
 .score div:last-child {{ border-bottom: none; }}
 .score .sh {{ background: #c8c8c8; }}
@@ -140,6 +137,7 @@ def parse_label(l):
 def clean_ans(a):
     a = re.sub(r"（[^）]*も可[^）]*）", "", a)
     a = re.sub(r"^[アイウエオカキク]（.*）$", lambda x: x.group(0)[0], a)
+    a = re.sub(r"（[^）]*）", "", a)
     return a
 
 
@@ -166,8 +164,10 @@ def parts_of(ans):
     return [("", len(a))]
 
 
-def cell_html(label, ans):
+def cell_html(label, ans, uni=None):
     ps = parts_of(ans)
+    if uni and len(ps) == 1 and not ps[0][0] and ps[0][1] <= 22:
+        ps = [("", uni)]
     total_chars = sum(max(n, 1) for _, n in ps)
     long = total_chars > 22
     if long:
@@ -203,9 +203,15 @@ def sheet_html(M, m, tot, chi):
         for mon, items in dais[d].items():
             cols, cur, curh = [], [], 0.0
             per = 6 if len(items) == 18 else 5  # 大問1の漢字は1列に5問（本番と同じ）
+            # 同じ問の中は、ますの大きさをそろえる（本番と同じ）
+            singles = [parts_of(a) for _, a in items]
+            singles = [p[0][1] for p in singles if len(p) == 1 and not p[0][0] and p[0][1] <= 22]
+            uni = max(singles) if singles else None
+            if any(sum(max(n, 1) for _, n in parts_of(a)) > 22 for _, a in items):
+                uni = 23  # 長く書く問題がある問は、全部を長い欄にそろえる
             for idx, (sub, a) in enumerate(items):
                 lab = re.sub(r"[()（）]", "", sub) or "　"
-                inner, w, h, _ = cell_html(lab, a)
+                inner, w, h, _ = cell_html(lab, a, uni)
                 cell = f'<div class="cell" style="width:{w:.1f}mm"><div class="lbl">{H.escape(lab)}</div>{inner}</div>'
                 if cur and ((d == "1" and mon == "" and idx % per == 0) or (not (d == "1" and mon == "") and curh + h > MAXH)):
                     cols.append(cur); cur, curh = [], 0.0
