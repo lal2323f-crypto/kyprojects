@@ -511,12 +511,16 @@ def build(m):
 <div class="sub">3年　国語表現（ビジネス）　2学期期末テスト対策（授業内テスト 11月26日 想定）　45分・100点</div>
 <table class="info"><tr><th>組</th><td style="width:12%"></td><th>番</th><td style="width:12%"></td><th>氏名</th><td style="width:40%"></td></tr></table>
 <table class="info"><tr><th>観点</th><th>知識・技能</th><th>思考・判断・表現</th><th>合計</th></tr>
-<tr><th>得点</th><td>　　　／{54 if m != 5 else 57}</td><td>　　　／{46 if m != 5 else 43}</td><td>　　　／100</td></tr></table></div>
+<tr><th>得点</th><td>　　　／@@CHI@@</td><td>　　　／@@SHI@@</td><td>　　　／100</td></tr></table></div>
 <div class="notes">【注意事項】<br>1　解答は、すべてこの問題用紙の解答欄（□）に書き込むこと。<br>2　指示のない限り、できるだけ漢字で書くこと。<br>3　字数制限のある問題は、句読点や記号も一字と数える。<br>4　記号で答える問題は、記号をはっきり書くこと。（完答）とある問題は、すべて合って得点とする。</div>''')
-    sec1(M); sec2(M); sec3(M); sec4(M); sec5(M)
-    s6pts = 22 if m != 5 else 19
-    M.add(sec_head(6, "次の文章を読んで、後の問いに答えなさい。", s6pts, "思"))
-    SEC6[m](M)
+    if m == 6:
+        import mock6
+        mock6.run(M)
+    else:
+        sec1(M); sec2(M); sec3(M); sec4(M); sec5(M)
+        s6pts = 22 if m != 5 else 19
+        M.add(sec_head(6, "次の文章を読んで、後の問いに答えなさい。", s6pts, "思"))
+        SEC6[m](M)
     M.add('<div class="end">― 以上 ―</div>')
     # 解答
     rows = "".join(f'<tr><td class="c">{H.escape(l)}</td><td>{a}</td><td class="c">{p}</td><td class="c">{"知" if k=="知" else "思"}</td><td>{e}</td><td>{s}</td></tr>' for l, a, p, k, e, s in M.key)
@@ -524,13 +528,14 @@ def build(m):
     chi = sum(r[2] for r in M.key if r[3] == "知")
     M.add(f'<div class="keyh">{title}　解答・解説</div><div>配点合計 {tot}点（知識・技能 {chi}点／思考・判断・表現 {tot-chi}点）</div>'
           f'<table class="key"><colgroup><col style="width:10%"><col style="width:24%"><col style="width:4%"><col style="width:5%"><col style="width:35%"><col style="width:22%"></colgroup><tr><th>問</th><th>正解</th><th>点</th><th>観点</th><th>解説</th><th>出どころ</th></tr>{rows}</table>')
+    M.parts[0] = M.parts[0].replace("@@CHI@@", str(chi)).replace("@@SHI@@", str(tot - chi))
     doc = f'<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>{title}</title><style>{CSS}</style></head><body>{"".join(M.parts)}</body></html>'
     return M, doc, tot, chi
 
 
 if __name__ == "__main__":
     out = {}
-    for m in range(1, 6):
+    for m in range(1, 7):
         M, doc, tot, chi = build(m)
         open(f"mogi{m}.html", "w").write(doc)
         from collections import Counter
@@ -592,7 +597,7 @@ def build_vertical(m):
 
 
 if __name__ == "__main__":
-    for m in range(1, 6):
+    for m in range(1, 7):
         q, k = build_vertical(m)
         open(f"v{m}_q.html", "w").write(q)
         open(f"v{m}_k.html", "w").write(k)

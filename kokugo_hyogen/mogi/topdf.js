@@ -3,14 +3,14 @@ const { execFileSync } = require('child_process');
 (async () => {
   const b = await chromium.launch();
   const p = await b.newPage();
-  const names = ['①', '②', '③', '④', '⑤'];
+  const names = ['①', '②', '③', '④', '⑤', '⑥'];
   const opt = {
     format: 'A4', landscape: true, printBackground: true,
     displayHeaderFooter: true, headerTemplate: '<span></span>',
     footerTemplate: '<div style="font-size:8px;width:100%;text-align:center"><span class="pageNumber"></span></div>',
     margin: { top: '12mm', bottom: '12mm', left: '12mm', right: '12mm' }
   };
-  for (let m = 1; m <= 5; m++) {
+  for (let m = 1; m <= 6; m++) {
     await p.goto('file://' + process.cwd() + `/v${m}_q.html`);
     await p.pdf({ ...opt, path: `_q${m}.pdf` });
     await p.goto('file://' + process.cwd() + `/v${m}_k.html`);

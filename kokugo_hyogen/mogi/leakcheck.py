@@ -1,6 +1,6 @@
 import json, re
 KANA="アイウエオカキクケコ"
-for m in range(1,6):
+for m in range(1,7):
     doc = open(f"mogi{m}.html").read()
     prob = doc.split('<div class="keyh">')[0]
     txt = re.sub(r"<[^>]+>", "", prob)
