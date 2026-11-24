@@ -316,9 +316,144 @@
   .menu-note.alert { background: #fef2f2; border: 2px solid #dc2626; box-shadow: 0 0 0 4px rgba(220,38,38,.12); color: #7f1d1d; font-size: 15px; }
   .menu-note.alert summary { color: #dc2626; font-size: 20px; }
   .menu-note.alert b { color: #dc2626; }
+
+  /* ===== 関係者ボタン・生徒情報 ===== */
+  .staff-btn {
+    position: fixed; top: 10px; right: 10px; z-index: 50;
+    font-size: 12px; font-weight: 800; color: #fff; letter-spacing: .05em;
+    background: rgba(15,23,42,.78); border: 1px solid rgba(255,255,255,.35); border-radius: 99px;
+    padding: 6px 14px; cursor: pointer; backdrop-filter: blur(4px); font-family: inherit;
+  }
+  .staff-btn:hover { background: rgba(15,23,42,.92); }
+  .student-badge {
+    display: inline-flex; align-items: center; gap: 10px; margin-top: 12px;
+    font-size: 13px; font-weight: 700; color: #fff;
+    background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); border-radius: 99px; padding: 4px 12px;
+  }
+  .student-badge:empty { display: none; }
+  .student-badge button { font: inherit; font-size: 12px; color: #c7d2fe; background: none; border: none; cursor: pointer; text-decoration: underline; }
+  .save-status { margin: -6px 0 14px; font-size: 13px; color: var(--subtext); }
+  .save-status.ok { color: var(--correct); font-weight: 700; }
+  .save-status.ng { color: var(--wrong); font-weight: 700; }
+
+  /* ===== 入力画面（生徒情報・パスワード） ===== */
+  .gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 60px 16px; }
+  .gate-box { width: 100%; max-width: 420px; background: var(--card); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
+  .gate-head { padding: 22px 22px 18px; color: #fff; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #3730a3 100%); }
+  .gate-head .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; color: #a5b4fc; }
+  .gate-head h2 { font-size: 22px; font-weight: 900; margin-top: 6px; }
+  .gate-body { padding: 20px 22px 22px; }
+  .gate p.note { font-size: 13px; color: var(--subtext); margin-bottom: 16px; line-height: 1.7; }
+  .field { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .field label { width: 5em; font-size: 13px; font-weight: 800; color: var(--subtext); }
+  .field select, .field input, .gate input {
+    flex: 1; width: 100%; font-family: inherit; font-size: 18px; color: var(--text);
+    background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; outline: none;
+  }
+  .field select:focus, .field input:focus, .gate input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  .field span.unit { font-size: 14px; font-weight: 700; }
+  .gate .btn { width: 100%; margin-top: 6px; }
+  .gate .err { min-height: 1.4em; font-size: 13px; font-weight: 700; color: var(--wrong); margin-top: 8px; }
+  .gate .link-btn { display: block; margin: 12px auto 0; font-size: 13px; color: var(--subtext); background: none; border: none; cursor: pointer; text-decoration: underline; font-family: inherit; }
+
+  /* ===== 関係者：結果画面 ===== */
+  #admin-view { max-width: 820px; margin: 0 auto; padding-bottom: 40px; }
+  .admin-tools { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin: 14px 0 4px; }
+  .admin-tools .upd { font-size: 12px; color: var(--subtext); }
+  .admin-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .admin-group { font-size: 12px; font-weight: 800; color: var(--subtext); margin: 10px 0 2px; letter-spacing: .05em; }
+  .tab-btn {
+    font-family: inherit; font-size: 13px; font-weight: 700; color: var(--subtext);
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 99px; padding: 5px 13px; cursor: pointer;
+  }
+  .tab-btn:hover { color: var(--primary); border-color: var(--primary); }
+  .tab-btn.active { color: #fff; background: var(--primary); border-color: var(--primary); }
+  .tab-btn.mode { font-size: 14px; padding: 7px 16px; }
+  .tab-btn.mode.active { background: #1e1b4b; border-color: #1e1b4b; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; }
+  .stat .k { font-size: 12px; font-weight: 700; color: var(--subtext); }
+  .stat .v { font-size: 28px; font-weight: 900; line-height: 1.25; }
+  .stat .v small { font-size: 15px; }
+  .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 10px 8px; }
+  .chart { display: flex; align-items: flex-end; gap: 6px; height: 150px; border-bottom: 1px solid var(--border); }
+  .chart .col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .chart .bar { width: 70%; max-width: 40px; background: var(--primary); border-radius: 4px 4px 0 0; }
+  .chart .cnt { font-size: 11px; font-weight: 800; margin-bottom: 2px; }
+  .chart-axis { display: flex; gap: 6px; }
+  .chart-axis span { flex: 1; text-align: center; font-size: 11px; color: var(--subtext); }
+  .chart-cap { font-size: 12px; color: var(--subtext); margin-top: 6px; }
+  .table-wrap { overflow-x: auto; }
+  .res-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14px; background: var(--card); border-radius: 12px; overflow: hidden; }
+  .res-table th { text-align: left; font-weight: 800; color: var(--subtext); padding: 9px 8px; border-bottom: 1px solid var(--border); cursor: pointer; white-space: nowrap; user-select: none; }
+  .res-table th.sorted { color: var(--primary); }
+  .res-table td { padding: 9px 8px; border-bottom: 1px dashed var(--border); white-space: nowrap; }
+  .res-table tr:last-child td { border-bottom: none; }
+  .res-table td.full { color: var(--correct); font-weight: 900; }
+  .res-table td.low { color: var(--wrong); font-weight: 900; }
+  .res-table td.date { color: var(--subtext); }
+  .del-btn { font: inherit; font-size: 13px; color: var(--subtext); background: none; border: none; text-decoration: underline; cursor: pointer; }
+  .del-btn:hover { color: var(--wrong); }
+  .admin-msg { padding: 30px 0; text-align: center; color: var(--subtext); font-size: 14px; }
+  @media (max-width: 560px) { .stats { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
+
+<button class="staff-btn" id="staff-btn" onclick="openStaff()">関係者</button>
+
+<!-- 生徒情報の入力画面（初回のみ） -->
+<div id="student-view" class="gate hidden">
+  <div class="gate-box">
+    <div class="gate-head"><div class="eyebrow">3年2学期期末テスト</div><h2>はじめに</h2></div>
+    <div class="gate-body">
+      <p class="note">学年・組・出席番号を入力してください。この端末に保存されるので、次回からは入力不要です。</p>
+      <div class="field"><label for="in-y">学年</label>
+        <select id="in-y"><option value="">--</option><option>1</option><option>2</option><option>3</option></select><span class="unit">年</span></div>
+      <div class="field"><label for="in-c">組</label>
+        <input id="in-c" type="number" inputmode="numeric" min="1" max="99" placeholder="例 4"><span class="unit">組</span></div>
+      <div class="field"><label for="in-n">出席番号</label>
+        <input id="in-n" type="number" inputmode="numeric" min="1" max="99" placeholder="例 12"><span class="unit">番</span></div>
+      <button class="btn btn-primary" onclick="saveStudent()">はじめる</button>
+      <div class="err" id="student-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 関係者パスワード画面 -->
+<div id="pw-view" class="gate hidden">
+  <div class="gate-box">
+    <div class="gate-head"><div class="eyebrow">関係者用</div><h2>パスワード</h2></div>
+    <div class="gate-body">
+      <p class="note">関係者用のパスワードを入力してください。</p>
+      <input type="password" id="pw-input" placeholder="パスワード" autocomplete="off" onkeydown="if(event.key==='Enter')checkPw()">
+      <button class="btn btn-primary" onclick="checkPw()">ひらく</button>
+      <div class="err" id="pw-err"></div>
+      <button class="link-btn" onclick="closeStaff()">‹ もどる</button>
+    </div>
+  </div>
+</div>
+
+<!-- 関係者：結果画面 -->
+<div id="admin-view" class="view hidden">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <button class="back-btn" onclick="closeStaff()">‹ 戻る</button>
+      <div class="topbar-text">
+        <div class="topbar-eyebrow">関係者用</div>
+        <div class="topbar-title">提出結果・閲覧記録</div>
+      </div>
+    </div>
+  </div>
+  <div class="admin-tools">
+    <div class="admin-tabs" id="mode-tabs"></div>
+    <div><span class="upd" id="upd-time"></span> <button class="tab-btn" onclick="loadAdmin()">↻ 更新</button></div>
+  </div>
+  <div id="set-tabs"></div>
+  <div class="admin-group">クラス</div>
+  <div class="admin-tabs" id="class-tabs"></div>
+  <div id="admin-body"></div>
+</div>
 
 <!-- 科目選択画面 -->
 <div id="menu-view">
@@ -328,6 +463,7 @@
       <div class="hero-eyebrow" id="hero-eyebrow">3年 2学期</div>
       <h1 id="hero-title">3年2学期期末テスト</h1>
       <p class="hero-sub" id="hero-sub">選択肢を選ぶとその場で採点。出題順は毎回ランダムです。</p>
+      <div class="student-badge" id="student-badge"></div>
     </div>
   </header>
   <div class="view">
@@ -370,6 +506,7 @@
   <h2>全問解答完了！</h2>
   <div class="score-big" id="score-big">0／0</div>
   <div class="score-sub" id="score-sub"></div>
+  <div class="save-status" id="save-status"></div>
   <div class="btn-row">
     <button class="btn btn-primary" onclick="restartAll()">問題の順番を変えてもう一度</button>
     <button class="btn btn-outline" onclick="restartWrong()">間違えた問題のみもう一度</button>
@@ -2129,7 +2266,7 @@ function renderMenu(group, parent) {
       </div>
       <div class="sel-arrow">›</div>`;
     if (s.soon) { b.disabled = true; b.classList.add("sel-soon"); }
-    else if (s.href) b.onclick = () => { window.open(s.href, "_blank", "noopener"); };
+    else if (s.href) b.onclick = () => { window.open(s.href, "_blank", "noopener"); logView(s); };
     else b.onclick = () => { location.hash = s.id; };
     list.appendChild(b);
   });
@@ -2143,12 +2280,26 @@ function goUp() {
   route();
 }
 
-// URL の #id が問題セットなら問題画面、まとめなら単元一覧、なければ科目一覧
+// 画面の切り替え：#admin → 関係者、生徒情報なし → 入力画面、問題セット → 問題画面、まとめ → 単元一覧、なし → 科目一覧
+const VIEWS = ["student-view", "pw-view", "admin-view", "menu-view", "quiz-view"];
+function showView(id) {
+  VIEWS.forEach(v => document.getElementById(v).classList.toggle("hidden", v !== id));
+  document.getElementById("staff-btn").classList.toggle("hidden", id === "pw-view" || id === "admin-view");
+}
+
 function route() {
-  const f = findNode(location.hash.slice(1));
+  const hash = location.hash.slice(1);
+  if (hash === "admin") {
+    if (isStaff()) { showView("admin-view"); renderAdmin(); loadAdmin(); }
+    else { showView("pw-view"); setTimeout(() => document.getElementById("pw-input").focus(), 100); }
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (!getStudent()) { showView("student-view"); window.scrollTo(0, 0); return; }
+  renderBadge();
+  const f = findNode(hash);
   const isQuiz = !!(f && f.node.questions);
-  document.getElementById("menu-view").classList.toggle("hidden", isQuiz);
-  document.getElementById("quiz-view").classList.toggle("hidden", !isQuiz);
+  showView(isQuiz ? "quiz-view" : "menu-view");
   if (isQuiz) {
     document.getElementById("back-btn").textContent = "‹ " + (f.parent ? f.parent.tab : "科目一覧");
     document.getElementById("topbar-eyebrow").textContent = f.parent ? "3年2学期期末テスト ・ " + f.parent.tab : "3年2学期期末テスト";
@@ -2157,6 +2308,246 @@ function route() {
     renderMenu(f && f.node.children ? f.node : null, f && f.node.children ? f.parent : null);
   }
   window.scrollTo(0, 0);
+}
+
+// =====================
+// 生徒情報（この端末に保存）
+// =====================
+const STUDENT_KEY = "final2_student";
+function getStudent() {
+  try { const s = JSON.parse(localStorage.getItem(STUDENT_KEY) || "null"); return s && s.y && s.c && s.n ? s : null; }
+  catch(e) { return null; }
+}
+function studentLabel(s) { return `${s.y}年${s.c}組${s.n}番`; }
+function studentKey(s) { return `${s.y}-${s.c}-${s.n}`; }
+function renderBadge() {
+  const s = getStudent();
+  document.getElementById("student-badge").innerHTML = s
+    ? `👤 ${esc(studentLabel(s))} <button onclick="changeStudent()">変更</button>` : "";
+}
+function saveStudent() {
+  const y = document.getElementById("in-y").value;
+  const c = document.getElementById("in-c").value.trim();
+  const n = document.getElementById("in-n").value.trim();
+  const err = document.getElementById("student-err");
+  if (!y || !/^\d{1,2}$/.test(c) || +c < 1 || !/^\d{1,2}$/.test(n) || +n < 1) { err.textContent = "学年・組・出席番号をすべて入力してください"; return; }
+  const s = { y: +y, c: +c, n: +n };
+  if (!confirm(`${studentLabel(s)} で登録します。よろしいですか？`)) return;
+  try { localStorage.setItem(STUDENT_KEY, JSON.stringify(s)); } catch(e) {}
+  err.textContent = "";
+  route();
+}
+function changeStudent() {
+  const s = getStudent();
+  if (s) {
+    document.getElementById("in-y").value = s.y;
+    document.getElementById("in-c").value = s.c;
+    document.getElementById("in-n").value = s.n;
+  }
+  try { localStorage.removeItem(STUDENT_KEY); } catch(e) {}
+  route();
+}
+
+// =====================
+// 結果・閲覧の送信（Firebase）
+// =====================
+const FIREBASE_URL = "https://quiz-as-20efb-default-rtdb.asia-southeast1.firebasedatabase.app";
+const RESULT_PATH = id => FIREBASE_URL + "/results/final2_" + id;
+const VIEW_PATH = id => FIREBASE_URL + "/results/final2_pdf_" + id;
+
+async function submitResult(correct, total, pct) {
+  const s = getStudent();
+  const el = document.getElementById("save-status");
+  if (!s) return;
+  const url = RESULT_PATH(current.id) + "/" + studentKey(s) + ".json";
+  el.className = "save-status"; el.textContent = "結果を送信中…";
+  try {
+    let prev = null;
+    const r = await fetch(url);
+    if (r.ok) prev = await r.json();
+    const count = (prev && prev.count || 0) + 1;
+    // スコアは最高点を残し、提出日と解いた回数は毎回更新
+    const best = prev && prev.score > correct ? prev : { score: correct, pct };
+    const data = { y: s.y, c: s.c, n: s.n, score: best.score, total, pct: best.pct, last: correct, ts: Date.now(), count };
+    const w = await fetch(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+    if (!w.ok) throw new Error(w.status);
+    el.className = "save-status ok"; el.textContent = `✓ ${studentLabel(s)} の結果を送信しました（${count}回目）`;
+  } catch(e) {
+    el.className = "save-status ng"; el.textContent = "結果を送信できませんでした（通信を確認してください）";
+  }
+}
+
+// 模擬問題のPDFを開いたことを記録する（開くのは止めない）
+async function logView(node) {
+  const s = getStudent();
+  if (!s) return;
+  const url = VIEW_PATH(node.id) + "/" + studentKey(s) + ".json";
+  try {
+    let prev = null;
+    const r = await fetch(url);
+    if (r.ok) prev = await r.json();
+    const now = Date.now();
+    const data = { y: s.y, c: s.c, n: s.n, count: (prev && prev.count || 0) + 1, first: prev && prev.first || now, ts: now };
+    await fetch(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+  } catch(e) {}
+}
+
+// =====================
+// 関係者
+// =====================
+const STAFF_PASSWORD = "ky";
+const STAFF_KEY = "final2_staff";
+function isStaff() { try { return sessionStorage.getItem(STAFF_KEY) === "1"; } catch(e) { return false; } }
+let staffReturn = "";
+function openStaff() {
+  staffReturn = location.hash;
+  location.hash = "admin";
+}
+function closeStaff() {
+  const back = staffReturn && staffReturn !== "#admin" ? staffReturn : "";
+  history.pushState(null, "", location.pathname + location.search + back);
+  route();
+}
+function checkPw() {
+  const inp = document.getElementById("pw-input");
+  if (inp.value === STAFF_PASSWORD) {
+    try { sessionStorage.setItem(STAFF_KEY, "1"); } catch(e) {}
+    inp.value = ""; document.getElementById("pw-err").textContent = "";
+    route();
+  } else {
+    document.getElementById("pw-err").textContent = "パスワードが違います";
+    inp.select();
+  }
+}
+
+// 問題セット・PDF の一覧（グループ名つき）
+function collect(pred, list = SUBJECTS, path = []) {
+  let out = [];
+  list.forEach(n => {
+    if (pred(n)) out.push({ node: n, group: path.slice(1).join(" ・ ") || path.join(" ・ ") });
+    if (n.children) out = out.concat(collect(pred, n.children, path.concat(n.tab)));
+  });
+  return out;
+}
+const QUIZ_SETS = () => collect(n => !!n.questions);
+const PDF_SETS = () => collect(n => !!n.href);
+
+const admin = { mode: "quiz", set: { quiz: null, pdf: null }, cls: null, data: {}, sort: "n", asc: true, loading: false, error: false };
+function adminList() { return admin.mode === "quiz" ? QUIZ_SETS() : PDF_SETS(); }
+function adminSet() {
+  const list = adminList();
+  if (!list.some(x => x.node.id === admin.set[admin.mode])) admin.set[admin.mode] = list.length ? list[0].node.id : null;
+  return admin.set[admin.mode];
+}
+function dataKey() { return admin.mode + ":" + adminSet(); }
+
+function renderAdmin() {
+  document.getElementById("mode-tabs").innerHTML = [["quiz", "📝 問題の結果"], ["pdf", "📄 模擬問題の閲覧"]].map(([m, l]) =>
+    `<button class="tab-btn mode${admin.mode === m ? " active" : ""}" onclick="pickMode('${m}')">${l}</button>`).join("");
+  const cur = adminSet();
+  // グループごとにタブを並べる
+  const groups = [];
+  adminList().forEach(x => { let g = groups.find(g => g.name === x.group); if (!g) groups.push(g = { name: x.group, items: [] }); g.items.push(x.node); });
+  document.getElementById("set-tabs").innerHTML = groups.map(g => `<div class="admin-group">${esc(g.name)}</div><div class="admin-tabs">${
+    g.items.map(n => `<button class="tab-btn${n.id === cur ? " active" : ""}" onclick="pickSet('${n.id}')">${esc(n.tab)}</button>`).join("")}</div>`).join("");
+
+  const rows = Object.entries(admin.data[dataKey()] || {}).map(([k, v]) => ({ key: k, ...v }));
+  const classes = {};
+  rows.forEach(r => { const c = `${r.y}-${r.c}`; (classes[c] = classes[c] || []).push(r); });
+  const ckeys = Object.keys(classes).sort((a, b) => { const [ay, ac] = a.split("-").map(Number), [by, bc] = b.split("-").map(Number); return ay - by || ac - bc; });
+  if (!ckeys.includes(admin.cls)) admin.cls = ckeys[0] || null;
+  document.getElementById("class-tabs").innerHTML = ckeys.map(c => {
+    const [y, cl] = c.split("-");
+    return `<button class="tab-btn${c === admin.cls ? " active" : ""}" onclick="pickClass('${c}')">${y}年${cl}組（${classes[c].length}）</button>`;
+  }).join("") || `<span class="upd">—</span>`;
+
+  const body = document.getElementById("admin-body");
+  if (!cur) { body.innerHTML = `<div class="admin-msg">まだ対象がありません</div>`; return; }
+  if (admin.loading && !admin.data[dataKey()]) { body.innerHTML = `<div class="admin-msg">読み込み中…</div>`; return; }
+  if (admin.error) { body.innerHTML = `<div class="admin-msg" style="color:var(--wrong)">読み込めませんでした。通信を確認して「更新」を押してください。</div>`; return; }
+  if (!admin.cls) { body.innerHTML = `<div class="admin-msg">${admin.mode === "quiz" ? "まだ提出がありません" : "まだ誰も開いていません"}</div>`; return; }
+
+  const list = classes[admin.cls];
+  const md = ts => { const d = new Date(ts); return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`; };
+  const sorted = [...list].sort((a, b) => ((a[admin.sort] ?? 0) - (b[admin.sort] ?? 0)) * (admin.asc ? 1 : -1) || a.n - b.n);
+  const th = cols => cols.map(([k, l]) => `<th class="${admin.sort === k ? "sorted" : ""}" onclick="sortBy('${k}')">${l}${admin.sort === k ? (admin.asc ? " ↑" : " ↓") : ""}</th>`).join("");
+
+  if (admin.mode === "pdf") {
+    const times = list.reduce((t, r) => t + (r.count || 1), 0);
+    body.innerHTML = `
+      <div class="stats">
+        <div class="stat"><div class="k">開いた人</div><div class="v">${list.length}<small>人</small></div></div>
+        <div class="stat"><div class="k">開いた回数（合計）</div><div class="v">${times}<small>回</small></div></div>
+      </div>
+      <div class="table-wrap"><table class="res-table">
+        <thead><tr>${th([["n", "番号"], ["count", "開いた回数"], ["first", "最初に開いた日時"], ["ts", "最後に開いた日時"]])}<th></th></tr></thead>
+        <tbody>${sorted.map(r => `<tr>
+          <td>${r.n}番</td><td>${r.count || 1}回</td>
+          <td class="date">${r.first ? md(r.first) : "—"}</td><td class="date">${r.ts ? md(r.ts) : "—"}</td>
+          <td><button class="del-btn" onclick="deleteRow('${r.key}')">消す</button></td></tr>`).join("")}
+        </tbody></table></div>`;
+    return;
+  }
+
+  const node = findNode(cur).node;
+  const total = node.questions.length;
+  const avg = Math.round(list.reduce((t, r) => t + r.score / (r.total || total) * 100, 0) / list.length);
+  const full = list.filter(r => r.score >= (r.total || total)).length;
+  const low = list.filter(r => r.score / (r.total || total) < .6).length;
+  const step = Math.max(1, Math.ceil(total / 8)), bins = [];
+  for (let b = 0; b <= total; b += step) bins.push({ from: b, n: 0 });
+  list.forEach(r => { bins[Math.min(Math.floor(r.score / step), bins.length - 1)].n++; });
+  const maxN = Math.max(...bins.map(b => b.n), 1);
+  body.innerHTML = `
+    <div class="stats">
+      <div class="stat"><div class="k">平均</div><div class="v">${avg}<small>%</small></div></div>
+      <div class="stat"><div class="k">提出</div><div class="v">${list.length}<small>人</small></div></div>
+      <div class="stat"><div class="k">満点</div><div class="v">${full}<small>人</small></div></div>
+      <div class="stat"><div class="k">60%未満</div><div class="v">${low}<small>人</small></div></div>
+    </div>
+    <div class="chart-box">
+      <div class="chart">${bins.map(b => `<div class="col">${b.n ? `<div class="cnt">${b.n}人</div>` : ""}<div class="bar" style="height:${b.n / maxN * 85}%"></div></div>`).join("")}</div>
+      <div class="chart-axis">${bins.map(b => `<span>${b.from}</span>`).join("")}</div>
+    </div>
+    <div class="chart-cap">点数の分布（${total}点満点・${list.length}人）※スコアは最高点</div>
+    <div class="table-wrap"><table class="res-table">
+      <thead><tr>${th([["n", "番号"], ["score", "スコア"], ["pct", "正答率"], ["ts", "提出日時"], ["count", "解いた回数"]])}<th></th></tr></thead>
+      <tbody>${sorted.map(r => { const tt = r.total || total; return `<tr>
+        <td>${r.n}番</td>
+        <td>${r.score} / ${tt}</td>
+        <td class="${r.score >= tt ? "full" : r.score / tt < .6 ? "low" : ""}">${Math.round(r.score / tt * 100)}%</td>
+        <td class="date">${r.ts ? md(r.ts) : "—"}</td>
+        <td>${r.count || 1}回</td>
+        <td><button class="del-btn" onclick="deleteRow('${r.key}')">消す</button></td></tr>`; }).join("")}
+      </tbody></table></div>`;
+}
+function pickMode(m) { admin.mode = m; admin.cls = null; admin.sort = "n"; admin.asc = true; renderAdmin(); if (!admin.data[dataKey()]) loadAdmin(); }
+function pickSet(id) { admin.set[admin.mode] = id; admin.cls = null; renderAdmin(); if (!admin.data[dataKey()]) loadAdmin(); }
+function pickClass(c) { admin.cls = c; renderAdmin(); }
+function sortBy(k) { if (admin.sort === k) admin.asc = !admin.asc; else { admin.sort = k; admin.asc = k === "n"; } renderAdmin(); }
+function adminPath() { return (admin.mode === "quiz" ? RESULT_PATH : VIEW_PATH)(adminSet()); }
+async function loadAdmin() {
+  if (!adminSet()) { renderAdmin(); return; }
+  const key = dataKey();
+  admin.loading = true; admin.error = false; renderAdmin();
+  try {
+    const r = await fetch(adminPath() + ".json");
+    if (!r.ok) throw new Error(r.status);
+    admin.data[key] = (await r.json()) || {};
+    const d = new Date();
+    document.getElementById("upd-time").textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")} 更新`;
+  } catch(e) { admin.error = true; }
+  admin.loading = false; renderAdmin();
+}
+async function deleteRow(key) {
+  const r = admin.data[dataKey()][key];
+  if (!confirm(`${r.y}年${r.c}組${r.n}番 の記録を消しますか？`)) return;
+  try {
+    const res = await fetch(adminPath() + "/" + key + ".json", { method: "DELETE" });
+    if (!res.ok) throw new Error(res.status);
+    delete admin.data[dataKey()][key];
+    renderAdmin();
+  } catch(e) { alert("消せませんでした。通信を確認してください。"); }
 }
 
 function selectSubject(node) {
@@ -2187,6 +2578,7 @@ function init(qList) {
 }
 
 function hideResult() {
+  const ss = document.getElementById("save-status"); if (ss) { ss.textContent = ""; ss.className = "save-status"; }
   document.getElementById("result-box").style.display = "none";
   document.getElementById("wrong-list").style.display = "none";
 }
@@ -2334,7 +2726,9 @@ function showResult(justFinished) {
   if (!justFinished) return;
   // 結果は最後の問題のすぐ下に出るので、最後の問題が見える位置のまま結果まで見せる
   setTimeout(() => rb.scrollIntoView({ behavior: "smooth", block: "nearest" }), 50);
-  if (s.isAllMode) saveRecord(correctCount, total, pct);
+  document.getElementById("save-status").textContent = "";
+  if (s.isAllMode) { saveRecord(correctCount, total, pct); submitResult(correctCount, total, pct); }
+  else { document.getElementById("save-status").className = "save-status"; document.getElementById("save-status").textContent = "※間違えた問題だけの解き直しは送信されません"; }
 }
 
 function loadRecords() {
