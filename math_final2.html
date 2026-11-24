@@ -2266,7 +2266,7 @@ function renderMenu(group, parent) {
       </div>
       <div class="sel-arrow">›</div>`;
     if (s.soon) { b.disabled = true; b.classList.add("sel-soon"); }
-    else if (s.href) b.onclick = () => { window.open(s.href, "_blank", "noopener"); logView(s); };
+    else if (s.href) b.onclick = () => { logView(s); window.open(s.href, "_blank", "noopener"); };
     else b.onclick = () => { location.hash = s.id; };
     list.appendChild(b);
   });
@@ -2297,6 +2297,7 @@ function route() {
   }
   if (!getStudent()) { showView("student-view"); window.scrollTo(0, 0); return; }
   renderBadge();
+  if (!route.resent) { route.resent = true; resendViews(); }
   const f = findNode(hash);
   const isQuiz = !!(f && f.node.questions);
   showView(isQuiz ? "quiz-view" : "menu-view");
@@ -2378,19 +2379,37 @@ async function submitResult(correct, total, pct) {
 }
 
 // 模擬問題のPDFを開いたことを記録する（開くのは止めない）
-async function logView(node) {
+// PDFを開くとこのページは裏に回るので、通信は1回だけにして先に送る。
+// 回数はこの端末に記録し、送れなかった分は次にページを開いたときに送り直す。
+const VIEWLOG_PREFIX = "final2_viewlog_";
+function putView(id, data) {
+  const url = VIEW_PATH(id) + "/" + studentKey(data) + ".json";
+  const opt = { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ y: data.y, c: data.c, n: data.n, count: data.count, first: data.first, ts: data.ts }) };
+  const done = r => { if (r.ok) { try { const cur = JSON.parse(localStorage.getItem(VIEWLOG_PREFIX + id) || "{}"); if (cur.ts === data.ts) { cur.sent = true; localStorage.setItem(VIEWLOG_PREFIX + id, JSON.stringify(cur)); } } catch(e) {} } };
+  return fetch(url, { ...opt, keepalive: true }).then(done).catch(() => fetch(url, opt).then(done).catch(() => {}));
+}
+function logView(node) {
   const s = getStudent();
   if (!s) return;
-  const url = VIEW_PATH(node.id) + "/" + studentKey(s) + ".json";
+  let prev = {};
+  try { prev = JSON.parse(localStorage.getItem(VIEWLOG_PREFIX + node.id) || "{}"); } catch(e) {}
+  if (studentKey(prev.y ? prev : s) !== studentKey(s)) prev = {};
+  const now = Date.now();
+  const data = { y: s.y, c: s.c, n: s.n, count: (prev.count || 0) + 1, first: prev.first || now, ts: now, sent: false };
+  try { localStorage.setItem(VIEWLOG_PREFIX + node.id, JSON.stringify(data)); } catch(e) {}
+  putView(node.id, data);
+}
+function resendViews() {
+  const s = getStudent();
+  if (!s) return;
   try {
-    let prev = null;
-    const r = await fetch(url);
-    if (r.ok) prev = await r.json();
-    const now = Date.now();
-    const data = { y: s.y, c: s.c, n: s.n, count: (prev && prev.count || 0) + 1, first: prev && prev.first || now, ts: now };
-    await fetch(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+    Object.keys(localStorage).filter(k => k.startsWith(VIEWLOG_PREFIX)).forEach(k => {
+      const d = JSON.parse(localStorage.getItem(k) || "{}");
+      if (d.y && !d.sent && studentKey(d) === studentKey(s)) putView(k.slice(VIEWLOG_PREFIX.length), d);
+    });
   } catch(e) {}
 }
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") resendViews(); });
 
 // =====================
 // 関係者
@@ -2432,9 +2451,10 @@ function collect(pred, list = SUBJECTS, path = []) {
 const QUIZ_SETS = () => collect(n => !!n.questions);
 const PDF_SETS = () => collect(n => !!n.href);
 
-const admin = { mode: "quiz", set: { quiz: null, pdf: null }, cls: null, data: {}, sort: "n", asc: true, loading: false, error: false };
+const admin = { mode: "quiz", set: { quiz: null, pdf: "__all" }, cls: null, data: {}, sort: "n", asc: true, loading: false, error: false };
 function adminList() { return admin.mode === "quiz" ? QUIZ_SETS() : PDF_SETS(); }
 function adminSet() {
+  if (admin.mode === "pdf" && admin.set.pdf === "__all") return "__all";
   const list = adminList();
   if (!list.some(x => x.node.id === admin.set[admin.mode])) admin.set[admin.mode] = list.length ? list[0].node.id : null;
   return admin.set[admin.mode];
@@ -2448,7 +2468,8 @@ function renderAdmin() {
   // グループごとにタブを並べる
   const groups = [];
   adminList().forEach(x => { let g = groups.find(g => g.name === x.group); if (!g) groups.push(g = { name: x.group, items: [] }); g.items.push(x.node); });
-  document.getElementById("set-tabs").innerHTML = groups.map(g => `<div class="admin-group">${esc(g.name)}</div><div class="admin-tabs">${
+  const allTab = admin.mode === "pdf" ? `<div class="admin-group">まとめ</div><div class="admin-tabs"><button class="tab-btn${cur === "__all" ? " active" : ""}" onclick="pickSet('__all')">すべてのPDF</button></div>` : "";
+  document.getElementById("set-tabs").innerHTML = allTab + groups.map(g => `<div class="admin-group">${esc(g.name)}</div><div class="admin-tabs">${
     g.items.map(n => `<button class="tab-btn${n.id === cur ? " active" : ""}" onclick="pickSet('${n.id}')">${esc(n.tab)}</button>`).join("")}</div>`).join("");
 
   const rows = Object.entries(admin.data[dataKey()] || {}).map(([k, v]) => ({ key: k, ...v }));
@@ -2472,6 +2493,21 @@ function renderAdmin() {
   const sorted = [...list].sort((a, b) => ((a[admin.sort] ?? 0) - (b[admin.sort] ?? 0)) * (admin.asc ? 1 : -1) || a.n - b.n);
   const th = cols => cols.map(([k, l]) => `<th class="${admin.sort === k ? "sorted" : ""}" onclick="sortBy('${k}')">${l}${admin.sort === k ? (admin.asc ? " ↑" : " ↓") : ""}</th>`).join("");
 
+  if (admin.mode === "pdf" && cur === "__all") {
+    const times = list.reduce((t, r) => t + (r.count || 1), 0);
+    body.innerHTML = `
+      <div class="stats">
+        <div class="stat"><div class="k">開いた人</div><div class="v">${list.length}<small>人</small></div></div>
+        <div class="stat"><div class="k">開いた回数（合計）</div><div class="v">${times}<small>回</small></div></div>
+      </div>
+      <div class="table-wrap"><table class="res-table">
+        <thead><tr>${th([["n", "番号"], ["count", "開いた回数"], ["ts", "最後に開いた日時"]])}<th>開いたPDF</th></tr></thead>
+        <tbody>${sorted.map(r => `<tr>
+          <td>${r.n}番</td><td>${r.count}回</td><td class="date">${md(r.ts)}</td>
+          <td style="white-space:normal">${r.pdfs.map(esc).join("、")}</td></tr>`).join("")}
+        </tbody></table></div>`;
+    return;
+  }
   if (admin.mode === "pdf") {
     const times = list.reduce((t, r) => t + (r.count || 1), 0);
     body.innerHTML = `
@@ -2526,14 +2562,31 @@ function pickSet(id) { admin.set[admin.mode] = id; admin.cls = null; renderAdmin
 function pickClass(c) { admin.cls = c; renderAdmin(); }
 function sortBy(k) { if (admin.sort === k) admin.asc = !admin.asc; else { admin.sort = k; admin.asc = k === "n"; } renderAdmin(); }
 function adminPath() { return (admin.mode === "quiz" ? RESULT_PATH : VIEW_PATH)(adminSet()); }
+function pdfShort(x) { return x.group.split(" ・ ").slice(-1)[0] + x.node.tab.replace("模擬問題", ""); }
 async function loadAdmin() {
   if (!adminSet()) { renderAdmin(); return; }
   const key = dataKey();
   admin.loading = true; admin.error = false; renderAdmin();
   try {
-    const r = await fetch(adminPath() + ".json");
-    if (!r.ok) throw new Error(r.status);
-    admin.data[key] = (await r.json()) || {};
+    if (adminSet() === "__all") {
+      // すべてのPDFの記録を集めて、生徒ごとにまとめる
+      const sets = PDF_SETS();
+      const all = await Promise.all(sets.map(async x => {
+        const r = await fetch(VIEW_PATH(x.node.id) + ".json");
+        if (!r.ok) throw new Error(r.status);
+        return { x, d: (await r.json()) || {} };
+      }));
+      const agg = {};
+      all.forEach(({ x, d }) => Object.entries(d).forEach(([k, v]) => {
+        const a = agg[k] = agg[k] || { y: v.y, c: v.c, n: v.n, count: 0, ts: 0, pdfs: [] };
+        a.count += v.count || 1; a.ts = Math.max(a.ts, v.ts || 0); a.pdfs.push(pdfShort(x));
+      }));
+      admin.data[key] = agg;
+    } else {
+      const r = await fetch(adminPath() + ".json");
+      if (!r.ok) throw new Error(r.status);
+      admin.data[key] = (await r.json()) || {};
+    }
     const d = new Date();
     document.getElementById("upd-time").textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")} 更新`;
   } catch(e) { admin.error = true; }
