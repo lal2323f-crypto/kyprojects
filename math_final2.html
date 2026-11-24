@@ -303,7 +303,7 @@
   }
   .hero-back:hover { background: rgba(255,255,255,.22); }
   .q-ja { font-size: 13.5px; color: var(--subtext); margin: -8px 0 14px; line-height: 1.7; }
-  .q-exp {
+  .q-exp { white-space: pre-line;
     margin-top: 8px; padding: 10px 12px; border-radius: 8px; background: var(--bg);
     color: var(--text); font-weight: 500; line-height: 1.7; font-size: 13px;
   }
@@ -630,9 +630,9 @@ const SUBJECTS = [
             "tab": "第31講　話法①",
             "eyebrow": "英語スタサプ ・ ベーシックレベル英語",
             "icon": "31",
-            "meta": "Chapter 1〜3（時制の一致・代名詞・指示語・時の副詞）",
-            "title": "スタサプ 第31講　話法①",
-            "desc": "ベーシックレベル英語 第31講 復習テスト（Chapter 1〜3）。直接話法から間接話法に書き換えるとき、空所に入る最も適切な語（句）を選びましょう。",
+            "meta": "Chapter 1〜3",
+            "title": "スタサプ 第31講　話法①（Chapter 1〜3）",
+            "desc": "次の英文を直接話法から間接話法に書き換えるとき，空所に入れるのにもっとも適切な語(句)をそれぞれ下の①～④から一つ選びなさい。",
             "recordKey": "final2_eng_s31a",
             "choiceLabels": [
               "①",
@@ -645,7 +645,6 @@ const SUBJECTS = [
                 "id": "s31-c1-1",
                 "cat": "Chapter 1",
                 "text": "I said, “I am a student.”<br>⇒ I said I (　　) a student.",
-                "ja": "私は、「私は学生だ」と言った。",
                 "choices": [
                   "am",
                   "was",
@@ -653,13 +652,12 @@ const SUBJECTS = [
                   "had been"
                 ],
                 "answer": 1,
-                "exp": "時制の一致により、発言部分の動詞を said と同じ過去形にする。am の過去形 was が正解。→ I said I was a student.（私は、自分が学生だと言った。）"
+                "exp": "I said, “I am a student.”　私は，「私は学生だ」と言った。\n⇒ I said I ( was ) a student.　私は，自分が学生だと言った。\n\n解説：この文を直接話法から間接話法に書き換える際には，発言部分を示すクォーテーションマーク内の動詞を，時制の一致により said と同じ時制にする。よって，am の過去形 was が正解。"
               },
               {
                 "id": "s31-c1-2",
                 "cat": "Chapter 1",
                 "text": "I said, “I have been tired.”<br>⇒ I said I (　　) tired.",
-                "ja": "私は、「ずっと疲れている」と言った。",
                 "choices": [
                   "am",
                   "was",
@@ -667,13 +665,12 @@ const SUBJECTS = [
                   "had been"
                 ],
                 "answer": 3,
-                "exp": "時制の一致により、現在完了形 have been を過去完了形 had been にする。→ I said I had been tired.（私は、自分がずっと疲れていると言った。）"
+                "exp": "I said, “I have been tired.”　私は，「ずっと疲れている」と言った。\n⇒ I said I ( had been ) tired.　私は，自分がずっと疲れていると言った。\n\n解説：時制の一致により，クォーテーションマーク内の現在完了形 have been を過去完了形にした had been が正解。"
               },
               {
                 "id": "s31-c1-3",
                 "cat": "Chapter 1",
                 "text": "I said, “I will become a teacher.”<br>⇒ I said I (　　) a teacher.",
-                "ja": "私は、「私は教師になる」と言った。",
                 "choices": [
                   "become",
                   "will become",
@@ -681,13 +678,12 @@ const SUBJECTS = [
                   "became"
                 ],
                 "answer": 2,
-                "exp": "時制の一致により、will を過去形の would にし、うしろに動詞の原形を続ける。→ I said I would become a teacher.（私は、自分が教師になると言った。）"
+                "exp": "I said, “I will become a teacher.”　私は，「私は教師になる」と言った。\n⇒ I said I ( would become ) a teacher.　私は，自分が教師になると言った。\n\n解説：クォーテーションマーク内の動詞は will become なので，時制の一致により，will を過去形の would にし，うしろに動詞の原形を続けた would become が正解。"
               },
               {
                 "id": "s31-c2-1",
                 "cat": "Chapter 2",
                 "text": "He said, “I’m walking my dog.”<br>⇒ He said he (　　) dog.",
-                "ja": "彼は、「僕は自分のイヌを散歩させている」と言った。",
                 "choices": [
                   "is walking my",
                   "is walking his",
@@ -695,13 +691,12 @@ const SUBJECTS = [
                   "was walking his"
                 ],
                 "answer": 3,
-                "exp": "I を he に、am を was に、my を his にする。人称代名詞の変化に注意。→ He said he was walking his dog.（彼は、自分のイヌを散歩させていると言った。）"
+                "exp": "He said, “I’m walking my dog.”　彼は，「僕は自分のイヌを散歩させている」と言った。\n⇒ He said he ( was walking his ) dog.　彼は，自分のイヌを散歩させていると言った。\n\n解説：“I’m walking my dog.” という発言部分を直接話法から間接話法に書き換える際には，I を he に，am を was に，my を his にする。人称代名詞の変化に注意。"
               },
               {
                 "id": "s31-c2-2",
                 "cat": "Chapter 2",
                 "text": "She said, “I don’t know this boy.”<br>⇒ She said she (　　) boy.",
-                "ja": "彼女は、「私はこの少年を知らない」と言った。",
                 "choices": [
                   "doesn’t know this",
                   "doesn’t know that",
@@ -709,13 +704,12 @@ const SUBJECTS = [
                   "didn’t know this"
                 ],
                 "answer": 2,
-                "exp": "I を she に、don’t を didn’t に、this を that にする。人称代名詞と指示語の変化に注意。→ She said she didn’t know that boy.（彼女は、自分はその少年を知らないと言った。）"
+                "exp": "She said, “I don’t know this boy.”　彼女は，「私はこの少年を知らない」と言った。\n⇒ She said she ( didn’t know that ) boy.　彼女は，自分はその少年を知らないと言った。\n\n解説：“I don’t know this boy.” という発言部分を直接話法から間接話法に書き換える際には，I を she に，don’t を didn’t に，this を that にする。人称代名詞と指示語の変化に注意。"
               },
               {
                 "id": "s31-c2-3",
                 "cat": "Chapter 2",
                 "text": "He said, “I like this movie very much.”<br>⇒ He said (　　) movie very much.",
-                "ja": "彼は、「僕はこの映画が大好きだ」と言った。",
                 "choices": [
                   "he liked this",
                   "he liked that",
@@ -723,13 +717,12 @@ const SUBJECTS = [
                   "I liked that"
                 ],
                 "answer": 1,
-                "exp": "I を he に、like を liked に、this を that にする。人称代名詞と指示語の変化に注意。→ He said he liked that movie very much.（彼は、自分はその映画が大好きだと言った。）"
+                "exp": "He said, “I like this movie very much.”　彼は，「僕はこの映画が大好きだ」と言った。\n⇒ He said ( he liked that ) movie very much.　彼は，自分はその映画が大好きだと言った。\n\n解説：“I like this movie very much.” という発言部分を直接話法から間接話法に書き換える際には，I を he に，like を liked に，this を that にする。人称代名詞と指示語の変化に注意。"
               },
               {
                 "id": "s31-c3-1",
                 "cat": "Chapter 3",
                 "text": "He said, “I want to watch a movie today.”<br>⇒ He said he wanted to watch a (　　).",
-                "ja": "彼は、「僕は今日、映画が見たい」と言った。",
                 "choices": [
                   "movie yesterday",
                   "movie tomorrow",
@@ -737,13 +730,12 @@ const SUBJECTS = [
                   "movie that day"
                 ],
                 "answer": 3,
-                "exp": "I を he に、want を wanted に、today を that day にする。時を表す副詞の変化に注意。→ He said he wanted to watch a movie that day.（彼はその日、映画が見たいと言った。）"
+                "exp": "He said, “I want to watch a movie today.”　彼は，「僕は今日，映画が見たい」と言った。\n⇒ He said he wanted to watch a ( movie that day ).　彼はその日，映画が見たいと言った。\n\n解説：“I want to watch a movie today.” という発言部分を直接話法から間接話法に書き換える際には，I を he に，want を wanted に，today を that day にする。時を表す副詞の変化に注意。"
               },
               {
                 "id": "s31-c3-2",
                 "cat": "Chapter 3",
                 "text": "She said, “I met the boy a few minutes ago.”<br>⇒ She said she had met the boy (　　).",
-                "ja": "彼女は、「私は数分前にその少年に会った」と言った。",
                 "choices": [
                   "after a few minutes",
                   "in a few minutes",
@@ -751,13 +743,12 @@ const SUBJECTS = [
                   "a few minutes before"
                 ],
                 "answer": 3,
-                "exp": "I を she に、met を had met に、a few minutes ago を a few minutes before にする。→ She said she had met the boy a few minutes before.（彼女は、自分が数分前にその少年に会ったと言った。）"
+                "exp": "She said, “I met the boy a few minutes ago.”　彼女は，「私は数分前にその少年に会った」と言った。\n⇒ She said she had met the boy ( a few minutes before ).　彼女は，自分が数分前にその少年に会ったと言った。\n\n解説：“I met the boy a few minutes ago.” という発言部分を直接話法から間接話法に書き換える際には，I を she に，met を had met に，a few minutes ago を a few minutes before にする。"
               },
               {
                 "id": "s31-c3-3",
                 "cat": "Chapter 3",
                 "text": "He said, “I will see her here tomorrow.”<br>⇒ He said he would see her (　　).",
-                "ja": "彼は、「僕は明日、ここで彼女に会うだろう」と言った。",
                 "choices": [
                   "there tomorrow",
                   "there the next day",
@@ -765,7 +756,7 @@ const SUBJECTS = [
                   "here the next day"
                 ],
                 "answer": 1,
-                "exp": "I を he に、will を would に、here を there に、tomorrow を the next day にする。→ He said he would see her there the next day.（彼は、自分がその翌日にそこで彼女に会うだろうと言った。）"
+                "exp": "He said, “I will see her here tomorrow.”　彼は，「僕は明日，ここで彼女に会うだろう」と言った。\n⇒ He said he would see her ( there the next day ).　彼は，自分がその翌日にそこで彼女に会うだろうと言った。\n\n解説：“I will see her here tomorrow.” という発言部分を直接話法から間接話法に書き換える際には，I を he に，will を would に，here を there に，tomorrow を the next day にする。"
               }
             ]
           },
@@ -774,9 +765,9 @@ const SUBJECTS = [
             "tab": "第31講　話法②",
             "eyebrow": "英語スタサプ ・ ベーシックレベル英語",
             "icon": "31",
-            "meta": "Chapter 4〜6（tell・ask・suggest）",
-            "title": "スタサプ 第31講　話法②",
-            "desc": "ベーシックレベル英語 第31講 復習テスト（Chapter 4〜6）。直接話法から間接話法に書き換えるとき、空所に入る最も適切な語（句）を選びましょう。",
+            "meta": "Chapter 4〜6",
+            "title": "スタサプ 第31講　話法②（Chapter 4〜6）",
+            "desc": "次の英文を直接話法から間接話法に書き換えるとき，空所に入れるのにもっとも適切な語(句)をそれぞれ下の①～④から一つ選びなさい。",
             "recordKey": "final2_eng_s31b",
             "choiceLabels": [
               "①",
@@ -789,7 +780,6 @@ const SUBJECTS = [
                 "id": "s31-c4-1",
                 "cat": "Chapter 4",
                 "text": "He said to me, “I went to bed early last night.”<br>⇒ He (　　) me he had gone to bed early the night before.",
-                "ja": "彼は私に、「僕は昨夜、早く寝た」と言った。",
                 "choices": [
                   "spoke",
                   "told",
@@ -797,13 +787,12 @@ const SUBJECTS = [
                   "said"
                 ],
                 "answer": 1,
-                "exp": "空所の直後に目的語 me があるので、他動詞 tell を用いて〈tell＋人（＋that）〜〉の文にする。→ He told me he had gone to bed early the night before.（彼は私に、自分はその前日の夜に早く寝たと言った。）"
+                "exp": "He said to me, “I went to bed early last night.”　彼は私に，「僕は昨夜，早く寝た」と言った。\n⇒ He ( told ) me he had gone to bed early the night before.　彼は私に，自分はその前日の夜に早く寝たと言った。\n\n解説：空所の直後に目的語 me があるので，他動詞 tell を用いて〈tell ＋人（＋ that）～〉の文にする。"
               },
               {
                 "id": "s31-c4-2",
                 "cat": "Chapter 4",
                 "text": "She said to me, “Don’t leave now.”<br>⇒ She (　　) leave then.",
-                "ja": "彼女は私に、「今行かないで」と言った。",
                 "choices": [
                   "talked not to me",
                   "talked to me not",
@@ -811,13 +800,12 @@ const SUBJECTS = [
                   "told me to not"
                 ],
                 "answer": 2,
-                "exp": "発言部分が否定の命令文。〈say to＋人, “否定の命令文”〉は〈tell＋人＋not to do〉に書き換える。→ She told me not to leave then.（彼女は私に、そのとき行かないように言った。）"
+                "exp": "She said to me, “Don’t leave now.”　彼女は私に，「今行かないで」と言った。\n⇒ She ( told me not to ) leave then.　彼女は私に，そのとき行かないように言った。\n\n解説：クォーテーションマーク内が否定の命令文。直接話法の〈say to ＋人，“否定の命令文”〉は間接話法の〈tell ＋人＋ not to do〉に書き換える。"
               },
               {
                 "id": "s31-c4-3",
                 "cat": "Chapter 4",
                 "text": "He said to me, “Try this cake.”<br>⇒ He (　　) try that cake.",
-                "ja": "彼は私に、「このケーキを食べてみて」と言った。",
                 "choices": [
                   "talked to me",
                   "said to me",
@@ -825,13 +813,12 @@ const SUBJECTS = [
                   "told me to"
                 ],
                 "answer": 3,
-                "exp": "発言部分が命令文。〈say to＋人, “命令文”〉は〈tell＋人＋to do〉に書き換える。→ He told me to try that cake.（彼は私に、そのケーキを食べてみるように言った。）"
+                "exp": "He said to me, “Try this cake.”　彼は私に，「このケーキを食べてみて」と言った。\n⇒ He ( told me to ) try that cake.　彼は私に，そのケーキを食べてみるように言った。\n\n解説：クォーテーションマーク内が命令文。直接話法の〈say to ＋人，“命令文”〉は間接話法の〈tell ＋人＋ to do〉に書き換える。"
               },
               {
                 "id": "s31-c5-1",
                 "cat": "Chapter 5",
                 "text": "He said to her, “Where are you going?”<br>⇒ He (　　) going.",
-                "ja": "彼は彼女に、「君はどこに向かっているの？」と言った。",
                 "choices": [
                   "told her where was she",
                   "asked her where was she",
@@ -839,13 +826,12 @@ const SUBJECTS = [
                   "told her where she was"
                 ],
                 "answer": 2,
-                "exp": "発言部分が疑問詞疑問文なので、〈say to＋人, “疑問詞疑問文”〉を〈ask＋人＋間接疑問文〉に書き換える。間接疑問文は「疑問詞＋S＋V」の語順。→ He asked her where she was going.（彼は彼女に、彼女がどこに向かっているか尋ねた。）"
+                "exp": "He said to her, “Where are you going?”　彼は彼女に，「君はどこに向かっているの？」と言った。\n⇒ He ( asked her where she was ) going.　彼は彼女に，彼女がどこに向かっているか尋ねた。\n\n解説：クォーテーションマーク内が疑問詞疑問文なので，〈say to ＋人，“疑問詞疑問文”〉を〈ask ＋人＋間接疑問文〉に書き換える。間接疑問文内の語順に注意。"
               },
               {
                 "id": "s31-c5-2",
                 "cat": "Chapter 5",
                 "text": "She said to me, “Do you like cats?”<br>⇒ She (　　) cats.",
-                "ja": "彼女は私に、「あなたはネコが好き？」と言った。",
                 "choices": [
                   "asked me whether I like",
                   "asked me whether I liked",
@@ -853,13 +839,12 @@ const SUBJECTS = [
                   "told me whether I like"
                 ],
                 "answer": 1,
-                "exp": "発言部分が Yes/No 疑問文なので、〈ask＋人＋whether[if] 〜〉に書き換える。→ She asked me whether I liked cats.（彼女は私に、私がネコ好きかどうか尋ねた。）"
+                "exp": "She said to me, “Do you like cats?”　彼女は私に，「あなたはネコが好き？」と言った。\n⇒ She ( asked me whether I liked ) cats.　彼女は私に，私がネコ好きかどうか尋ねた。\n\n解説：クォーテーションマーク内が Yes/No 疑問文なので，〈say to ＋人，“Yes/No 疑問文”〉を〈ask ＋人＋ whether[if] ～〉に書き換える。"
               },
               {
                 "id": "s31-c5-3",
                 "cat": "Chapter 5",
                 "text": "I said to him, “Will you go there alone?”<br>⇒ I (　　) there alone.",
-                "ja": "私は彼に、「君は一人でそこに行くの？」と言った。",
                 "choices": [
                   "told him if he would go",
                   "asked him if you would go",
@@ -867,13 +852,12 @@ const SUBJECTS = [
                   "told him if you would go"
                 ],
                 "answer": 2,
-                "exp": "発言部分が Yes/No 疑問文なので、〈ask＋人＋if[whether] 〜〉に書き換える。you は he に、will は would にする。→ I asked him if he would go there alone.（私は彼に、彼が一人でそこに行くかどうか尋ねた。）"
+                "exp": "I said to him, “Will you go there alone?”　私は彼に，「君は一人でそこに行くの？」と言った。\n⇒ I ( asked him if he would go ) there alone.　私は彼に，彼が一人でそこに行くかどうか尋ねた。\n\n解説：クォーテーションマーク内が Yes/No 疑問文なので，〈say to ＋人，“Yes/No 疑問文”〉を〈ask ＋人＋ if [whether] ～〉に書き換える。"
               },
               {
                 "id": "s31-c6-1",
                 "cat": "Chapter 6",
                 "text": "He said to me, “Let’s eat something.”<br>⇒ He (　　) that we eat something.",
-                "ja": "彼は私に、「何か食べよう」と言った。",
                 "choices": [
                   "suggested to me",
                   "talked to me",
@@ -881,13 +865,12 @@ const SUBJECTS = [
                   "told me"
                 ],
                 "answer": 0,
-                "exp": "発言部分が提案を表す Let’s 〜. の文なので、〈say to＋人, “Let’s 〜.”〉を〈suggest to＋人＋that we 〜〉に書き換える。→ He suggested to me that we eat something.（彼は私に、私たちが何か食べることを提案した。）"
+                "exp": "He said to me, “Let’s eat something.”　彼は私に，「何か食べよう」と言った。\n⇒ He ( suggested to me ) that we eat something.　彼は私に，私たちが何か食べることを提案した。\n\n解説：クォーテーションマーク内が提案を表す Let’s ～ . の文なので，〈say to ＋人，“Let’s ～ .”〉を〈suggest to ＋人＋ that we ～〉に書き換える。"
               },
               {
                 "id": "s31-c6-2",
                 "cat": "Chapter 6",
                 "text": "She said to him, “Please tell me the truth.”<br>⇒ She (　　) the truth.",
-                "ja": "彼女は彼に、「私に真実を教えて」と言った。",
                 "choices": [
                   "suggested to him he tell her",
                   "suggested to him he tell me",
@@ -895,13 +878,12 @@ const SUBJECTS = [
                   "asked him to tell her"
                 ],
                 "answer": 3,
-                "exp": "発言部分が依頼を表す Please 〜. の文なので、〈say to＋人, “Please 〜.”〉を〈ask＋人＋to do 〜〉に書き換える。me は her にする。→ She asked him to tell her the truth.（彼女は彼に、自分に真実を伝えるよう頼んだ。）"
+                "exp": "She said to him, “Please tell me the truth.”　彼女は彼に，「私に真実を教えて」と言った。\n⇒ She ( asked him to tell her ) the truth.　彼女は彼に，自分に真実を伝えるよう頼んだ。\n\n解説：クォーテーションマーク内が依頼を表す Please ～ . の文なので，〈say to ＋人，“Please ～ .”〉を〈ask ＋人＋ to do ～〉に書き換える。"
               },
               {
                 "id": "s31-c6-3",
                 "cat": "Chapter 6",
                 "text": "I said to her, “Would you call me at 10 a.m.?”<br>⇒ I (　　) at 10 a.m.",
-                "ja": "私は彼女に、「午前10時に私に電話してもらえますか。」と言った。",
                 "choices": [
                   "asked her to call her",
                   "suggested to her she call me",
@@ -909,7 +891,7 @@ const SUBJECTS = [
                   "suggested to her she call her"
                 ],
                 "answer": 2,
-                "exp": "発言部分が依頼を表す Would you 〜? の文なので、〈say to＋人, “Would you 〜?”〉を〈ask＋人＋to do 〜〉に書き換える。→ I asked her to call me at 10 a.m.（私は彼女に、午前10時に自分に電話するよう頼んだ。）"
+                "exp": "I said to her, “Would you call me at 10 a.m.?”　私は彼女に，「午前 10 時に私に電話してもらえますか。」と言った。\n⇒ I ( asked her to call me ) at 10 a.m.　私は彼女に，午前 10 時に自分に電話するよう頼んだ。\n\n解説：クォーテーションマーク内が依頼を表す Would you ～ ? の文なので，〈say to ＋人，“Would you ～ ?”〉を〈ask ＋人＋ to do ～〉に書き換える。"
               }
             ]
           },
@@ -918,9 +900,9 @@ const SUBJECTS = [
             "tab": "第32講　否定",
             "eyebrow": "英語スタサプ ・ ベーシックレベル英語",
             "icon": "32",
-            "meta": "Chapter 1〜4（準否定・部分否定・強い否定・二重否定）",
-            "title": "スタサプ 第32講　否定",
-            "desc": "ベーシックレベル英語 第32講 復習テスト（Chapter 1〜4）。日本文の意味に合うように、空所に入る最も適切な語（句）を選びましょう。",
+            "meta": "Chapter 1〜4",
+            "title": "スタサプ 第32講　否定（Chapter 1〜4）",
+            "desc": "日本文の意味に合うように，次の英文の空所に入れるのにもっとも適切な語(句)をそれぞれ下の①～④から一つ選びなさい。",
             "recordKey": "final2_eng_s32",
             "choiceLabels": [
               "①",
@@ -941,7 +923,7 @@ const SUBJECTS = [
                   "few"
                 ],
                 "answer": 2,
-                "exp": "「ほとんど〜ない」という程度は、準否定語の hardly[scarcely] で表す。→ I could hardly understand her."
+                "exp": "I could ( hardly ) understand her.　私は彼女の言うことがほとんどわからなかった。\n\n解説：「ほとんど～ない」という程度は，準否定語の hardly[scarcely] で表す。"
               },
               {
                 "id": "s32-c1-2",
@@ -955,13 +937,13 @@ const SUBJECTS = [
                   "rarely"
                 ],
                 "answer": 3,
-                "exp": "「めったに〜ない」という頻度は、準否定語の rarely[seldom] で表す。stay up all night「徹夜する」。→ I rarely stay up all night."
+                "exp": "I ( rarely ) stay up all night.　私はめったに徹夜しない。\n\n解説：「めったに～ない」という頻度は，準否定語の rarely[seldom] で表す。stay up all night「徹夜する」。"
               },
               {
                 "id": "s32-c1-3",
                 "cat": "Chapter 1",
                 "text": "I had (　　) money last month.",
-                "ja": "私は先月、ほとんどお金がなかった。",
+                "ja": "私は先月，ほとんどお金がなかった。",
                 "choices": [
                   "little",
                   "hardly",
@@ -969,7 +951,7 @@ const SUBJECTS = [
                   "seldom"
                 ],
                 "answer": 0,
-                "exp": "「（数量が）ほとんど〜ない」は準否定語の few[little] で表す。空所の直後に不可算名詞 money があるので little が正解。→ I had little money last month."
+                "exp": "I had ( little ) money last month.　私は先月，ほとんどお金がなかった。\n\n解説：「（数量が）ほとんど～ない」は，準否定語の few[little] で表す。ここでは空所の直後に不可算名詞 money があるので，little が正解。"
               },
               {
                 "id": "s32-c2-1",
@@ -983,13 +965,13 @@ const SUBJECTS = [
                   "not all"
                 ],
                 "answer": 1,
-                "exp": "「いつも〜なわけではない」という部分否定は not always で表す。→ She is not always busy."
+                "exp": "She is ( not always ) busy.　彼女はいつも忙しいわけではない。\n\n解説：「いつも～なわけではない」という部分否定は not always で表す。"
               },
               {
                 "id": "s32-c2-2",
                 "cat": "Chapter 2",
                 "text": "I couldn’t see (　　) the animals in the zoo.",
-                "ja": "私は、その動物園内の全ての動物を見られたわけではなかった。",
+                "ja": "私は，その動物園内の全ての動物を見られたわけではなかった。",
                 "choices": [
                   "any",
                   "every",
@@ -997,7 +979,7 @@ const SUBJECTS = [
                   "all"
                 ],
                 "answer": 3,
-                "exp": "「すべての名詞が〜なわけではない」という部分否定は〈not all＋名詞〉または〈not every＋単数形の名詞〉で表す。空所の直後が the animals なので all が正解。→ I couldn’t see all the animals in the zoo."
+                "exp": "I couldn’t see ( all ) the animals in the zoo.　私は，その動物園内の全ての動物を見られたわけではなかった。\n\n解説：「すべての名詞が～なわけではない」という部分否定は〈not all ＋名詞〉もしくは〈not every ＋単数形の名詞〉で表す。ここでは空所の直後が the animals なので，all が正解。"
               },
               {
                 "id": "s32-c2-3",
@@ -1011,7 +993,7 @@ const SUBJECTS = [
                   "not every"
                 ],
                 "answer": 2,
-                "exp": "「必ずしも〜なわけではない」という部分否定は not necessarily で表す。→ Your parents or teachers are not necessarily right."
+                "exp": "Your parents or teachers are ( not necessarily ) right.　君の両親や教師が必ずしも正しいとは限らない。\n\n解説：「必ずしも～なわけではない」という部分否定は not necessarily で表す。"
               },
               {
                 "id": "s32-c3-1",
@@ -1025,7 +1007,7 @@ const SUBJECTS = [
                   "by no means"
                 ],
                 "answer": 3,
-                "exp": "「決して〜ではない」は by no means または far from で表す。smart「賢い」。→ The boy is by no means smart."
+                "exp": "The boy is ( by no means ) smart.　その少年は決して賢くはない。\n\n解説：「決して～ではない」は by no means または far from で表す。smart「賢い」。"
               },
               {
                 "id": "s32-c3-2",
@@ -1039,7 +1021,7 @@ const SUBJECTS = [
                   "free from"
                 ],
                 "answer": 1,
-                "exp": "「決して〜ではない」は by no means または far from で表す。useful「役に立つ」。→ The book was far from useful."
+                "exp": "The book was ( far from ) useful.　その本は決して役立つものではなかった。\n\n解説：「決して～ではない」は by no means または far from で表す。useful「役に立つ」。"
               },
               {
                 "id": "s32-c3-3",
@@ -1053,7 +1035,7 @@ const SUBJECTS = [
                   "every"
                 ],
                 "answer": 2,
-                "exp": "「〜するような人ではない」は「〜する最後の人」から転じて the last person to do で表す。hurt「〜を傷つける」。→ He is the last person to hurt people’s feelings."
+                "exp": "He is the ( last ) person to hurt people’s feelings.　彼は人の気持ちを傷つけるような人ではない。\n\n解説：「～するような人ではない」は「～する最後の人」から転じて the last person to do で表す。hurt「～を傷つける」。"
               },
               {
                 "id": "s32-c4-1",
@@ -1067,13 +1049,13 @@ const SUBJECTS = [
                   "or"
                 ],
                 "answer": 0,
-                "exp": "「〜せざるをえない」は have no choice but to do「〜以外選択肢がない」という、前置詞 but「〜以外」を用いた二重否定の表現で表す。→ I had no choice but to call her."
+                "exp": "I had no choice ( but ) to call her.　私は彼女に電話せざるをえなかった。\n\n解説：「～せざるをえない」は，have no choice but to do「～以外選択肢がない」という前置詞 but「～以外」を用いた二重否定の表現で表す。"
               },
               {
                 "id": "s32-c4-2",
                 "cat": "Chapter 4",
                 "text": "That day, I read (　　) but comic books.",
-                "ja": "その日、私は漫画しか読まなかった。",
+                "ja": "その日，私は漫画しか読まなかった。",
                 "choices": [
                   "everything",
                   "anything",
@@ -1081,7 +1063,7 @@ const SUBJECTS = [
                   "nothing"
                 ],
                 "answer": 3,
-                "exp": "「〜しかない」は nothing but「〜以外の何もない」という、前置詞 but「〜以外」を用いた二重否定の表現で表す。→ That day, I read nothing but comic books."
+                "exp": "That day, I read ( nothing ) but comic books.　その日，私は漫画しか読まなかった。\n\n解説：「～しかない」は，nothing but「～以外の何もない」という前置詞 but「～以外」を用いた二重否定の表現で表す。"
               },
               {
                 "id": "s32-c4-3",
@@ -1095,7 +1077,7 @@ const SUBJECTS = [
                   "always"
                 ],
                 "answer": 2,
-                "exp": "「A すると必ず B する」は never A without B「B なしで決して A しない」という二重否定の表現で表す。→ He never goes shopping without spending a lot of money."
+                "exp": "He never goes shopping ( without ) spending a lot of money.　彼は買い物に出かけると必ず大金を使う。\n\n解説：「A すると必ず B する」は never A without B「B なしで決して A しない」という二重否定の表現で表す。"
               }
             ]
           }
