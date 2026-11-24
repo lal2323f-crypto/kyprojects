@@ -607,7 +607,256 @@ const SUBJECTS = [
       }
     ]
   },
-  { id: "eng",    tab: "英語",        eyebrow: "英語",         icon: "A",  meta: "準備中", soon: true },
+  {
+    "id": "eng",
+    "tab": "英語",
+    "eyebrow": "英語",
+    "icon": "A",
+    "meta": "スタサプ",
+    "title": "英語",
+    "desc": "解く単元を選んでください",
+    "children": [
+      {
+        "id": "eng-stsp",
+        "tab": "スタサプ",
+        "eyebrow": "英語",
+        "icon": "📱",
+        "meta": "ベーシックレベル英語 復習テスト",
+        "title": "英語スタサプ",
+        "desc": "解く講を選んでください",
+        "children": [
+          {
+            "id": "eng-s31",
+            "tab": "第31講　話法",
+            "eyebrow": "英語スタサプ ・ ベーシックレベル英語",
+            "icon": "31",
+            "meta": "Chapter 1〜5（直接話法→間接話法）",
+            "title": "スタサプ 第31講　話法",
+            "desc": "ベーシックレベル英語 第31講 復習テスト（Chapter 1〜5）。直接話法から間接話法に書き換えるとき、空所に入る最も適切な語（句）を選びましょう。",
+            "recordKey": "final2_eng_s31",
+            "choiceLabels": [
+              "①",
+              "②",
+              "③",
+              "④"
+            ],
+            "questions": [
+              {
+                "id": "s31-c1-1",
+                "cat": "Chapter 1",
+                "text": "I said, “I am a student.”<br>⇒ I said I (　　) a student.",
+                "ja": "私は、「私は学生だ」と言った。",
+                "choices": [
+                  "am",
+                  "was",
+                  "were",
+                  "had been"
+                ],
+                "answer": 1,
+                "exp": "時制の一致により、発言部分の動詞を said と同じ過去形にする。am の過去形 was が正解。→ I said I was a student.（私は、自分が学生だと言った。）"
+              },
+              {
+                "id": "s31-c1-2",
+                "cat": "Chapter 1",
+                "text": "I said, “I have been tired.”<br>⇒ I said I (　　) tired.",
+                "ja": "私は、「ずっと疲れている」と言った。",
+                "choices": [
+                  "am",
+                  "was",
+                  "have been",
+                  "had been"
+                ],
+                "answer": 3,
+                "exp": "時制の一致により、現在完了形 have been を過去完了形 had been にする。→ I said I had been tired.（私は、自分がずっと疲れていると言った。）"
+              },
+              {
+                "id": "s31-c1-3",
+                "cat": "Chapter 1",
+                "text": "I said, “I will become a teacher.”<br>⇒ I said I (　　) a teacher.",
+                "ja": "私は、「私は教師になる」と言った。",
+                "choices": [
+                  "become",
+                  "will become",
+                  "would become",
+                  "became"
+                ],
+                "answer": 2,
+                "exp": "時制の一致により、will を過去形の would にし、うしろに動詞の原形を続ける。→ I said I would become a teacher.（私は、自分が教師になると言った。）"
+              },
+              {
+                "id": "s31-c2-1",
+                "cat": "Chapter 2",
+                "text": "He said, “I’m walking my dog.”<br>⇒ He said he (　　) dog.",
+                "ja": "彼は、「僕は自分のイヌを散歩させている」と言った。",
+                "choices": [
+                  "is walking my",
+                  "is walking his",
+                  "was walking my",
+                  "was walking his"
+                ],
+                "answer": 3,
+                "exp": "I を he に、am を was に、my を his にする。人称代名詞の変化に注意。→ He said he was walking his dog.（彼は、自分のイヌを散歩させていると言った。）"
+              },
+              {
+                "id": "s31-c2-2",
+                "cat": "Chapter 2",
+                "text": "She said, “I don’t know this boy.”<br>⇒ She said she (　　) boy.",
+                "ja": "彼女は、「私はこの少年を知らない」と言った。",
+                "choices": [
+                  "doesn’t know this",
+                  "doesn’t know that",
+                  "didn’t know that",
+                  "didn’t know this"
+                ],
+                "answer": 2,
+                "exp": "I を she に、don’t を didn’t に、this を that にする。人称代名詞と指示語の変化に注意。→ She said she didn’t know that boy.（彼女は、自分はその少年を知らないと言った。）"
+              },
+              {
+                "id": "s31-c2-3",
+                "cat": "Chapter 2",
+                "text": "He said, “I like this movie very much.”<br>⇒ He said (　　) movie very much.",
+                "ja": "彼は、「僕はこの映画が大好きだ」と言った。",
+                "choices": [
+                  "he liked this",
+                  "he liked that",
+                  "I liked this",
+                  "I liked that"
+                ],
+                "answer": 1,
+                "exp": "I を he に、like を liked に、this を that にする。人称代名詞と指示語の変化に注意。→ He said he liked that movie very much.（彼は、自分はその映画が大好きだと言った。）"
+              },
+              {
+                "id": "s31-c3-1",
+                "cat": "Chapter 3",
+                "text": "He said, “I want to watch a movie today.”<br>⇒ He said he wanted to watch a (　　).",
+                "ja": "彼は、「僕は今日、映画が見たい」と言った。",
+                "choices": [
+                  "movie yesterday",
+                  "movie tomorrow",
+                  "movie today",
+                  "movie that day"
+                ],
+                "answer": 3,
+                "exp": "I を he に、want を wanted に、today を that day にする。時を表す副詞の変化に注意。→ He said he wanted to watch a movie that day.（彼はその日、映画が見たいと言った。）"
+              },
+              {
+                "id": "s31-c3-2",
+                "cat": "Chapter 3",
+                "text": "She said, “I met the boy a few minutes ago.”<br>⇒ She said she had met the boy (　　).",
+                "ja": "彼女は、「私は数分前にその少年に会った」と言った。",
+                "choices": [
+                  "after a few minutes",
+                  "in a few minutes",
+                  "a few minutes ago",
+                  "a few minutes before"
+                ],
+                "answer": 3,
+                "exp": "I を she に、met を had met に、a few minutes ago を a few minutes before にする。→ She said she had met the boy a few minutes before.（彼女は、自分が数分前にその少年に会ったと言った。）"
+              },
+              {
+                "id": "s31-c3-3",
+                "cat": "Chapter 3",
+                "text": "He said, “I will see her here tomorrow.”<br>⇒ He said he would see her (　　).",
+                "ja": "彼は、「僕は明日、ここで彼女に会うだろう」と言った。",
+                "choices": [
+                  "there tomorrow",
+                  "there the next day",
+                  "here tomorrow",
+                  "here the next day"
+                ],
+                "answer": 1,
+                "exp": "I を he に、will を would に、here を there に、tomorrow を the next day にする。→ He said he would see her there the next day.（彼は、自分がその翌日にそこで彼女に会うだろうと言った。）"
+              },
+              {
+                "id": "s31-c4-1",
+                "cat": "Chapter 4",
+                "text": "He said to me, “I went to bed early last night.”<br>⇒ He (　　) me he had gone to bed early the night before.",
+                "ja": "彼は私に、「僕は昨夜、早く寝た」と言った。",
+                "choices": [
+                  "spoke",
+                  "told",
+                  "talked",
+                  "said"
+                ],
+                "answer": 1,
+                "exp": "空所の直後に目的語 me があるので、他動詞 tell を用いて〈tell＋人（＋that）〜〉の文にする。→ He told me he had gone to bed early the night before.（彼は私に、自分はその前日の夜に早く寝たと言った。）"
+              },
+              {
+                "id": "s31-c4-2",
+                "cat": "Chapter 4",
+                "text": "She said to me, “Don’t leave now.”<br>⇒ She (　　) leave then.",
+                "ja": "彼女は私に、「今行かないで」と言った。",
+                "choices": [
+                  "talked not to me",
+                  "talked to me not",
+                  "told me not to",
+                  "told me to not"
+                ],
+                "answer": 2,
+                "exp": "発言部分が否定の命令文。〈say to＋人, “否定の命令文”〉は〈tell＋人＋not to do〉に書き換える。→ She told me not to leave then.（彼女は私に、そのとき行かないように言った。）"
+              },
+              {
+                "id": "s31-c4-3",
+                "cat": "Chapter 4",
+                "text": "He said to me, “Try this cake.”<br>⇒ He (　　) try that cake.",
+                "ja": "彼は私に、「このケーキを食べてみて」と言った。",
+                "choices": [
+                  "talked to me",
+                  "said to me",
+                  "spoke me to",
+                  "told me to"
+                ],
+                "answer": 3,
+                "exp": "発言部分が命令文。〈say to＋人, “命令文”〉は〈tell＋人＋to do〉に書き換える。→ He told me to try that cake.（彼は私に、そのケーキを食べてみるように言った。）"
+              },
+              {
+                "id": "s31-c5-1",
+                "cat": "Chapter 5",
+                "text": "He said to her, “Where are you going?”<br>⇒ He (　　) going.",
+                "ja": "彼は彼女に、「君はどこに向かっているの？」と言った。",
+                "choices": [
+                  "told her where was she",
+                  "asked her where was she",
+                  "asked her where she was",
+                  "told her where she was"
+                ],
+                "answer": 2,
+                "exp": "発言部分が疑問詞疑問文なので、〈say to＋人, “疑問詞疑問文”〉を〈ask＋人＋間接疑問文〉に書き換える。間接疑問文は「疑問詞＋S＋V」の語順。→ He asked her where she was going.（彼は彼女に、彼女がどこに向かっているか尋ねた。）"
+              },
+              {
+                "id": "s31-c5-2",
+                "cat": "Chapter 5",
+                "text": "She said to me, “Do you like cats?”<br>⇒ She (　　) cats.",
+                "ja": "彼女は私に、「あなたはネコが好き？」と言った。",
+                "choices": [
+                  "asked me whether I like",
+                  "asked me whether I liked",
+                  "told me whether I liked",
+                  "told me whether I like"
+                ],
+                "answer": 1,
+                "exp": "発言部分が Yes/No 疑問文なので、〈ask＋人＋whether[if] 〜〉に書き換える。→ She asked me whether I liked cats.（彼女は私に、私がネコ好きかどうか尋ねた。）"
+              },
+              {
+                "id": "s31-c5-3",
+                "cat": "Chapter 5",
+                "text": "I said to him, “Will you go there alone?”<br>⇒ I (　　) there alone.",
+                "ja": "私は彼に、「君は一人でそこに行くの？」と言った。",
+                "choices": [
+                  "told him if he would go",
+                  "asked him if you would go",
+                  "asked him if he would go",
+                  "told him if you would go"
+                ],
+                "answer": 2,
+                "exp": "発言部分が Yes/No 疑問文なので、〈ask＋人＋if[whether] 〜〉に書き換える。you は he に、will は would にする。→ I asked him if he would go there alone.（私は彼に、彼が一人でそこに行くかどうか尋ねた。）"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
   { id: "geo",    tab: "地理",        eyebrow: "地理",         icon: "地", meta: "準備中", soon: true },
   {
     "id": "net",
