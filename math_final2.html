@@ -612,7 +612,7 @@ const SUBJECTS = [
     "tab": "英語",
     "eyebrow": "英語",
     "icon": "A",
-    "meta": "スタサプ",
+    "meta": "スタサプ 第31講・第32講",
     "title": "英語",
     "desc": "解く単元を選んでください",
     "children": [
@@ -621,19 +621,19 @@ const SUBJECTS = [
         "tab": "スタサプ",
         "eyebrow": "英語",
         "icon": "📱",
-        "meta": "ベーシックレベル英語 復習テスト",
+        "meta": "ベーシックレベル英語 復習テスト（第31講・第32講）",
         "title": "英語スタサプ",
         "desc": "解く講を選んでください",
         "children": [
           {
-            "id": "eng-s31",
-            "tab": "第31講　話法",
+            "id": "eng-s31a",
+            "tab": "第31講　話法①",
             "eyebrow": "英語スタサプ ・ ベーシックレベル英語",
             "icon": "31",
-            "meta": "Chapter 1〜5（直接話法→間接話法）",
-            "title": "スタサプ 第31講　話法",
-            "desc": "ベーシックレベル英語 第31講 復習テスト（Chapter 1〜5）。直接話法から間接話法に書き換えるとき、空所に入る最も適切な語（句）を選びましょう。",
-            "recordKey": "final2_eng_s31",
+            "meta": "Chapter 1〜3（時制の一致・代名詞・指示語・時の副詞）",
+            "title": "スタサプ 第31講　話法①",
+            "desc": "ベーシックレベル英語 第31講 復習テスト（Chapter 1〜3）。直接話法から間接話法に書き換えるとき、空所に入る最も適切な語（句）を選びましょう。",
+            "recordKey": "final2_eng_s31a",
             "choiceLabels": [
               "①",
               "②",
@@ -766,7 +766,25 @@ const SUBJECTS = [
                 ],
                 "answer": 1,
                 "exp": "I を he に、will を would に、here を there に、tomorrow を the next day にする。→ He said he would see her there the next day.（彼は、自分がその翌日にそこで彼女に会うだろうと言った。）"
-              },
+              }
+            ]
+          },
+          {
+            "id": "eng-s31b",
+            "tab": "第31講　話法②",
+            "eyebrow": "英語スタサプ ・ ベーシックレベル英語",
+            "icon": "31",
+            "meta": "Chapter 4〜6（tell・ask・suggest）",
+            "title": "スタサプ 第31講　話法②",
+            "desc": "ベーシックレベル英語 第31講 復習テスト（Chapter 4〜6）。直接話法から間接話法に書き換えるとき、空所に入る最も適切な語（句）を選びましょう。",
+            "recordKey": "final2_eng_s31b",
+            "choiceLabels": [
+              "①",
+              "②",
+              "③",
+              "④"
+            ],
+            "questions": [
               {
                 "id": "s31-c4-1",
                 "cat": "Chapter 4",
@@ -850,6 +868,234 @@ const SUBJECTS = [
                 ],
                 "answer": 2,
                 "exp": "発言部分が Yes/No 疑問文なので、〈ask＋人＋if[whether] 〜〉に書き換える。you は he に、will は would にする。→ I asked him if he would go there alone.（私は彼に、彼が一人でそこに行くかどうか尋ねた。）"
+              },
+              {
+                "id": "s31-c6-1",
+                "cat": "Chapter 6",
+                "text": "He said to me, “Let’s eat something.”<br>⇒ He (　　) that we eat something.",
+                "ja": "彼は私に、「何か食べよう」と言った。",
+                "choices": [
+                  "suggested to me",
+                  "talked to me",
+                  "asked me",
+                  "told me"
+                ],
+                "answer": 0,
+                "exp": "発言部分が提案を表す Let’s 〜. の文なので、〈say to＋人, “Let’s 〜.”〉を〈suggest to＋人＋that we 〜〉に書き換える。→ He suggested to me that we eat something.（彼は私に、私たちが何か食べることを提案した。）"
+              },
+              {
+                "id": "s31-c6-2",
+                "cat": "Chapter 6",
+                "text": "She said to him, “Please tell me the truth.”<br>⇒ She (　　) the truth.",
+                "ja": "彼女は彼に、「私に真実を教えて」と言った。",
+                "choices": [
+                  "suggested to him he tell her",
+                  "suggested to him he tell me",
+                  "asked him to tell me",
+                  "asked him to tell her"
+                ],
+                "answer": 3,
+                "exp": "発言部分が依頼を表す Please 〜. の文なので、〈say to＋人, “Please 〜.”〉を〈ask＋人＋to do 〜〉に書き換える。me は her にする。→ She asked him to tell her the truth.（彼女は彼に、自分に真実を伝えるよう頼んだ。）"
+              },
+              {
+                "id": "s31-c6-3",
+                "cat": "Chapter 6",
+                "text": "I said to her, “Would you call me at 10 a.m.?”<br>⇒ I (　　) at 10 a.m.",
+                "ja": "私は彼女に、「午前10時に私に電話してもらえますか。」と言った。",
+                "choices": [
+                  "asked her to call her",
+                  "suggested to her she call me",
+                  "asked her to call me",
+                  "suggested to her she call her"
+                ],
+                "answer": 2,
+                "exp": "発言部分が依頼を表す Would you 〜? の文なので、〈say to＋人, “Would you 〜?”〉を〈ask＋人＋to do 〜〉に書き換える。→ I asked her to call me at 10 a.m.（私は彼女に、午前10時に自分に電話するよう頼んだ。）"
+              }
+            ]
+          },
+          {
+            "id": "eng-s32",
+            "tab": "第32講　否定",
+            "eyebrow": "英語スタサプ ・ ベーシックレベル英語",
+            "icon": "32",
+            "meta": "Chapter 1〜4（準否定・部分否定・強い否定・二重否定）",
+            "title": "スタサプ 第32講　否定",
+            "desc": "ベーシックレベル英語 第32講 復習テスト（Chapter 1〜4）。日本文の意味に合うように、空所に入る最も適切な語（句）を選びましょう。",
+            "recordKey": "final2_eng_s32",
+            "choiceLabels": [
+              "①",
+              "②",
+              "③",
+              "④"
+            ],
+            "questions": [
+              {
+                "id": "s32-c1-1",
+                "cat": "Chapter 1",
+                "text": "I could (　　) understand her.",
+                "ja": "私は彼女の言うことがほとんどわからなかった。",
+                "choices": [
+                  "seldom",
+                  "rarely",
+                  "hardly",
+                  "few"
+                ],
+                "answer": 2,
+                "exp": "「ほとんど〜ない」という程度は、準否定語の hardly[scarcely] で表す。→ I could hardly understand her."
+              },
+              {
+                "id": "s32-c1-2",
+                "cat": "Chapter 1",
+                "text": "I (　　) stay up all night.",
+                "ja": "私はめったに徹夜しない。",
+                "choices": [
+                  "hardly",
+                  "little",
+                  "scarcely",
+                  "rarely"
+                ],
+                "answer": 3,
+                "exp": "「めったに〜ない」という頻度は、準否定語の rarely[seldom] で表す。stay up all night「徹夜する」。→ I rarely stay up all night."
+              },
+              {
+                "id": "s32-c1-3",
+                "cat": "Chapter 1",
+                "text": "I had (　　) money last month.",
+                "ja": "私は先月、ほとんどお金がなかった。",
+                "choices": [
+                  "little",
+                  "hardly",
+                  "few",
+                  "seldom"
+                ],
+                "answer": 0,
+                "exp": "「（数量が）ほとんど〜ない」は準否定語の few[little] で表す。空所の直後に不可算名詞 money があるので little が正解。→ I had little money last month."
+              },
+              {
+                "id": "s32-c2-1",
+                "cat": "Chapter 2",
+                "text": "She is (　　) busy.",
+                "ja": "彼女はいつも忙しいわけではない。",
+                "choices": [
+                  "not both",
+                  "not always",
+                  "not every",
+                  "not all"
+                ],
+                "answer": 1,
+                "exp": "「いつも〜なわけではない」という部分否定は not always で表す。→ She is not always busy."
+              },
+              {
+                "id": "s32-c2-2",
+                "cat": "Chapter 2",
+                "text": "I couldn’t see (　　) the animals in the zoo.",
+                "ja": "私は、その動物園内の全ての動物を見られたわけではなかった。",
+                "choices": [
+                  "any",
+                  "every",
+                  "each",
+                  "all"
+                ],
+                "answer": 3,
+                "exp": "「すべての名詞が〜なわけではない」という部分否定は〈not all＋名詞〉または〈not every＋単数形の名詞〉で表す。空所の直後が the animals なので all が正解。→ I couldn’t see all the animals in the zoo."
+              },
+              {
+                "id": "s32-c2-3",
+                "cat": "Chapter 2",
+                "text": "Your parents or teachers are (　　) right.",
+                "ja": "君の両親や教師が必ずしも正しいとは限らない。",
+                "choices": [
+                  "not both",
+                  "necessarily not",
+                  "not necessarily",
+                  "not every"
+                ],
+                "answer": 2,
+                "exp": "「必ずしも〜なわけではない」という部分否定は not necessarily で表す。→ Your parents or teachers are not necessarily right."
+              },
+              {
+                "id": "s32-c3-1",
+                "cat": "Chapter 3",
+                "text": "The boy is (　　) smart.",
+                "ja": "その少年は決して賢くはない。",
+                "choices": [
+                  "not always",
+                  "free from",
+                  "not every",
+                  "by no means"
+                ],
+                "answer": 3,
+                "exp": "「決して〜ではない」は by no means または far from で表す。smart「賢い」。→ The boy is by no means smart."
+              },
+              {
+                "id": "s32-c3-2",
+                "cat": "Chapter 3",
+                "text": "The book was (　　) useful.",
+                "ja": "その本は決して役立つものではなかった。",
+                "choices": [
+                  "no means",
+                  "far from",
+                  "any means",
+                  "free from"
+                ],
+                "answer": 1,
+                "exp": "「決して〜ではない」は by no means または far from で表す。useful「役に立つ」。→ The book was far from useful."
+              },
+              {
+                "id": "s32-c3-3",
+                "cat": "Chapter 3",
+                "text": "He is the (　　) person to hurt people’s feelings.",
+                "ja": "彼は人の気持ちを傷つけるような人ではない。",
+                "choices": [
+                  "most",
+                  "first",
+                  "last",
+                  "every"
+                ],
+                "answer": 2,
+                "exp": "「〜するような人ではない」は「〜する最後の人」から転じて the last person to do で表す。hurt「〜を傷つける」。→ He is the last person to hurt people’s feelings."
+              },
+              {
+                "id": "s32-c4-1",
+                "cat": "Chapter 4",
+                "text": "I had no choice (　　) to call her.",
+                "ja": "私は彼女に電話せざるをえなかった。",
+                "choices": [
+                  "but",
+                  "nor",
+                  "and",
+                  "or"
+                ],
+                "answer": 0,
+                "exp": "「〜せざるをえない」は have no choice but to do「〜以外選択肢がない」という、前置詞 but「〜以外」を用いた二重否定の表現で表す。→ I had no choice but to call her."
+              },
+              {
+                "id": "s32-c4-2",
+                "cat": "Chapter 4",
+                "text": "That day, I read (　　) but comic books.",
+                "ja": "その日、私は漫画しか読まなかった。",
+                "choices": [
+                  "everything",
+                  "anything",
+                  "something",
+                  "nothing"
+                ],
+                "answer": 3,
+                "exp": "「〜しかない」は nothing but「〜以外の何もない」という、前置詞 but「〜以外」を用いた二重否定の表現で表す。→ That day, I read nothing but comic books."
+              },
+              {
+                "id": "s32-c4-3",
+                "cat": "Chapter 4",
+                "text": "He never goes shopping (　　) spending a lot of money.",
+                "ja": "彼は買い物に出かけると必ず大金を使う。",
+                "choices": [
+                  "hardly",
+                  "when",
+                  "without",
+                  "always"
+                ],
+                "answer": 2,
+                "exp": "「A すると必ず B する」は never A without B「B なしで決して A しない」という二重否定の表現で表す。→ He never goes shopping without spending a lot of money."
               }
             ]
           }
