@@ -592,11 +592,18 @@ const SUBJECTS = [
         children: []
       },
       {
-        id: "mock-bio", tab: "生物", eyebrow: "模擬問題", icon: "🧬", meta: "生物の模擬問題（PDF）",
+        id: "mock-bio", tab: "生物", eyebrow: "模擬問題", icon: "🧬", meta: "生物模擬問題（①〜⑥）",
         title: "模擬問題　生物", desc: "解く回を選んでください（PDFが開きます）",
-        noteTitle: "📌 お知らせ", note: "生物の模擬問題のPDFはまだありません。追加されるとここに表示されます。",
+        noteTitle: "📌 お知らせ", note: "PDFの最後に解答・解説が付いています。",
         // PDFを追加するときは children に { id, tab, eyebrow, icon, meta, href: "final2_mock/ファイル名.pdf" } を足す
-        children: []
+        children: [
+          { id: "mock-bio-1", tab: "模擬問題①", eyebrow: "生物", icon: "①", meta: "問題＋解答・解説（9ページ）", href: "final2_mock/seibutsu_01.pdf" },
+          { id: "mock-bio-2", tab: "模擬問題②", eyebrow: "生物", icon: "②", meta: "問題＋解答・解説（9ページ）", href: "final2_mock/seibutsu_02.pdf" },
+          { id: "mock-bio-3", tab: "模擬問題③", eyebrow: "生物", icon: "③", meta: "問題＋解答・解説（9ページ）", href: "final2_mock/seibutsu_03.pdf" },
+          { id: "mock-bio-4", tab: "模擬問題④", eyebrow: "生物", icon: "④", meta: "問題＋解答・解説（9ページ）", href: "final2_mock/seibutsu_04.pdf" },
+          { id: "mock-bio-5", tab: "模擬問題⑤", eyebrow: "生物", icon: "⑤", meta: "問題＋解答・解説（9ページ）", href: "final2_mock/seibutsu_05.pdf" },
+          { id: "mock-bio-6", tab: "模擬問題⑥", eyebrow: "生物", icon: "⑥", meta: "問題＋解答・解説（8ページ）", href: "final2_mock/seibutsu_06.pdf" }
+        ]
       },
       {
         id: "mock-eng", tab: "英語", eyebrow: "模擬問題", icon: "A", meta: "英語コミュニケーション（①〜⑥）",
