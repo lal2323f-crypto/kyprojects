@@ -599,11 +599,18 @@ const SUBJECTS = [
         children: []
       },
       {
-        id: "mock-eng", tab: "英語", eyebrow: "模擬問題", icon: "A", meta: "英語の模擬問題（PDF）",
+        id: "mock-eng", tab: "英語", eyebrow: "模擬問題", icon: "A", meta: "英語コミュニケーション（①〜⑥）",
         title: "模擬問題　英語", desc: "解く回を選んでください（PDFが開きます）",
-        noteTitle: "📌 お知らせ", note: "英語の模擬問題のPDFはまだありません。追加されるとここに表示されます。",
+        noteTitle: "📌 お知らせ", note: "問題冊子の後ろ（解答編）に解答・解説があります。解き終わるまで見ないこと。",
         // PDFを追加するときは children に { id, tab, eyebrow, icon, meta, href: "final2_mock/ファイル名.pdf" } を足す
-        children: []
+        children: [
+          { id: "mock-eng-1", tab: "模擬問題①", eyebrow: "英語コミュニケーション", icon: "①", meta: "問題＋解答・解説（22ページ）", href: "final2_mock/eigo_01.pdf" },
+          { id: "mock-eng-2", tab: "模擬問題②", eyebrow: "英語コミュニケーション", icon: "②", meta: "問題＋解答・解説（22ページ）", href: "final2_mock/eigo_02.pdf" },
+          { id: "mock-eng-3", tab: "模擬問題③", eyebrow: "英語コミュニケーション", icon: "③", meta: "問題＋解答・解説（22ページ）", href: "final2_mock/eigo_03.pdf" },
+          { id: "mock-eng-4", tab: "模擬問題④", eyebrow: "英語コミュニケーション", icon: "④", meta: "問題＋解答・解説（22ページ）", href: "final2_mock/eigo_04.pdf" },
+          { id: "mock-eng-5", tab: "模擬問題⑤", eyebrow: "英語コミュニケーション", icon: "⑤", meta: "問題＋解答・解説（22ページ）", href: "final2_mock/eigo_05.pdf" },
+          { id: "mock-eng-6", tab: "模擬問題⑥", eyebrow: "英語コミュニケーション", icon: "⑥", meta: "問題＋解答・解説（22ページ）", href: "final2_mock/eigo_06.pdf" }
+        ]
       }
     ]
   },
