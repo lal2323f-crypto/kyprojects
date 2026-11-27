@@ -90,3 +90,16 @@ def drop(n, si, q):
     EXAMS[n]['sections'][si]['subs'] = [x for x in EXAMS[n]['sections'][si]['subs'] if x is not q]
 drop(2, 0, I['i_aurora']); drop(3, 0, I['i_cs']); drop(5, 4, F['cg_dfb'])
 drop(2, 0, I['i_steppe'])
+# ---- 教科書の図・旅行計画への差し替え ----
+from bank7 import TX
+drop(2, 0, I['i_et']); drop(2, 4, F['coffee'])
+EXAMS[2]['sections'][4]['subs'] = [TX['tx_afclim'], TX['tx_mineral']] + EXAMS[2]['sections'][4]['subs']
+drop(4, 0, I['i_d']); drop(4, 0, I['i_tate'])
+EXAMS[4]['sections'][4]['subs'] = [TX['tx_euclim'], TX['tx_euagri']] + EXAMS[4]['sections'][4]['subs']
+s6 = EXAMS[6]['sections']
+s6[0] = q('教科書のアクティビティ（旅行計画）と章の扉', [TX[k] for k in ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 'c1', 'c2']])
+s6[4]['subs'] = [TX['tx_afagri'], TX['tx_mobile'], TX['tx_euro'], F['cacao']] + [x for x in s6[4]['subs'] if x['kind'] == 'w']
+s6[5]['subs'] = [TX['mono'], TX['fair']] + s6[5]['subs']
+
+from common import wr
+EXAMS[6]['sections'][5]['subs'] = [s for s in EXAMS[6]['sections'][5]['subs'] if not (s['kind']=='w' and s['a']=='ユーロ')] + [wr('教科書p.145で紹介された、ペルーの遺跡マチュピチュで、観光と除草の目的で放し飼いにされている動物を答えなさい。', 'リャマ', '教p.145写真5', '本来の生息地はマチュピチュよりも標高が低い。')]
