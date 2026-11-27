@@ -8,8 +8,8 @@ def wr(q, a, src='', ex='', hint='', **k):
     d = dict(kind='w', q=q, a=a, src=src, ex=ex, hint=hint); d.update(k); return d
 EUROPE = img('img/europe_q.png', 125, '地図Ⅰ')
 NORDIC = img('img/nordic_q_s.png', 120, '地図Ⅱ')
-AFCLIM = img('img/africa_clim_q.png', 95, '図　アフリカの気候区分（凡例は省略）')
-def afclim(n): return img('img/africa_clim_q.png', 95, f'図{n}　アフリカの気候区分（凡例は省略）')
+AFCLIM = img('img/africa_clim_q.png', 95, '図　アフリカの気候区分')
+def afclim(n): return img('img/africa_clim_q.png', 95, f'図{n}　アフリカの気候区分')
 
 EUROPE1 = img('img/europe_q.png', 125, '地図')
 NORDIC1 = img('img/nordic_q_s.png', 120, '地図')

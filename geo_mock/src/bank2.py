@@ -52,8 +52,8 @@ M = {
 'mapB_fjord': mc('地図Ⅰ中のBの国の西岸に多くみられる、氷河のU字谷に海水が進入した地形を選びなさい。', 'フィヨルド', ['リアス海岸', 'ラグーン', '三角州'], SN + 'p.9', '世界遺産。'),
 }
 # ---------- 図・表・写真 ----------
-PH = {k: img(f'img/{f}', w, cap) for k, f, w, cap in [('fjord', 'ph_fjord.jpg', 62, '写真'), ('sami', 'ph_sami.jpg', 45, '写真'), ('table', 'ph_table.jpg', 62, '写真'), ('savanna', 'ph_savanna.jpg', 62, '写真'), ('sapeur', 'ph_sapeur.jpg', 40, '写真'), ('nclim', 'nordic_climate_q.png', 72, '図　北欧の気候区分（スライド「地誌04 北欧」より。凡例は省略）')]}
-COFFEE_RANK = '''<div class="fig"><table class="dt"><tr><th>順位</th><th>国名</th><th>1人あたり1日の杯数</th></tr><tr><td>1位</td><td>X</td><td class="r">7.79</td></tr><tr><td>2位</td><td>Y</td><td class="r">3.32</td></tr><tr><td>3位</td><td>Z</td><td class="r">2.59</td></tr></table><div class="figcap">表　コーヒーの消費量（スライド「地誌04 北欧」より）</div></div>'''
+PH = {k: img(f'img/{f}', w, cap) for k, f, w, cap in [('fjord', 'ph_fjord.jpg', 62, '写真'), ('sami', 'ph_sami.jpg', 45, '写真'), ('table', 'ph_table.jpg', 62, '写真'), ('savanna', 'ph_savanna.jpg', 62, '写真'), ('sapeur', 'ph_sapeur.jpg', 40, '写真'), ('nclim', 'nordic_climate_q.png', 72, '図　北欧の気候区分')]}
+COFFEE_RANK = '''<div class="fig"><table class="dt"><tr><th>順位</th><th>国名</th><th>1人あたり1日の杯数</th></tr><tr><td>1位</td><td>X</td><td class="r">7.79</td></tr><tr><td>2位</td><td>Y</td><td class="r">3.32</td></tr><tr><td>3位</td><td>Z</td><td class="r">2.59</td></tr></table><div class="figcap">表　コーヒーの消費量</div></div>'''
 def T(title, unit, rows, hide): return table(title, unit, rows, hide=hide)
 DOMINO = '''<div class="fig"><svg width="430" height="190" xmlns="http://www.w3.org/2000/svg" font-family="IPAGothic" font-size="12">
 <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z"/></marker></defs>
@@ -67,7 +67,7 @@ DOMINO = '''<div class="fig"><svg width="430" height="190" xmlns="http://www.w3.
 <line x1="75" y1="100" x2="105" y2="143" stroke="#000" marker-end="url(#ar)"/><text x="2" y="130" font-size="10">土地・水・資源の奪い合い</text>
 <line x1="340" y1="100" x2="172" y2="150" stroke="#000" marker-end="url(#ar)"/><text x="290" y="128" font-size="10">不満爆発</text>
 <line x1="170" y1="160" x2="262" y2="160" stroke="#000" marker-end="url(#ar)"/><text x="190" y="185" font-size="10">借金地獄へ</text>
-</svg><div class="figcap">図2　アフリカの課題のつながり（ワークシートp.38より）</div></div>'''
+</svg><div class="figcap">図　アフリカの課題のつながり</div></div>'''
 F = {
 'ph_fjord': mc('写真は、ノルウェーでみられる地形である。この地形を何というか。', 'フィヨルド', ['リアス海岸', 'カール', 'ケスタ'], SN + 'p.9-10', '氷河によるU字谷に海水が進入。', fig=PH['fjord'], p2=1),
 'ph_sami': mc('写真は、スカンジナビア北部の先住民の暮らしである。この先住民を何というか。', 'サーミ', ['イヌイット', 'マサイ', 'ベドウィン'], SN + 'p.22・p.25', 'ラップランドに居住。トナカイの放牧。', fig=PH['sami'], p2=1),

@@ -44,19 +44,19 @@ EXAMS[5] = dict(no='⑤', note='総仕上げ：北欧とアフリカの地誌全
  q('北欧とアフリカの資料', [F[k] for k in ['cacao', 'tea', 'copper', 'diamond', 'cg_dfb', 'ph_table', 'cof_x', 'domino']] + [W['w_victoria']]),
 ])
 
-EXAMS[1]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_kesta', 'k_kokusai', 'k_polder', 'k_alps', 'k_renga', 'k_tuareg', 'k_matoke', 'k_dorei']]))
+EXAMS[1]['sections'].append(q('ヨーロッパとアフリカの生活文化', [K[k] for k in ['k_kesta', 'k_kokusai', 'k_polder', 'k_alps', 'k_renga', 'k_tuareg', 'k_matoke', 'k_dorei']]))
 EXAMS[1]['sections'][0]['subs'] = EXAMS[1]['sections'][0]['subs'][:-2]
 EXAMS[1]['sections'][4]['subs'] = [s for s in EXAMS[1]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[1]['sections'][4]['subs'][3:]
-EXAMS[2]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_ec', 'k_polder', 'k_engei', 'k_mokkotsu', 'k_genkai', 'k_masai', 'k_koshari', 'k_shohin', 'k_kaffa']]))
+EXAMS[2]['sections'].append(q('ヨーロッパとアフリカの生活文化', [K[k] for k in ['k_ec', 'k_polder', 'k_engei', 'k_mokkotsu', 'k_genkai', 'k_masai', 'k_koshari', 'k_shohin', 'k_kaffa']]))
 EXAMS[2]['sections'][0]['subs'] = EXAMS[2]['sections'][0]['subs'][:-3]
 EXAMS[2]['sections'][4]['subs'] = [s for s in EXAMS[2]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[2]['sections'][4]['subs'][2:]
-EXAMS[3]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_eu27', 'k_1993', 'k_schengen', 'k_medfarm', 'k_rye', 'k_subsahara', 'k_tuareg', 'k_id', 'k_copt']]))
+EXAMS[3]['sections'].append(q('ヨーロッパとアフリカの生活文化', [K[k] for k in ['k_eu27', 'k_1993', 'k_schengen', 'k_medfarm', 'k_rye', 'k_subsahara', 'k_tuareg', 'k_id', 'k_copt']]))
 EXAMS[3]['sections'][0]['subs'] = EXAMS[3]['sections'][0]['subs'][:-2]
 EXAMS[3]['sections'][4]['subs'] = [s for s in EXAMS[3]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[3]['sections'][4]['subs'][3:]
-EXAMS[4]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_finwine', 'k_ysl', 'k_kesta', 'k_renga', 'k_copt', 'k_matoke', 'k_madagascar', 'k_aswan', 'k_serengeti']]))
+EXAMS[4]['sections'].append(q('ヨーロッパとアフリカの生活文化', [K[k] for k in ['k_finwine', 'k_ysl', 'k_kesta', 'k_renga', 'k_copt', 'k_matoke', 'k_madagascar', 'k_aswan', 'k_serengeti']]))
 EXAMS[4]['sections'][0]['subs'] = EXAMS[4]['sections'][0]['subs'][:-2]
 EXAMS[4]['sections'][4]['subs'] = [s for s in EXAMS[4]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[4]['sections'][4]['subs'][2:]
-EXAMS[5]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_alps', 'k_cfb', 'k_kokusai', 'k_mokkotsu', 'k_genkai', 'k_infra', 'k_yohji', 'k_kaffa', 'k_injera']]))
+EXAMS[5]['sections'].append(q('ヨーロッパとアフリカの生活文化', [K[k] for k in ['k_alps', 'k_cfb', 'k_kokusai', 'k_mokkotsu', 'k_genkai', 'k_infra', 'k_yohji', 'k_kaffa', 'k_injera']]))
 EXAMS[5]['sections'][0]['subs'] = EXAMS[5]['sections'][0]['subs'][:-3]
 EXAMS[5]['sections'][4]['subs'] = [s for s in EXAMS[5]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[5]['sections'][4]['subs'][2:]
 # ---- ヨーロッパ地図（地図Ⅲ）を①〜⑤に追加し、同じ数の問題を外す ----
@@ -80,11 +80,11 @@ add_eu(5, ['e5', 'e10', 'e11'], [(4, F['cof_x']), (4, F['tea']), (4, F['copper']
 N.update(Y); A.update(Z)
 EXAMS[6] = dict(no='⑥', note='残りの項目の総まとめ：ヨーロッパ地図（課題A全部）、北欧・アフリカの細かい語、教科書の写真・図', sections=[
  q('北欧とアフリカの自然環境', [I[k] for k in ['i_kokki', 'i_shinki', 'i_kyokuken', 'i_tate', 'i_6do']]),
- lead('北欧の地誌（ワークシート・スライドのまとめ）', [['y_siberia', 'y_plate', 'y_low', 'y_hyoga', 'y_fukuzatsu', 'y_kochi'], ['y_byakuya', 'y_sami', 'y_sauna'], ['y_hydro', 'y_tax', 'y_russia', 'y_matome']], N),
+ lead('北欧の地誌', [['y_siberia', 'y_plate', 'y_low', 'y_hyoga', 'y_fukuzatsu', 'y_kochi'], ['y_byakuya', 'y_sami', 'y_sauna'], ['y_hydro', 'y_tax', 'y_russia', 'y_matome']], N),
  dict(kind='map', title='次の地図はヨーロッパを示したものである。これ', subs=[E6[k] for k in ['e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10']] + [wr('地図中の⑪の海流名を答えなさい。', '北大西洋海流', '2学期末ヨーロッパ地図 課題A', '暖流。偏西風とともに北欧に暖かさを運ぶ。')], fig=EUMAP6),
- lead('アフリカの地誌（ワークシートの残り）', [['z_region', 'z_dan', 'z_kaigan', 'z_dia', 'z_kigo', 'z_sabana', 'z_yakihata'], ['z_muslim', 'z_jini', 'z_higeki', 'z_lang'], ['z_wana', 'z_mpesa', 'z_env', 'z_ict', 'z_au']], A),
+ lead('アフリカの地誌', [['z_region', 'z_dan', 'z_kaigan', 'z_dia', 'z_kigo', 'z_sabana', 'z_yakihata'], ['z_muslim', 'z_jini', 'z_higeki', 'z_lang'], ['z_wana', 'z_mpesa', 'z_env', 'z_ict', 'z_au']], A),
  q('北欧とアフリカの資料', [F[k] for k in ['cof_yz', 'cacao', 'cassava_r', 'ph_fjord', 'ph_table', 'cof_x']] + [W['w_tobikoe']]),
- q('ヨーロッパとアフリカ（教科書・プリント）', [K6[k] for k in ['k_dogon', 'k_malagasy', 'k_schuman', 'k_lisbon', 'k_techno', 'k_hyogako', 'k_df', 'k_ishi', 'k_bread', 'k_kozan']] + [wr('2002年に流通が始まったEUの単一通貨を答えなさい。', 'ユーロ', '教p.147図5', 'デンマーク・スウェーデンなどは導入していない。')]),
+ q('ヨーロッパとアフリカの生活文化', [K6[k] for k in ['k_dogon', 'k_malagasy', 'k_schuman', 'k_lisbon', 'k_techno', 'k_hyogako', 'k_df', 'k_ishi', 'k_bread', 'k_kozan']] + [wr('2002年に流通が始まったEUの単一通貨を答えなさい。', 'ユーロ', '教p.147図5', 'デンマーク・スウェーデンなどは導入していない。')]),
 ])
 def drop(n, si, q):
     EXAMS[n]['sections'][si]['subs'] = [x for x in EXAMS[n]['sections'][si]['subs'] if x is not q]
@@ -97,9 +97,9 @@ EXAMS[2]['sections'][4]['subs'] = [TX['tx_afclim'], TX['tx_mineral']] + EXAMS[2]
 drop(4, 0, I['i_d']); drop(4, 0, I['i_tate'])
 EXAMS[4]['sections'][4]['subs'] = [TX['tx_euclim'], TX['tx_euagri']] + EXAMS[4]['sections'][4]['subs']
 s6 = EXAMS[6]['sections']
-s6[0] = q('教科書のアクティビティ（旅行計画）と章の扉', [TX[k] for k in ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 'c1', 'c2']])
+s6[0] = q('世界の旅行と生活文化', [TX[k] for k in ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 'c1', 'c2']])
 s6[4]['subs'] = [TX['tx_afagri'], TX['tx_mobile'], TX['tx_euro'], F['cacao']] + [x for x in s6[4]['subs'] if x['kind'] == 'w']
 s6[5]['subs'] = [TX['mono'], TX['fair']] + s6[5]['subs']
 
 from common import wr
-EXAMS[6]['sections'][5]['subs'] = [s for s in EXAMS[6]['sections'][5]['subs'] if not (s['kind']=='w' and s['a']=='ユーロ')] + [wr('教科書p.145で紹介された、ペルーの遺跡マチュピチュで、観光と除草の目的で放し飼いにされている動物を答えなさい。', 'リャマ', '教p.145写真5', '本来の生息地はマチュピチュよりも標高が低い。')]
+EXAMS[6]['sections'][5]['subs'] = [s for s in EXAMS[6]['sections'][5]['subs'] if not (s['kind']=='w' and s['a']=='ユーロ')] + [wr('ペルーの遺跡マチュピチュで、観光と除草の目的で放し飼いにされている動物を答えなさい。', 'リャマ', '教p.145写真5', '本来の生息地はマチュピチュよりも標高が低い。')]

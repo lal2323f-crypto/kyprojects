@@ -19,6 +19,9 @@ def run(n):
     items, secs = compose(ex); place(items, best[1])
     body, total = render(ex, items, secs)
     open(os.path.join(OUT, f'mock{n}.html'), 'w').write(doc(f'地理総合 模擬問題{ex["no"]}', body))
+    cov, rest = body.split('</section>', 1)
+    open(os.path.join(OUT, f'.cover{n}.html'), 'w').write(doc('c', cov + '</section>'))
+    open(os.path.join(OUT, f'.body{n}.html'), 'w').write(doc('b', rest.replace('page-break-after:always','')))
     nm = sum(1 for i in items if i['kind'] != 'w'); p2 = sum(1 for i in items if i.get('pt') == 2 and i['kind'] != 'w'); nw = sum(1 for i in items if i['kind'] == 'w')
     bal = [0]*4
     for i in items:

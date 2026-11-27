@@ -102,7 +102,7 @@ def render(exam, items, secs):
 <p>◆印刷不鮮明、ページの不足等が確認できた際は、速やかに挙手し、監督の先生に申し出ること。</p>
 <p>◆テスト当日に欠席者がいた場合、問題冊子は回収となるので、必ずクラス・出席番号・氏名を記入すること。</p></div>
 <div class="cname">＿＿組　＿＿番　氏名＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿</div>
-<div class="cmeta">（模擬問題の範囲：{E(exam['note'])}）</div></section>''')
+</section>''')
     for si, s in enumerate(secs):
         sec = s['sec']
         bl = [items[j] for j in s['bl']]; sb = [items[j] for j in s['subs']]
