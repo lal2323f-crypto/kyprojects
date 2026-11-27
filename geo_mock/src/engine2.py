@@ -88,13 +88,16 @@ def choices_html(it):
         return '<div class="chl">' + ''.join(f'<span class="c">{CIR[k]}{E(c)}</span>' for k, c in enumerate(ch)) + '</div>'
     return '<div class="chv">' + ''.join(f'<div>{CIR[k]}{E(c)}</div>' for k, c in enumerate(ch)) + '</div>'
 
+def abox(it):
+    return f'<div class="abox"><span class="al">{nb(it["no"])}</span><span class="aw"></span></div>'
+
 def render(exam, items, secs):
     H = []
     mk = [i for i in items if i['kind'] != 'w']; wk = [i for i in items if i['kind'] == 'w']
     H.append(f'''<section class="cover"><div class="crow"><div class="cyear">2026年度</div><div class="cdate">2026年12月1日(火) 1校時<br><span class="ctan">担当：岩佐、小田嶋、二見</span></div></div>
 <h1>3学年地理総合　2学期期末テスト<br><span class="msub">模擬問題{exam['no']}</span></h1>
 <div class="cnote">注意事項</div><div class="cbul">
-<p>◆設問中の{nb(1)}〜{nb(len(mk))}、および{nb('あ')}〜{nb(KANA[len(wk)-1])}は解答欄の番号を指す。この模擬問題では、各番号の［　　］に直接答えを書き込むこと。</p>
+<p>◆設問中の{nb(1)}〜{nb(len(mk))}、および{nb('あ')}〜{nb(KANA[len(wk)-1])}は解答欄の番号を指す。この模擬問題では、各問の右下の解答欄（四角）に直接答えを書き込むこと。</p>
 <p>◆解答は明瞭に記入すること。<u>採点者が解読不可と判断した場合は得点とならない。</u></p>
 <p>◆印刷不鮮明、ページの不足等が確認できた際は、速やかに挙手し、監督の先生に申し出ること。</p>
 <p>◆テスト当日に欠席者がいた場合、問題冊子は回収となるので、必ずクラス・出席番号・氏名を記入すること。</p></div>
@@ -114,7 +117,7 @@ def render(exam, items, secs):
             ins = f'{sec["title"]}を見て、{nb(mcs[0]["no"])}〜{nb(mcs[-1]["no"])}' + (f'および{nb(ws[0]["no"])}' if ws else '') + 'に答えなさい。'
         else:
             ins = f'{sec["title"]}について、次の各問に答えなさい。'
-        H.append(f'<section class="q{" brk" if si in (1, 2, 3) else ""}"><h2>大設問{si+1}　{ins}</h2>')
+        H.append(f'<section class="q{" brk" if si in (1, 2, 3, 5) else ""}"><h2>大設問{si+1}　{ins}</h2>')
         if sec.get('fig_before'): H.append(sec['fig_before'])
         if sec['kind'] == 'lead':
             t = E(s['text'])
@@ -123,7 +126,7 @@ def render(exam, items, secs):
             H.append('<div class="lead">' + ''.join(f'<p>{p}</p>' for p in t.split('\n')) + '</div>')
             if sec.get('fig'): H.append(sec['fig'])
             for it in bl:
-                H.append(f'<div class="bq"><span class="qn">{nb(it["no"])}［　　］：</span>{choices_html(it)}</div>')
+                H.append(f'<div class="bq"><div class="qbody"><span class="qn">{nb(it["no"])}：</span>{choices_html(it)}</div>{abox(it)}</div>')
         elif sec.get('fig'):
             H.append(sec['fig'])
         qn = 0
@@ -136,14 +139,14 @@ def render(exam, items, secs):
                 first = (q is qs[0])
                 if h:
                     head = (f'<div><span class="qh">問{qn}</span> {E(h)}</div>' if first else '')
-                    lab = f'<div class="qq">{nb(it["no"])}' + ('' if it['kind'] == 'w' else '［　　］') + f'：{qt}</div>'
+                    lab = f'<div class="qq">{nb(it["no"])}：{qt}</div>'
                 else:
                     head = ''
-                    lab = f'<div class="qi"><span class="qh">問{qn}</span>　{nb(it["no"])}' + ('' if it['kind'] == 'w' else '［　　］') + f'：{qt}</div>'
+                    lab = f'<div class="qi"><span class="qh">問{qn}</span>　{nb(it["no"])}：{qt}</div>'
                 if it['kind'] == 'w':
                     H.append(f'<div class="sq">{head}{lab}' + (it.get('fig') or '') + f'<div class="wbox">{nb(it["no"])}<span class="wl">{E(it.get("hint",""))}</span></div></div>')
                 else:
-                    H.append(f'<div class="sq">{head}{lab}' + (it.get('fig') or '') + choices_html(it) + '</div>')
+                    H.append(f'<div class="sq">{head}<div class="qrow"><div class="qbody">{lab}' + (it.get('fig') or '') + choices_html(it) + f'</div>{abox(it)}</div></div>')
         H.append('</section>')
     rows = []
     for it in items:
@@ -162,7 +165,9 @@ body{font-family:"IPAGothic",sans-serif;font-size:10.4pt;line-height:1.75;color:
 .cname{margin:36mm 0 0 18mm;font-size:12pt}.cmeta{font-size:8.5pt;color:#555;margin-top:14mm}
 h2{font-size:10.6pt;font-weight:bold;margin:6mm 0 2mm;page-break-after:avoid;break-inside:avoid}.brk{page-break-before:always}.brk h2{margin-top:0}
 .lead p{text-indent:1em;margin:0 0 1.5mm}
-.bq{display:flex;margin:0.6mm 0 0.6mm 4mm;page-break-inside:avoid}.bq .qn{white-space:nowrap;min-width:30mm}
+.bq{display:flex;align-items:flex-end;margin:0.8mm 0 0.8mm 4mm;page-break-inside:avoid;border-bottom:1px dotted #ccc;padding-bottom:0.6mm}.bq .qbody{display:flex;flex:1}.bq .qn{white-space:nowrap;min-width:16mm}
+.qrow{display:flex;align-items:flex-end}.qrow .qbody{flex:1}
+.abox{display:flex;align-items:center;margin-left:3mm;flex:none}.abox .al{font-size:8pt;margin-right:1mm;white-space:nowrap}.abox .aw{display:inline-block;width:12mm;height:8mm;border:1.2px solid #000}
 .chl{display:flex;flex-wrap:wrap}.chl .c{min-width:31mm;margin-right:3mm}
 .chv{margin-left:4mm}.chv div{margin:0.3mm 0}
 .sq{margin:2.2mm 0 2.8mm;page-break-inside:avoid}.qh{font-weight:normal}.qq{margin-left:4mm}.qi{text-indent:-12mm;padding-left:12mm}

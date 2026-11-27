@@ -1,5 +1,6 @@
 from bank import N, A
 from bank3 import X
+from bank4 import K
 N.update(X); A.update(X)
 from bank2 import I, M, F, W, MAPC, MAPK
 def lead(title, paras, src, extra=()):
@@ -42,3 +43,19 @@ EXAMS[5] = dict(no='⑤', note='総仕上げ：北欧とアフリカの地誌全
  lead('アフリカの地誌', [['a54', 'a_region', 'a_ankoku', 'a_atlas', 'a_drake', 'a_sahara'], ['a_amazon', 'a_latosol', 'a_kanryu', 'a_cs'], ['a_sapeur', 'a_rel', 'x_kouyougo', 'a_yakihata', 'x_olive', 'a_mono'], ['x_kokkyo', 'a_debt', 'a_slum', 'a_sahel', 'a_jinko']], A, []),
  q('北欧とアフリカの資料', [F[k] for k in ['cacao', 'tea', 'copper', 'diamond', 'cg_dfb', 'ph_table', 'cof_x', 'domino']] + [W['w_victoria']]),
 ])
+
+EXAMS[1]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_kesta', 'k_kokusai', 'k_polder', 'k_alps', 'k_renga', 'k_tuareg', 'k_matoke', 'k_dorei']]))
+EXAMS[1]['sections'][0]['subs'] = EXAMS[1]['sections'][0]['subs'][:-2]
+EXAMS[1]['sections'][4]['subs'] = [s for s in EXAMS[1]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[1]['sections'][4]['subs'][3:]
+EXAMS[2]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_ec', 'k_polder', 'k_engei', 'k_mokkotsu', 'k_genkai', 'k_masai', 'k_koshari', 'k_shohin', 'k_kaffa']]))
+EXAMS[2]['sections'][0]['subs'] = EXAMS[2]['sections'][0]['subs'][:-3]
+EXAMS[2]['sections'][4]['subs'] = [s for s in EXAMS[2]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[2]['sections'][4]['subs'][2:]
+EXAMS[3]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_eu27', 'k_1993', 'k_schengen', 'k_medfarm', 'k_rye', 'k_subsahara', 'k_tuareg', 'k_id', 'k_copt']]))
+EXAMS[3]['sections'][0]['subs'] = EXAMS[3]['sections'][0]['subs'][:-2]
+EXAMS[3]['sections'][4]['subs'] = [s for s in EXAMS[3]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[3]['sections'][4]['subs'][3:]
+EXAMS[4]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_finwine', 'k_ysl', 'k_kesta', 'k_renga', 'k_copt', 'k_matoke', 'k_madagascar', 'k_aswan', 'k_serengeti']]))
+EXAMS[4]['sections'][0]['subs'] = EXAMS[4]['sections'][0]['subs'][:-2]
+EXAMS[4]['sections'][4]['subs'] = [s for s in EXAMS[4]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[4]['sections'][4]['subs'][2:]
+EXAMS[5]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_alps', 'k_cfb', 'k_kokusai', 'k_mokkotsu', 'k_genkai', 'k_infra', 'k_yohji', 'k_kaffa', 'k_injera']]))
+EXAMS[5]['sections'][0]['subs'] = EXAMS[5]['sections'][0]['subs'][:-3]
+EXAMS[5]['sections'][4]['subs'] = [s for s in EXAMS[5]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[5]['sections'][4]['subs'][2:]
