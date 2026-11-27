@@ -170,7 +170,7 @@ h2{font-size:10.6pt;font-weight:bold;margin:6mm 0 2mm;page-break-after:avoid;bre
 .abox{display:flex;align-items:center;margin-left:3mm;flex:none}.abox .al{font-size:8pt;margin-right:1mm;white-space:nowrap}.abox .aw{display:inline-block;width:12mm;height:8mm;border:1.2px solid #000}
 .chl{display:flex;flex-wrap:nowrap}.chl .c{flex:1 1 0;min-width:0;padding-right:2mm}
 .chv{margin-left:4mm}.chv div{margin:0.3mm 0}
-.sq{margin:2.2mm 0 2.8mm}.qrow{page-break-inside:avoid}.sqw{page-break-inside:avoid}.qh{font-weight:normal}.qq{margin-left:4mm}.qi{text-indent:-12mm;padding-left:12mm}
+.sq{margin:2.2mm 0 2.8mm;page-break-inside:avoid;break-inside:avoid}.qrow{page-break-inside:avoid}.sqw{page-break-inside:avoid}.qh{font-weight:normal}.qq{margin-left:4mm}.qi{text-indent:-12mm;padding-left:12mm}
 .sq .chl,.sq .chv{margin-left:14mm}
 .wbox{border:1px solid #000;height:10mm;margin:1.5mm 0 0 14mm;width:80%;padding:0.5mm 2mm}
 .wl{font-size:9pt;color:#444;margin-left:4mm}
