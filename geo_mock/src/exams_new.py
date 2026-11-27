@@ -59,3 +59,34 @@ EXAMS[4]['sections'][4]['subs'] = [s for s in EXAMS[4]['sections'][4]['subs'] if
 EXAMS[5]['sections'].append(q('ヨーロッパとアフリカ（教科書・プリント）', [K[k] for k in ['k_alps', 'k_cfb', 'k_kokusai', 'k_mokkotsu', 'k_genkai', 'k_infra', 'k_yohji', 'k_kaffa', 'k_injera']]))
 EXAMS[5]['sections'][0]['subs'] = EXAMS[5]['sections'][0]['subs'][:-3]
 EXAMS[5]['sections'][4]['subs'] = [s for s in EXAMS[5]['sections'][4]['subs'] if s['kind'] == 'w'] if False else EXAMS[5]['sections'][4]['subs'][2:]
+# ---- ヨーロッパ地図（地図Ⅲ）を①〜⑤に追加し、同じ数の問題を外す ----
+from bank6 import E3, E6, EUMAP, EUMAP6, Y, Z, K6
+from common import wr
+def add_eu(n, keys, drop):
+    sec = EXAMS[n]['sections'][2]
+    ws = [s for s in sec['subs'] if s['kind'] == 'w']; ms = [s for s in sec['subs'] if s['kind'] != 'w']
+    sec['subs'] = ms + [E3[k] for k in keys] + ws
+    sec['fig'] = sec['fig'] + EUMAP
+    sec['title'] = '次の地図Ⅰ・地図Ⅱは北欧、地図Ⅲはヨーロッパを示したものである。これら'
+    for si, q in drop:
+        s = EXAMS[n]['sections'][si]['subs']
+        EXAMS[n]['sections'][si]['subs'] = [x for x in s if x is not q]
+add_eu(1, ['e1', 'e2', 'e9'], [(4, F['cof_x']), (4, F['coffee']), (4, F['cg_af'])])
+add_eu(2, ['e3', 'e10', 'e7'], [(4, F['cg_af']), (4, F['nclim1']), (0, I['i_south7'])])
+add_eu(3, ['e2', 'e7', 'e8'], [(0, I['i_af']), (0, I['i_steppe']), (4, F['nclim2'])])
+add_eu(4, ['e4', 'e8', 'e9'], [(4, F['cof_x']), (4, F['cg_cs']), (4, F['nclim2'])])
+add_eu(5, ['e5', 'e10', 'e11'], [(4, F['cof_x']), (4, F['tea']), (4, F['copper'])])
+# ---- 模擬⑥：まだ出題していない項目＋ヨーロッパ地図の全部 ----
+N.update(Y); A.update(Z)
+EXAMS[6] = dict(no='⑥', note='残りの項目の総まとめ：ヨーロッパ地図（課題A全部）、北欧・アフリカの細かい語、教科書の写真・図', sections=[
+ q('北欧とアフリカの自然環境', [I[k] for k in ['i_kokki', 'i_shinki', 'i_kyokuken', 'i_tate', 'i_6do']]),
+ lead('北欧の地誌（ワークシート・スライドのまとめ）', [['y_siberia', 'y_plate', 'y_low', 'y_hyoga', 'y_fukuzatsu', 'y_kochi'], ['y_byakuya', 'y_sami', 'y_sauna'], ['y_hydro', 'y_tax', 'y_russia', 'y_matome']], N),
+ dict(kind='map', title='次の地図はヨーロッパを示したものである。これ', subs=[E6[k] for k in ['e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10']] + [wr('地図中の⑪の海流名を答えなさい。', '北大西洋海流', '2学期末ヨーロッパ地図 課題A', '暖流。偏西風とともに北欧に暖かさを運ぶ。')], fig=EUMAP6),
+ lead('アフリカの地誌（ワークシートの残り）', [['z_region', 'z_dan', 'z_kaigan', 'z_dia', 'z_kigo', 'z_sabana', 'z_yakihata'], ['z_muslim', 'z_jini', 'z_higeki', 'z_lang'], ['z_wana', 'z_mpesa', 'z_env', 'z_ict', 'z_au']], A),
+ q('北欧とアフリカの資料', [F[k] for k in ['cof_yz', 'cacao', 'cassava_r', 'ph_fjord', 'ph_table', 'cof_x']] + [W['w_tobikoe']]),
+ q('ヨーロッパとアフリカ（教科書・プリント）', [K6[k] for k in ['k_dogon', 'k_malagasy', 'k_schuman', 'k_lisbon', 'k_techno', 'k_hyogako', 'k_df', 'k_ishi', 'k_bread', 'k_kozan']] + [wr('2002年に流通が始まったEUの単一通貨を答えなさい。', 'ユーロ', '教p.147図5', 'デンマーク・スウェーデンなどは導入していない。')]),
+])
+def drop(n, si, q):
+    EXAMS[n]['sections'][si]['subs'] = [x for x in EXAMS[n]['sections'][si]['subs'] if x is not q]
+drop(2, 0, I['i_aurora']); drop(3, 0, I['i_cs']); drop(5, 4, F['cg_dfb'])
+drop(2, 0, I['i_steppe'])

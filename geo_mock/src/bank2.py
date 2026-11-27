@@ -20,8 +20,8 @@ I = {
 'i_africa_kikou': mc('アフリカ大陸が広がる緯度の範囲として正しいものを選びなさい。', '北緯・南緯それぞれ約35度まで', ['北緯・南緯それぞれ約10度まで', '北緯・南緯それぞれ約60度まで', '北緯約35度から北緯約70度まで'], SA + 'p.14', '赤道を挟んで対称。', nocheck=True),
 }
 # ---------- 大設問3：北欧の地図 ----------
-MAPC = img('img/nordic_country.png', 118, '地図Ⅰ')
-MAPK = img('img/nordic_q_s.png', 118, '地図Ⅱ')
+MAPC = img('img/nordic_country.png', 88, '地図Ⅰ')
+MAPK = img('img/nordic_q_s.png', 88, '地図Ⅱ')
 BAL = ['エストニア', 'ラトビア', 'リトアニア', 'ポーランド', 'アイルランド', 'オランダ']
 M = {
 'mA': mc('地図Ⅰ中のAの国名を選びなさい。', 'アイスランド', ['フェロー諸島', 'グリーンランド', 'エストニア'], '2学期末ヨーロッパ地図 課題B・WS p.31', '火山島。首都レイキャビク。', nocheck=True),
@@ -52,7 +52,7 @@ M = {
 'mapB_fjord': mc('地図Ⅰ中のBの国の西岸に多くみられる、氷河のU字谷に海水が進入した地形を選びなさい。', 'フィヨルド', ['リアス海岸', 'ラグーン', '三角州'], SN + 'p.9', '世界遺産。'),
 }
 # ---------- 図・表・写真 ----------
-PH = {k: img(f'img/{f}', w, cap) for k, f, w, cap in [('fjord', 'ph_fjord.jpg', 85, '写真'), ('sami', 'ph_sami.jpg', 62, '写真'), ('table', 'ph_table.jpg', 85, '写真'), ('savanna', 'ph_savanna.jpg', 85, '写真'), ('sapeur', 'ph_sapeur.jpg', 52, '写真'), ('nclim', 'nordic_climate.png', 95, '図　北欧の気候区分（スライド「地誌04 北欧」より）')]}
+PH = {k: img(f'img/{f}', w, cap) for k, f, w, cap in [('fjord', 'ph_fjord.jpg', 62, '写真'), ('sami', 'ph_sami.jpg', 45, '写真'), ('table', 'ph_table.jpg', 62, '写真'), ('savanna', 'ph_savanna.jpg', 62, '写真'), ('sapeur', 'ph_sapeur.jpg', 40, '写真'), ('nclim', 'nordic_climate.png', 72, '図　北欧の気候区分（スライド「地誌04 北欧」より）')]}
 COFFEE_RANK = '''<div class="fig"><table class="dt"><tr><th>順位</th><th>国名</th><th>1人あたり1日の杯数</th></tr><tr><td>1位</td><td>X</td><td class="r">7.79</td></tr><tr><td>2位</td><td>Y</td><td class="r">3.32</td></tr><tr><td>3位</td><td>Z</td><td class="r">2.59</td></tr></table><div class="figcap">表　コーヒーの消費量（スライド「地誌04 北欧」より）</div></div>'''
 def T(title, unit, rows, hide): return table(title, unit, rows, hide=hide)
 DOMINO = '''<div class="fig"><svg width="430" height="190" xmlns="http://www.w3.org/2000/svg" font-family="IPAGothic" font-size="12">

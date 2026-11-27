@@ -144,7 +144,7 @@ def render(exam, items, secs):
                     head = ''
                     lab = f'<div class="qi"><span class="qh">問{qn}</span>　{nb(it["no"])}：{qt}</div>'
                 if it['kind'] == 'w':
-                    H.append(f'<div class="sq">{head}{lab}' + (it.get('fig') or '') + f'<div class="wbox">{nb(it["no"])}<span class="wl">{E(it.get("hint",""))}</span></div></div>')
+                    H.append(f'<div class="sq sqw">{head}{lab}' + (it.get('fig') or '') + f'<div class="wbox">{nb(it["no"])}<span class="wl">{E(it.get("hint",""))}</span></div></div>')
                 else:
                     H.append(f'<div class="sq">{head}<div class="qrow"><div class="qbody">{lab}' + (it.get('fig') or '') + choices_html(it) + f'</div>{abox(it)}</div></div>')
         H.append('</section>')
@@ -165,12 +165,12 @@ body{font-family:"IPAGothic",sans-serif;font-size:10.4pt;line-height:1.75;color:
 .cname{margin:36mm 0 0 18mm;font-size:12pt}.cmeta{font-size:8.5pt;color:#555;margin-top:14mm}
 h2{font-size:10.6pt;font-weight:bold;margin:6mm 0 2mm;page-break-after:avoid;break-inside:avoid}.brk{page-break-before:always}.brk h2{margin-top:0}
 .lead p{text-indent:1em;margin:0 0 1.5mm}
-.bq{display:flex;align-items:flex-end;margin:0.8mm 0 0.8mm 4mm;page-break-inside:avoid;border-bottom:1px dotted #ccc;padding-bottom:0.6mm}.bq .qbody{display:flex;flex:1}.bq .qn{white-space:nowrap;min-width:16mm}
+.bq{display:flex;align-items:flex-end;margin:0.8mm 0 0.8mm 4mm;page-break-inside:avoid;border-bottom:1px dotted #ccc;padding-bottom:0.6mm}.bq .qbody{display:flex;flex:1}.bq .qbody .chl,.bq .qbody .chv{flex:1}.bq .qn{white-space:nowrap;min-width:15mm}
 .qrow{display:flex;align-items:flex-end}.qrow .qbody{flex:1}
 .abox{display:flex;align-items:center;margin-left:3mm;flex:none}.abox .al{font-size:8pt;margin-right:1mm;white-space:nowrap}.abox .aw{display:inline-block;width:12mm;height:8mm;border:1.2px solid #000}
-.chl{display:flex;flex-wrap:wrap}.chl .c{min-width:31mm;margin-right:3mm}
+.chl{display:flex;flex-wrap:nowrap}.chl .c{flex:1 1 0;min-width:0;padding-right:2mm}
 .chv{margin-left:4mm}.chv div{margin:0.3mm 0}
-.sq{margin:2.2mm 0 2.8mm;page-break-inside:avoid}.qh{font-weight:normal}.qq{margin-left:4mm}.qi{text-indent:-12mm;padding-left:12mm}
+.sq{margin:2.2mm 0 2.8mm}.qrow{page-break-inside:avoid}.sqw{page-break-inside:avoid}.qh{font-weight:normal}.qq{margin-left:4mm}.qi{text-indent:-12mm;padding-left:12mm}
 .sq .chl,.sq .chv{margin-left:14mm}
 .wbox{border:1px solid #000;height:10mm;margin:1.5mm 0 0 14mm;width:80%;padding:0.5mm 2mm}
 .wl{font-size:9pt;color:#444;margin-left:4mm}
