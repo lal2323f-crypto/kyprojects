@@ -52,7 +52,7 @@ M = {
 'mapB_fjord': mc('地図Ⅰ中のBの国の西岸に多くみられる、氷河のU字谷に海水が進入した地形を選びなさい。', 'フィヨルド', ['リアス海岸', 'ラグーン', '三角州'], SN + 'p.9', '世界遺産。'),
 }
 # ---------- 図・表・写真 ----------
-PH = {k: img(f'img/{f}', w, cap) for k, f, w, cap in [('fjord', 'ph_fjord.jpg', 62, '写真'), ('sami', 'ph_sami.jpg', 45, '写真'), ('table', 'ph_table.jpg', 62, '写真'), ('savanna', 'ph_savanna.jpg', 62, '写真'), ('sapeur', 'ph_sapeur.jpg', 40, '写真'), ('nclim', 'nordic_climate.png', 72, '図　北欧の気候区分（スライド「地誌04 北欧」より）')]}
+PH = {k: img(f'img/{f}', w, cap) for k, f, w, cap in [('fjord', 'ph_fjord.jpg', 62, '写真'), ('sami', 'ph_sami.jpg', 45, '写真'), ('table', 'ph_table.jpg', 62, '写真'), ('savanna', 'ph_savanna.jpg', 62, '写真'), ('sapeur', 'ph_sapeur.jpg', 40, '写真'), ('nclim', 'nordic_climate_q.png', 72, '図　北欧の気候区分（スライド「地誌04 北欧」より。凡例は省略）')]}
 COFFEE_RANK = '''<div class="fig"><table class="dt"><tr><th>順位</th><th>国名</th><th>1人あたり1日の杯数</th></tr><tr><td>1位</td><td>X</td><td class="r">7.79</td></tr><tr><td>2位</td><td>Y</td><td class="r">3.32</td></tr><tr><td>3位</td><td>Z</td><td class="r">2.59</td></tr></table><div class="figcap">表　コーヒーの消費量（スライド「地誌04 北欧」より）</div></div>'''
 def T(title, unit, rows, hide): return table(title, unit, rows, hide=hide)
 DOMINO = '''<div class="fig"><svg width="430" height="190" xmlns="http://www.w3.org/2000/svg" font-family="IPAGothic" font-size="12">
@@ -74,8 +74,8 @@ F = {
 'ph_table': mc('写真のケープタウンの背後にみえる山頂の平らな山のような地形について、規模が小さいものを何というか。', 'メサ', ['カルスト', 'カール', 'ドリーネ'], SA + 'p.5', 'テーブルマウンテン。小規模な卓状地。', fig=PH['table'], p2=1),
 'ph_savanna': mc('写真の植生がみられる気候を選びなさい。', 'サバナ気候', ['ステップ気候', '砂漠気候', '熱帯雨林気候'], SA + 'p.18', '丈の高い草原（サバンナ）と乾燥に強い高木の疎林。', fig=PH['savanna'], p2=1),
 'ph_sapeur': mc('写真は、コンゴから始まった「紳士の集まり」の人々である。この人々を何というか。', 'サプール', ['マサイ', 'ズールー', 'ボリウッド'], SA + 'p.24', '平和を訴える。', fig=PH['sapeur'], p2=1),
-'nclim1': mc('図で、スカンジナビア半島の大部分に分布する気候を選びなさい。', '冷帯湿潤気候（Dfc）', ['西岸海洋性気候（Cfb）', 'ツンドラ気候（ET）', '西岸海洋性気候（Cfc）'], SN + 'p.13・p.18', 'Dfcの地域にはタイガが広がる。', fig=PH['nclim'], p2=1),
-'nclim2': mc('図で、デンマークに分布する気候を選びなさい。', '西岸海洋性気候（Cfb）', ['冷帯湿潤気候（Dfc）', 'ツンドラ気候（ET）', '冷帯湿潤気候（Dfb）'], SN + 'p.13・p.15', '暖流と偏西風の影響で温帯。', fig=PH['nclim'], p2=1),
+'nclim1': mc('図中のAの地域（スカンジナビア半島の大部分）に分布する気候を選びなさい。', '冷帯湿潤気候（Dfc）', ['西岸海洋性気候（Cfb）', 'ツンドラ気候（ET）', '西岸海洋性気候（Cfc）'], SN + 'p.13・p.18', 'Dfcの地域にはタイガが広がる。', fig=PH['nclim'], p2=1),
+'nclim2': mc('図中のBの地域（デンマークなど）に分布する気候を選びなさい。', '西岸海洋性気候（Cfb）', ['冷帯湿潤気候（Dfc）', 'ツンドラ気候（ET）', '冷帯湿潤気候（Dfb）'], SN + 'p.13・p.15', '暖流と偏西風の影響で温帯。', fig=PH['nclim'], p2=1),
 'cof_x': mc('表のXにあてはまる国を選びなさい。', 'ルクセンブルク', ['イタリア', 'ブラジル', 'カナダ'], SN + 'p.30', '2位Y、3位Zは北欧の国。', fig=COFFEE_RANK),
 'cof_yz': fx('表のY・Zにあてはまる国の組合せとして正しいものを選びなさい。', ['Y デンマーク・Z フィンランド', 'Y フィンランド・Z デンマーク', 'Y ノルウェー・Z スウェーデン', 'Y スウェーデン・Z ノルウェー'], 1, SN + 'p.30・WS p.33', 'フィンランド2位、デンマーク3位。「長く暗い冬を暖める1杯」。', fig=COFFEE_RANK, p2=1),
 'cacao': mc('表のXにあてはまる国を選びなさい。', 'コートジボワール', ['リビア', 'チャド', 'モロッコ'], SA + 'p.28-29', 'カカオの世界最大の輸出国。', fig=row(T('表　カカオの生産量', '千t(2019年)', CACAO, {0: 'X'}))),

@@ -32,9 +32,9 @@ def climograph(title, temps, prec, w=190, h=165):
         s.append(f'<text x="{L-3}" y="{y+3}" text-anchor="end">{t}</text>')
         s.append(f'<text x="{R+3}" y="{y+3}">{(t+20)*10}</text>')
     for i, p in enumerate(prec):
-        x = L + i * bw + 1.5; s.append(f'<rect x="{x}" y="{py(p)}" width="{bw-3}" height="{B-py(p)}" fill="#7aa7c7" stroke="#336" stroke-width="0.5"/>')
+        x = L + i * bw + 1.5; s.append(f'<rect x="{x}" y="{py(p)}" width="{bw-3}" height="{B-py(p)}" fill="#c8c8c8" stroke="#000" stroke-width="0.6"/>')
     pts = ' '.join(f'{L+(i+0.5)*bw},{ty(t)}' for i, t in enumerate(temps))
-    s.append(f'<polyline points="{pts}" fill="none" stroke="#c00" stroke-width="2"/>')
+    s.append(f'<polyline points="{pts}" fill="none" stroke="#000" stroke-width="2.4"/>')
     s.append(f'<rect x="{L}" y="{T}" width="{R-L}" height="{B-T}" fill="none" stroke="#000"/>')
     for i, m in ((0, 1), (6, 7), (11, 12)):
         s.append(f'<text x="{L+(i+0.5)*bw}" y="{B+11}" text-anchor="middle">{m}月</text>')
